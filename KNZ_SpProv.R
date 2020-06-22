@@ -66,12 +66,12 @@ KNZ_GFP <- KNZ_GFP[,c(3,4,1,2,5)]
 # Some sp have NA values. Will hand check to see if these are in species_provided instead of species_accepted
 # save into folder
 
-write.csv(KNZ_BGP, "~/Dropbox/CoRRE_database/Data/OriginalData/Species Providence/KNZ_BGP_NativeStatus.csv")
-write.csv(KNZ_IRG, "~/Dropbox/CoRRE_database/Data/OriginalData/Species Providence/KNZ_IRG_NativeStatus.csv")
-write.csv(KNZ_pplots, "~/Dropbox/CoRRE_database/Data/OriginalData/Species Providence/KNZ_pplots_NativeStatus.csv")
-write.csv(KNZ_RaMPs, "~/Dropbox/CoRRE_database/Data/OriginalData/Species Providence/KNZ_RaMPs_NativeStatus.csv")
-write.csv(KNZ_RHPs, "~/Dropbox/CoRRE_database/Data/OriginalData/Species Providence/KNZ_RHPs_NativeStatus.csv")
-write.csv(KNZ_GFP, "~/Dropbox/CoRRE_database/Data/OriginalData/Species Providence/KNZ_GFP_NativeStatus.csv")
+write.csv(KNZ_BGP, "~/Dropbox/CoRRE_database/Data/OriginalData/Species Providence/KNZ_BGP_NativeStatus.csv", row.names = FALSE)
+write.csv(KNZ_IRG, "~/Dropbox/CoRRE_database/Data/OriginalData/Species Providence/KNZ_IRG_NativeStatus.csv", row.names = FALSE)
+write.csv(KNZ_pplots, "~/Dropbox/CoRRE_database/Data/OriginalData/Species Providence/KNZ_pplots_NativeStatus.csv", row.names = FALSE)
+write.csv(KNZ_RaMPs, "~/Dropbox/CoRRE_database/Data/OriginalData/Species Providence/KNZ_RaMPs_NativeStatus.csv", row.names = FALSE)
+write.csv(KNZ_RHPs, "~/Dropbox/CoRRE_database/Data/OriginalData/Species Providence/KNZ_RHPs_NativeStatus.csv", row.names = FALSE)
+write.csv(KNZ_GFP, "~/Dropbox/CoRRE_database/Data/OriginalData/Species Providence/KNZ_GFP_NativeStatus.csv", row.names = FALSE)
 
 
 
