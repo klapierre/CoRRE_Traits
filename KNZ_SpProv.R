@@ -50,28 +50,28 @@ KNZ_GFP$Experiment <- "GFP"
 #Combine Data
 
 KNZ_BGP <- merge(KNZ_BGP, Konza_sp, all.x = TRUE)
-KNZ_BGP <- KNZ_BGP[,c(3,4,1,2,5)]
+KNZ_BGP <- KNZ_BGP[,c(3,4,2,1,5)]
 KNZ_IRG <- merge(KNZ_IRG, Konza_sp, all.x = TRUE)
-KNZ_IRG <- KNZ_IRG[,c(3,4,1,2,5)]
+KNZ_IRG <- KNZ_IRG[,c(3,4,2,1,5)]
 KNZ_pplots <- merge(KNZ_pplots, Konza_sp, all.x = TRUE)
-KNZ_pplots <- KNZ_pplots[,c(3,4,1,2,5)]
+KNZ_pplots <- KNZ_pplots[,c(3,4,2,1,5)]
 KNZ_RaMPs <- merge(KNZ_RaMPs, Konza_sp, all.x = TRUE)
-KNZ_RaMPs <- KNZ_RaMPs[,c(3,4,1,2,5)]
+KNZ_RaMPs <- KNZ_RaMPs[,c(3,4,2,1,5)]
 KNZ_RHPs <- merge(KNZ_RHPs, Konza_sp, all.x = TRUE)
-KNZ_RHPs <- KNZ_RHPs[,c(3,4,1,2,5)]
+KNZ_RHPs <- KNZ_RHPs[,c(3,4,2,1,5)]
 KNZ_GFP <- merge(KNZ_GFP, Konza_sp, all.x = TRUE)
-KNZ_GFP <- KNZ_GFP[,c(3,4,1,2,5)]
+KNZ_GFP <- KNZ_GFP[,c(3,4,2,1,5)]
 
 
 # Some sp have NA values. Will hand check to see if these are in species_provided instead of species_accepted
 # save into folder
 
-write.csv(KNZ_BGP, "~/Dropbox/CoRRE_database/Data/OriginalData/Species Providence/KNZ_BGP_NativeStatus.csv")
-write.csv(KNZ_IRG, "~/Dropbox/CoRRE_database/Data/OriginalData/Species Providence/KNZ_IRG_NativeStatus.csv")
-write.csv(KNZ_pplots, "~/Dropbox/CoRRE_database/Data/OriginalData/Species Providence/KNZ_pplots_NativeStatus.csv")
-write.csv(KNZ_RaMPs, "~/Dropbox/CoRRE_database/Data/OriginalData/Species Providence/KNZ_RaMPs_NativeStatus.csv")
-write.csv(KNZ_RHPs, "~/Dropbox/CoRRE_database/Data/OriginalData/Species Providence/KNZ_RHPs_NativeStatus.csv")
-write.csv(KNZ_GFP, "~/Dropbox/CoRRE_database/Data/OriginalData/Species Providence/KNZ_GFP_NativeStatus.csv")
+write.csv(KNZ_BGP, "~/Dropbox/CoRRE_database/Data/OriginalData/Species Providence/KNZ_BGP_NativeStatus.csv", row.names = FALSE)
+write.csv(KNZ_IRG, "~/Dropbox/CoRRE_database/Data/OriginalData/Species Providence/KNZ_IRG_NativeStatus.csv", row.names = FALSE)
+write.csv(KNZ_pplots, "~/Dropbox/CoRRE_database/Data/OriginalData/Species Providence/KNZ_pplots_NativeStatus.csv", row.names = FALSE)
+write.csv(KNZ_RaMPs, "~/Dropbox/CoRRE_database/Data/OriginalData/Species Providence/KNZ_RaMPs_NativeStatus.csv", row.names = FALSE)
+write.csv(KNZ_RHPs, "~/Dropbox/CoRRE_database/Data/OriginalData/Species Providence/KNZ_RHPs_NativeStatus.csv", row.names = FALSE)
+write.csv(KNZ_GFP, "~/Dropbox/CoRRE_database/Data/OriginalData/Species Providence/KNZ_GFP_NativeStatus.csv", row.names = FALSE)
 
 
 
