@@ -133,7 +133,10 @@ write.csv(Alberta_CCD, "Data/OriginalData/Species Provenance/Alberta_CCD_NativeS
 #### Jornada ####
 #################
 JRN_study119 <- read.csv("Data/OriginalData/Species Provenance/JRN_study 119.csv")
+<<<<<<< HEAD
 JRN_study278 <- read.csv("~/Dropbox/CoRRE_database/Contacting Data Providers/Site_Sp_lists/JRN_study278.csv")
+=======
+>>>>>>> 638e5f615cdf0b99aac747cf2883452ae6fe253d
 Sp_matched <- read.csv("Data/CleanedData/Traits/CoRRE_TRY_species_list.csv", row.names = 1)
 # Need to get rid of space after species name to merge with the species list we have from TRY
 JRN_study119$Species_provided <- trimws(JRN_study119$Species_provided, which = "right")
@@ -147,6 +150,7 @@ JRN_study119 <- JRN_study119[,c(2,3,1,7,5,6)]
 names(JRN_study119)[4] <- "Species_accepted"
 
 write.csv(JRN_study119,"Data/OriginalData/Species Provenance/JRN_study 119_NativeStatus.csv")
+<<<<<<< HEAD
 
 merge_dat <- JRN_study119[,c(4,5)]
 JRN_study278 <- merge(JRN_study278, merge_dat, all.x = TRUE)
@@ -156,3 +160,5 @@ JRN_study278$Notes <- NA
 JRN_study278 <- JRN_study278[,c(4,5,2,1,3,6)]
 
 write.csv(JRN_study278,"Data/OriginalData/Species Provenance/JRN_study278_NativeStatus.csv" )
+=======
+>>>>>>> 638e5f615cdf0b99aac747cf2883452ae6fe253d
