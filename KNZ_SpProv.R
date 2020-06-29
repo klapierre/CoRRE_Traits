@@ -1,4 +1,8 @@
-## Konza Species Provenance
+### Script to clean up some of the species provenance data before combining it together.
+### 1. Konza experiment species
+### 2. NIN_HerbDiv
+### 3. ALberta_CCD
+### 4. Jornada experiments
 
 # set wd
 setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database")
@@ -6,9 +10,13 @@ setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database")
 # Libraries
 library(Hmisc)
 
+
+###############
+### KONZA ####
+##############
 ## Read in data
 # Dataset with native status
-Konza_sp <- read.csv("~/Dropbox/CoRRE_database/Data/OriginalData/Species Provenance/2020 sp list_Konza.csv")
+Konza_sp <- read.csv("Data/OriginalData/Species Provenance/Data given by PIs/2020 sp list_Konza.csv")
 
 #Konza experiment species
 KNZ_BGP <- read.csv("~/Dropbox/CoRRE_database/Contacting Data Providers/Site_Sp_lists/KNZ_BGP.csv")
@@ -73,11 +81,12 @@ write.csv(KNZ_RaMPs, "~/Dropbox/CoRRE_database/Data/OriginalData/Species Provena
 write.csv(KNZ_RHPs, "~/Dropbox/CoRRE_database/Data/OriginalData/Species Provenance/KNZ_RHPs_NativeStatus.csv", row.names = FALSE)
 write.csv(KNZ_GFP, "~/Dropbox/CoRRE_database/Data/OriginalData/Species Provenance/KNZ_GFP_NativeStatus.csv", row.names = FALSE)
 
+#####################
+#### NIN_HerbDiv ####
+#####################
 
-## Adding in NIN_HerbDiv dataset
-
-NIN <- read.csv("~/Dropbox/CoRRE_database/Data/OriginalData/Species Provenance/HerbDiv_2019_Cover_Tx_Trait_toKaitlin.csv")
-NIN_HerbDiv <- read.csv("~/Dropbox/CoRRE_database/Contacting Data Providers/Site_Sp_lists/KNZ_BGP.csv")
+NIN <- read.csv("Data/OriginalData/Species Provenance/Data given by PIs/HerbDiv_2019_Cover_Tx_Trait_toKaitlin.csv")
+NIN_HerbDiv <- read.csv("~/Dropbox/CoRRE_database/Contacting Data Providers/Site_Sp_lists/NIN_HerbDiv.csv")
 
 names(NIN)[9] <- "Species_accepted"
 #NIN$Species_accepted <- tolower(NIN$Species_accepted)
@@ -105,3 +114,45 @@ for (i in 1:nrow(merge1)){
 }
 
 write.csv(merge1, "~/Dropbox/CoRRE_database/Data/OriginalData/Species Provenance/NIN_HerbDiv_NativeStatus.csv", row.names = FALSE)
+
+
+######################
+#### Alberta CCD ####
+#####################
+
+CCD <- read.csv("Data/OriginalData/Species Provenance/Data given by PIs/Alberta_CCD_Natives_Sub.csv")
+Alberta_CCD <- read.csv("~/Dropbox/CoRRE_database/Contacting Data Providers/Site_Sp_lists/Alberta_CCD.csv")
+CCD[,1] <- tolower(CCD[,1])
+names(CCD)[1] <- "Species_provided"
+
+Alberta_CCD <- merge(Alberta_CCD, CCD, all.x = TRUE)
+
+write.csv(Alberta_CCD, "Data/OriginalData/Species Provenance/Alberta_CCD_NativeStatus.csv", row.names = FALSE)
+
+##################
+#### Jornada ####
+#################
+JRN_study119 <- read.csv("Data/OriginalData/Species Provenance/JRN_study 119.csv")
+JRN_study278 <- read.csv("~/Dropbox/CoRRE_database/Contacting Data Providers/Site_Sp_lists/JRN_study278.csv")
+Sp_matched <- read.csv("Data/CleanedData/Traits/CoRRE_TRY_species_list.csv", row.names = 1)
+# Need to get rid of space after species name to merge with the species list we have from TRY
+JRN_study119$Species_provided <- trimws(JRN_study119$Species_provided, which = "right")
+
+
+names(Sp_matched) <- c("Species_provided", "Match")
+Sp_matched <- Sp_matched[,-3]
+
+JRN_study119 <- merge(JRN_study119, Sp_matched, all.x = TRUE)
+JRN_study119 <- JRN_study119[,c(2,3,1,7,5,6)]
+names(JRN_study119)[4] <- "Species_accepted"
+
+write.csv(JRN_study119,"Data/OriginalData/Species Provenance/JRN_study 119_NativeStatus.csv")
+
+merge_dat <- JRN_study119[,c(4,5)]
+JRN_study278 <- merge(JRN_study278, merge_dat, all.x = TRUE)
+JRN_study278$Site <- "JRN"
+JRN_study278$Experiment <- "278"
+JRN_study278$Notes <- NA
+JRN_study278 <- JRN_study278[,c(4,5,2,1,3,6)]
+
+write.csv(JRN_study278,"Data/OriginalData/Species Provenance/JRN_study278_NativeStatus.csv" )
