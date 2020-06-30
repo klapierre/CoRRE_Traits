@@ -4,7 +4,7 @@
 ### 3. ALberta_CCD
 ### 4. Jornada experiments
 
-# set wd
+# setwd
 setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database")
 
 # Libraries
@@ -59,16 +59,22 @@ KNZ_GFP$Experiment <- "GFP"
 
 KNZ_BGP <- merge(KNZ_BGP, Konza_sp, all.x = TRUE)
 KNZ_BGP <- KNZ_BGP[,c(3,4,2,1,5)]
+KNZ_BGP$Notes <- NA
 KNZ_IRG <- merge(KNZ_IRG, Konza_sp, all.x = TRUE)
 KNZ_IRG <- KNZ_IRG[,c(3,4,2,1,5)]
+KNZ_IRG$Notes <- NA
 KNZ_pplots <- merge(KNZ_pplots, Konza_sp, all.x = TRUE)
 KNZ_pplots <- KNZ_pplots[,c(3,4,2,1,5)]
+KNZ_pplots$Notes <- NA
 KNZ_RaMPs <- merge(KNZ_RaMPs, Konza_sp, all.x = TRUE)
 KNZ_RaMPs <- KNZ_RaMPs[,c(3,4,2,1,5)]
+KNZ_RaMPs$Notes <- NA
 KNZ_RHPs <- merge(KNZ_RHPs, Konza_sp, all.x = TRUE)
 KNZ_RHPs <- KNZ_RHPs[,c(3,4,2,1,5)]
+KNZ_RHPs$Notes <- NA
 KNZ_GFP <- merge(KNZ_GFP, Konza_sp, all.x = TRUE)
 KNZ_GFP <- KNZ_GFP[,c(3,4,2,1,5)]
+KNZ_GFP$Notes <- NA
 
 
 # Some sp have NA values. Will hand check to see if these are in species_provided instead of species_accepted
@@ -113,6 +119,10 @@ for (i in 1:nrow(merge1)){
   }
 }
 
+merge1$Site <- "NIN"
+merge1$Experiment <- "HerbDiv"
+merge1$Notes <- NA
+merge1 <- merge1[,c(4,5,2,1,3,6)]
 write.csv(merge1, "~/Dropbox/CoRRE_database/Data/OriginalData/Species Provenance/NIN_HerbDiv_NativeStatus.csv", row.names = FALSE)
 
 
@@ -126,17 +136,18 @@ CCD[,1] <- tolower(CCD[,1])
 names(CCD)[1] <- "Species_provided"
 
 Alberta_CCD <- merge(Alberta_CCD, CCD, all.x = TRUE)
+Alberta_CCD$Site <- "Alberta"
+Alberta_CCD$Experiment <- "CCD"
+Alberta_CCD$Notes <- NA
+Alberta_CCD <- Alberta_CCD[,c(4,5,1,2,3,6)]
 
 write.csv(Alberta_CCD, "Data/OriginalData/Species Provenance/Alberta_CCD_NativeStatus.csv", row.names = FALSE)
 
 ##################
 #### Jornada ####
 #################
-JRN_study119 <- read.csv("Data/OriginalData/Species Provenance/JRN_study 119.csv")
-<<<<<<< HEAD
+JRN_study119 <- read.csv("Data/OriginalData/Species Provenance/Data given by PIs/JRN_study 119.csv")
 JRN_study278 <- read.csv("~/Dropbox/CoRRE_database/Contacting Data Providers/Site_Sp_lists/JRN_study278.csv")
-=======
->>>>>>> 638e5f615cdf0b99aac747cf2883452ae6fe253d
 Sp_matched <- read.csv("Data/CleanedData/Traits/CoRRE_TRY_species_list.csv", row.names = 1)
 # Need to get rid of space after species name to merge with the species list we have from TRY
 JRN_study119$Species_provided <- trimws(JRN_study119$Species_provided, which = "right")
@@ -149,8 +160,7 @@ JRN_study119 <- merge(JRN_study119, Sp_matched, all.x = TRUE)
 JRN_study119 <- JRN_study119[,c(2,3,1,7,5,6)]
 names(JRN_study119)[4] <- "Species_accepted"
 
-write.csv(JRN_study119,"Data/OriginalData/Species Provenance/JRN_study 119_NativeStatus.csv")
-<<<<<<< HEAD
+write.csv(JRN_study119,"Data/OriginalData/Species Provenance/JRN_study 119_NativeStatus.csv", row.names = FALSE)
 
 merge_dat <- JRN_study119[,c(4,5)]
 JRN_study278 <- merge(JRN_study278, merge_dat, all.x = TRUE)
@@ -159,6 +169,4 @@ JRN_study278$Experiment <- "278"
 JRN_study278$Notes <- NA
 JRN_study278 <- JRN_study278[,c(4,5,2,1,3,6)]
 
-write.csv(JRN_study278,"Data/OriginalData/Species Provenance/JRN_study278_NativeStatus.csv" )
-=======
->>>>>>> 638e5f615cdf0b99aac747cf2883452ae6fe253d
+write.csv(JRN_study278,"Data/OriginalData/Species Provenance/JRN_study278_NativeStatus.csv", row.names = FALSE)
