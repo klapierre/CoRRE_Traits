@@ -170,3 +170,18 @@ JRN_study278$Notes <- NA
 JRN_study278 <- JRN_study278[,c(4,5,2,1,3,6)]
 
 write.csv(JRN_study278,"Data/OriginalData/Species Provenance/JRN_study278_NativeStatus.csv", row.names = FALSE)
+
+
+######################
+## CUL_Culardoch Sp ##
+######################
+## Need to run JRN at least to get Sp_matched dataframe
+
+CUL <- read.csv("Data/OriginalData/Species Provenance/CUL_Culardoch_NativeStatus.csv")
+CUL <- CUL[,-1]
+CUL <- merge(CUL, Sp_matched, all.x = TRUE)
+
+CUL <- CUL[,c(2,3,1,7,5,6)]
+names(CUL)[4] <- "Species_accepted"
+
+write.csv(CUL, "Data/OriginalData/Species Provenance/CUL_Culardoch_NativeStatus.csv", row.names = FALSE)
