@@ -26,23 +26,26 @@ df$treatment <- paste(df$CO2.Treatment, df$Nitrogen.Treatment, sep = "_")
 df <- df[,c(17, 19, 3, 4, 18, 14,15)]
 df$site_code <-"CDR"
 df$project_name <- "BioCON"
+df$data_type <- "biomass"
 
-names(df)[c(3,4,6,7)] <- c("plot_id", "block", "genus_species", "biomass")
+names(df)[c(3,4,6,7)] <- c("plot_id", "block", "genus_species", "abundance")
 
-df <- df[,c(1:5,8,9,6,7)]
+df <- df[,c(1:4,10,5,8,9,6,7)]
 
+names(df)
 write.csv(df, "Data/CleanedData/Sites/Species csv/CDR_BioCON.csv", row.names = FALSE)
 
 ### ANPP data ###
 
-ANPP <- aggregate(df$biomass, by = list(calendar_year = df$calendar_year, treatment = df$treatment,  
+ANPP <- aggregate(df$abundance, by = list(calendar_year = df$calendar_year, treatment = df$treatment,  
                                         plot_id = df$plot_id, block = df$block), FUN = sum)
-names(ANPP)[5] <- "ANPP"
+names(ANPP)[5] <- "anpp"
 
 ANPP$site_code <- "CDR"
 ANPP$project_name <- "BioCON"
+ANPP$data_type <- "biomass"
 
-ANPP <- ANPP[,c(1:4,6,7,5)]
+ANPP <- ANPP[,c(1:4,8,6,7,5)]
 
 write.csv(ANPP, "Data/CleanedData/Sites/ANPP csv/CDR_BioCON_anpp.csv")
                   
