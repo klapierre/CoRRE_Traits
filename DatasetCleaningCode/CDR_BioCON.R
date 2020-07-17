@@ -65,5 +65,5 @@ ANPP$data_type <- "biomass"
 
 ANPP <- ANPP[,c(1:4,8,6,7,5)]
 
-write.csv(ANPP, "Data/CleanedData/Sites/ANPP csv/CDR_BioCON_anpp.csv")
+write.csv(ANPP, "Data/CleanedData/Sites/ANPP csv/CDR_BioCON_anpp.csv", row.names = FALSE)
                   

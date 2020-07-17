@@ -3,9 +3,10 @@
 ################
 setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database")
 
+# biomass data
 file <- "https://portal.edirepository.org/nis/dataviewer?packageid=knb-lter-knz.57.10&entityid=eaf1b05d4c7578a1fe1efc5173b80953"
 df <- read.csv(file, header = TRUE)
-
+df$CUYRDD <- as.numeric(df$CUYRDD)
 
 for (i in 1:nrow(df)){
   if(df$NUTRIENT[i] == "n+p"){
@@ -17,7 +18,7 @@ df$treatment <- paste(df$BURN, df$MOW, df$NUTRIENT, sep = "_")
 
 df <- df[df$MOW == "u",]
 
-df$anpp <- df$LVGRASS + df$FORBS
+df$anpp <- df$LVGRASS + df$FORBS + df$CUYRDD
 
 df <- aggregate(df$anpp, by = list(calendar_year = df$RECYEAR, plot_id = df$PLOT, 
                                      treatment = df$treatment), FUN = mean)
@@ -30,7 +31,7 @@ df$anpp <- df$anpp*10 # mulitply by 10 to get g/m2, currently g/0.1 m2
 
 df <- df[,c(1,3,2,7,8,5,6,4)]
 
-write.csv(df, "Data/CleanedData/Sites/ANPP csv/KNZ_BGP_anpp.csv")
+write.csv(df, "Data/CleanedData/Sites/ANPP csv/KNZ_BGP_anpp.csv", row.names = FALSE)
 
 
 file1 <- "https://pasta.lternet.edu/package/data/eml/knb-lter-knz/17/11/410e032a0651ce990c8c497be62c68f7"
@@ -39,7 +40,7 @@ df1 <- read.csv(file1, header = TRUE)
 ## Convert cover class to mid-points
 # 1 = 0.5, 2 = 3.5, 3 = 15, 4 = 37.5, 5=62.5, 6 = 85, 7 = 97.5
 
-
+# Taking midpoints of cover classes 
 df1$CoverClass[df1$CoverClass == 1] <- 0.5
 df1$CoverClass[df1$CoverClass == 2] <- 3.5
 df1$CoverClass[df1$CoverClass == 3] <- 15
@@ -56,3 +57,14 @@ names(df1)[5] <- "abundance"
 df1$site_code <- "KNZ"
 df1$project_name <- "BGP"
 df1$treatment_year <- df1$calendar_year - 1985
+df1$genus_species <- paste(df1$genus, df1$species, sep = " ")
+df1$data_type <- "cover"
+
+# need to add treatments from biomass data to cover data
+trts <- df[,c("treatment", "plot_id")]
+df2 <- merge(df1, trts, by = "plot_id")
+
+df1 <- df2[,c(2,11,1,10,8,6,7,9,5)]
+
+write.csv(df1, "Data/CleanedData/Sites/Species csv/KNZ_BGP.csv", row.names = FALSE)
+
