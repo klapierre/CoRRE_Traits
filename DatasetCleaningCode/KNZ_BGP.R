@@ -32,3 +32,27 @@ df <- df[,c(1,3,2,7,8,5,6,4)]
 
 write.csv(df, "Data/CleanedData/Sites/ANPP csv/KNZ_BGP_anpp.csv")
 
+
+file1 <- "https://pasta.lternet.edu/package/data/eml/knb-lter-knz/17/11/410e032a0651ce990c8c497be62c68f7"
+df1 <- read.csv(file1, header = TRUE)
+
+## Convert cover class to mid-points
+# 1 = 0.5, 2 = 3.5, 3 = 15, 4 = 37.5, 5=62.5, 6 = 85, 7 = 97.5
+
+
+df1$CoverClass[df1$CoverClass == 1] <- 0.5
+df1$CoverClass[df1$CoverClass == 2] <- 3.5
+df1$CoverClass[df1$CoverClass == 3] <- 15
+df1$CoverClass[df1$CoverClass == 4] <- 37.5
+df1$CoverClass[df1$CoverClass == 5] <- 62.5
+df1$CoverClass[df1$CoverClass == 6] <- 85
+df1$CoverClass[df1$CoverClass == 7] <- 97.5
+
+ 
+df1 <- aggregate(df1$CoverClass, 
+                  by = list(calendar_year = df1$RecYear, genus = df1$Ab_genus,
+                            species = df1$Ab_species, plot_id = df1$Plot), FUN = mean)
+names(df1)[5] <- "abundance"
+df1$site_code <- "KNZ"
+df1$project_name <- "BGP"
+df1$treatment_year <- df1$calendar_year - 1985
