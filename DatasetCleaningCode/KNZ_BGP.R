@@ -42,7 +42,7 @@ df1 <- read.csv(file1, header = TRUE)
 
 # Taking midpoints of cover classes 
 df1$CoverClass[df1$CoverClass == 1] <- 0.5
-df1$CoverClass[df1$CoverClass == 2] <- 3.5
+df1$CoverClass[df1$CoverClass == 2] <- 3
 df1$CoverClass[df1$CoverClass == 3] <- 15
 df1$CoverClass[df1$CoverClass == 4] <- 37.5
 df1$CoverClass[df1$CoverClass == 5] <- 62.5
