@@ -50,23 +50,29 @@ cover_dat <- cover_dat[-which(is.na(cover_dat$cover)),]
 cover_dat$site_code <- "AZI"
 cover_dat$project_name <- "NitPhos"
 cover_dat$data_type <- "cover"
-names(cover_dat)[c(1:5)] <- c("calendar_year", "treatment", "plot_id", "abundance", "genus_species")
-cover_dat <- cover_dat[,c(1,2,3,9,6,7,8,5,4)]
 
+trt_plot <- as.data.frame(unique(cover_dat[,c('repeat.', 'trt')]))
+trt_plot <- cbind(seq(1:60), trt_plot)
+names(trt_plot)[1]<- "plot_id"
+cover_dat <- merge(cover_dat, trt_plot)
+cover_dat <- cover_dat[,c(3,1,10,9,6,7,8,5,4)]
+names(cover_dat)[c(1,2,8,9)] <- c("calendar_year", "treatment",  "genus_species", "abundance")
 write.csv(cover_dat, "Data/CleanedData/Sites/Species csv/AZI_NitPhos.csv", row.names = FALSE)
 
 
 
 ANPP <- dat[,-4]
 ANPP <- ANPP[-which(is.na(ANPP$mass)),]
-ANPP <- aggregate(ANPP$mass, by = list(calendar_year = ANPP$year, treatment = ANPP$trt,
-                                       plot_id = ANPP$repeat., treatment_year = ANPP$treatment_year),
+ANPP <- aggregate(ANPP$mass, by = list(calendar_year = ANPP$year, trt = ANPP$trt,
+                                       repeat. = ANPP$repeat., treatment_year = ANPP$treatment_year),
                   FUN = sum)
 names(ANPP)[5] <- "anpp"
 ANPP$data_type <- "biomass"
 ANPP$site_code <- "AZI"
 ANPP$project_name <- "NitPhos"
-ANPP <- ANPP[,c(3,6,2,4,1,7,8,5)]
+ANPP <- merge(trt_plot, ANPP)
+ANPP <- ANPP[,c(4,2,3,7,5,8,9,6)]
+names(ANPP)[2] <- "treatment_year"
 
 write.csv(ANPP, "Data/CleanedData/Sites/ANPP csv/AZI_NitPhos.csv", row.names = FALSE)
 
