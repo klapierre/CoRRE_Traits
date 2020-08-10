@@ -25,6 +25,7 @@ trt_plot <- cbind(seq(1:28), trt_plot)
 names(trt_plot)<- c("plot_id", "species")
 # take out number in front of treatment
 trt_plot$treatment <- sub('.', '', trt_plot$species)
+trt_plot$block <- substr(trt_plot$species, 1, 1)
 # add data back into df
 df <- merge(df, trt_plot)
 
@@ -36,8 +37,8 @@ names(df1)[1] <- "calendar_year"
 write.csv(df1, "Data/CleanedData/Sites/Species csv/DL_NSFC20132016.csv", row.names = FALSE)
 
 ## pull out anpp dataset
-df2 <- df[,c(2,59:65)]
+df2 <- df[,c(2,59:66)]
 names(df2)[1] <- "calendar_year"
-df2 <- df2[,c(1,8,7,5,6,3,4,2)]
+df2 <- df2[,c(1,8,7,5,6,9,3,4,2)]
 write.csv(df2, "Data/CleanedData/Sites/ANPP csv/DL_NSFC_anpp20132016.csv", row.names = FALSE)
 

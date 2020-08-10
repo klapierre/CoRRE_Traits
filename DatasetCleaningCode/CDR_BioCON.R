@@ -62,8 +62,9 @@ names(ANPP)[5] <- "anpp"
 ANPP$site_code <- "CDR"
 ANPP$project_name <- "BioCON"
 ANPP$data_type <- "biomass"
+ANPP$treatment_year <- ANPP$calendar_year -1997
 
-ANPP <- ANPP[,c(1:4,8,6,7,5)]
+ANPP <- ANPP[,c(1:4,8,6,7,5,9)]
 
 write.csv(ANPP, "Data/CleanedData/Sites/ANPP csv/CDR_BioCON_anpp.csv", row.names = FALSE)
                   

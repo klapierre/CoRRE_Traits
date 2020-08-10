@@ -72,7 +72,7 @@ ANPP$site_code <- "AZI"
 ANPP$project_name <- "NitPhos"
 ANPP <- merge(trt_plot, ANPP)
 ANPP <- ANPP[,c(4,2,3,7,5,8,9,6)]
-names(ANPP)[2] <- "treatment_year"
+names(ANPP)[2] <- "treatment"
 
 write.csv(ANPP, "Data/CleanedData/Sites/ANPP csv/AZI_NitPhos.csv", row.names = FALSE)
 
