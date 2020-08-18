@@ -31,7 +31,7 @@ df <- merge(df, trt_plot)
 
 
 df1 <- gather(df, key = genus_species, value = abundance, 3:58)
-df1 <- df1[,c(2,9,8,6,7,4,5,10,11)]
+df1 <- df1[,c(2,4:12)]
 names(df1)[1] <- "calendar_year"
 
 write.csv(df1, "Data/CleanedData/Sites/Species csv/DL_NSFC20132016.csv", row.names = FALSE)
