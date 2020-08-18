@@ -75,7 +75,7 @@ df1 <- df1[df1$abundance>0,]
 
 #add in project details
 df1$site_code <- "KUFS"
-df1$project_name <- "E6"
+df1$project_name <- "E2"
 df1$data_type <- "biomass"
 df1$treatment_year <- df1$Year - 2000
 

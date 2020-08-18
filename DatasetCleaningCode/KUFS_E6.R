@@ -72,7 +72,6 @@ for (i in 1:nrow(df)){
 df <- df[,-c(5:7)]
 names(df)[c(1:4)] <- c("calendar_year", "plot_id", "block", "community")
 df$treatment_year <- df$calendar_year - 2001
-df <- df[,c(1,10,2,3,4,9,7,8,5,6)]
 write.csv(df, "Data/CleanedData/Sites/Species csv/KUFS_E6.csv", row.names = FALSE)
 
 ## ANPP data
