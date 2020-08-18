@@ -2,6 +2,8 @@
 #### KNZ_RHPs ####
 ##################
 library(tidyr)
+library(plyr)
+library(stringr)
 setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database")
 
 file <- "https://portal.lternet.edu/nis/dataviewer?packageid=knb-lter-knz.103.2&entityid=366e428fea83641acf1926ef18adc72e"
@@ -9,6 +11,8 @@ df <- read.csv(file, header = TRUE)
 species <- read.csv("Data/OriginalData/Sites/KNZ_RHPs/Species_list.csv", header = FALSE)
 species <- as.data.frame(t(species))
 names(species) <- c("genus_species", "genus_species_code")
+rownames(species) <- seq(1:nrow(species))
+species$genus_species_code <- str_trim(species$genus_species_code, side = c("both", "left", "right"))
 
 # columns imported as characters instead of numeric
 for(i in 12:99){
@@ -37,9 +41,9 @@ df1 <- merge(df1, trt_plots)
 df2 <- df1[,c(2,3,5, 10:97)]
 df2[is.na(df2)] <- 0
 df2 <- gather(df2, key = "genus_species_code", value = "abundance", 4:87)
-df2 <- merge(species, df2)
+df2 <- merge(df2, species)
 df2$data_type <- "cover"
-df2 <- df2[,c(3,4,9,5,11,6,7,8,2,10)]
+df2 <- df2[-1]
 
 write.csv(df2, "Data/CleanedData/Sites/Species csv/KNZ_RHPs.csv", row.names = FALSE)
 
