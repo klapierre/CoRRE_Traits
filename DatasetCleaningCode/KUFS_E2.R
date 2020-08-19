@@ -110,9 +110,9 @@ for (i in 1:nrow(df1)){
 }
 
 #order and get rid of columns
-df1 <- df1[,c(2,6,4,16,15,12,13,10,11)]
+df1 <- df1[,c(2,4,5,10,11:16)]
 #rename
-names(df1)[c(1,2,3)] <- c("calendar_year", "plot_id", "block")
+names(df1)[c(1,2,3)] <- c("calendar_year", "block", "plot_id")
 
 #save
 write.csv(df1, "Data/CleanedData/Sites/Species csv/KUFS_E2.csv", row.names = FALSE)

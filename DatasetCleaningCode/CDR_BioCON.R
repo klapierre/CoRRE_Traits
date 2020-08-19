@@ -1,6 +1,8 @@
 #################
 ## CDR_BioCON ##
 ################
+library(stringr)
+
 setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database")
 # Pull data from LTER site
 # biomass data
@@ -11,6 +13,10 @@ df <- read.delim(file, header=TRUE)
 file1 <- "https://pasta.lternet.edu/package/data/eml/knb-lter-cdr/301/8/c41fc5de0beadc305668d5d2a4d40b7b"
 df1 <- read.delim(file1, header = TRUE)
 
+# get 16 planted species
+planted <- unique(df1$Monospecies)
+planted <- planted[c(2:17)]
+
 # Only using 16 species plots
 df <- df[df$CountOfSpecies == 16,]
 
@@ -20,7 +26,7 @@ df$Month <- as.numeric(format(df$Date, format = "%m"))
 df$calendar_year <- as.numeric(format(df$Date, format = "%Y"))
 df <- df[df$Month == 8,]
 # Create treatment year column 
-df$treatmet_year <- df$calendar_year - 1997
+df$treatment_year <- df$calendar_year - 1997
 
 # Create treatment column
 df$treatment <- paste(df$CO2.Treatment, df$Nitrogen.Treatment, sep = "_")
@@ -41,7 +47,7 @@ df1 <- df1[df1$CountOfSpecies == 16 & df1$Season == "August", ]
 # Create treatment column
 df1$treatment <- paste(df1$CO2.Treatment, df1$Nitrogen.Treatment, sep = "_")
 
-df1$treatmet_year <- df1$Year - 1997
+df1$treatment_year <- df1$Year - 1997
 df1$site_code <- "CDR"
 df1$project_name <- "BioCON"
 df1$data_type <- "cover"
@@ -50,6 +56,15 @@ names(df1)[c(1,3,4,9,10)] <- c("calendar_year", "plot_id", "block", "genus_speci
 
 df2 <- rbind(df1, df)
 
+# clean species names to get only 16 planted species
+df2$genus_species <-str_trim(df2$genus_species, side = "right")
+df2$genus_species <- gsub("poa pratensis", "Poa pratensis", df2$genus_species)
+df2$genus_species <- gsub("schizachyrium scoparium", "Schizachyrium scoparium", df2$genus_species)
+df2$genus_species <- gsub("amorpha canescens", "Amorpha canescens", df2$genus_species)
+df2$genus_species <- gsub("bromus inermis", "Bromus inermis", df2$genus_species)
+df2$genus_species <- gsub("poa compressa", "Poa compressa", df2$genus_species)
+
+df2 <- df2[df2$genus_species %in% planted,]
 
 write.csv(df2, "Data/CleanedData/Sites/Species csv/CDR_BioCON.csv", row.names = FALSE)
 

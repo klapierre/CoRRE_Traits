@@ -90,7 +90,7 @@ black <- aggregate(black$quadcover, by = list(calendar_year = black$year, treatm
 black <- aggregate(black$x, by = list(calendar_year = black$calendar_year, treatment =black$treatment, 
                                           plot_id = black$plot_id, block = black$block, genus_species = black$genus_species),
                      FUN = mean)
-black$community <- "black_gramma"
+black$community_type <- "black_gramma"
 black$site_code <- "SEV"
 black$project_name <- "EDGE"
 black$data_type <- "cover"
@@ -107,7 +107,7 @@ blue <- aggregate(blue$quadcover, by = list(calendar_year = blue$year, treatment
 blue <- aggregate(blue$x, by = list(calendar_year = blue$calendar_year, treatment =blue$treatment, 
                                       plot_id = blue$plot_id, block = blue$block, genus_species = blue$genus_species),
                    FUN = mean)
-blue$community <- "blue_gramma"
+blue$community_type <- "blue_gramma"
 blue$site_code <- "SEV"
 blue$project_name <- "EDGE"
 blue$data_type <- "cover"

@@ -70,7 +70,7 @@ for (i in 1:nrow(df)){
 }
 
 df <- df[,-c(5:7)]
-names(df)[c(1:4)] <- c("calendar_year", "plot_id", "block", "community")
+names(df)[c(1:4)] <- c("calendar_year", "plot_id", "block", "community_type")
 df$treatment_year <- df$calendar_year - 2001
 write.csv(df, "Data/CleanedData/Sites/Species csv/KUFS_E6.csv", row.names = FALSE)
 
@@ -137,7 +137,7 @@ for (i in 1:nrow(df1)){
 
 df1$treatment_year <- df1$Year - 2001
 df1 <- df1[,c(2,16,4,5,6,15,17,13,14,11)]
-names(df1)[c(1,3:5,10)] <- c("calendar_year", "plot_id", "block", "community", "anpp")
+names(df1)[c(1,3:5,10)] <- c("calendar_year", "plot_id", "block", "community_type", "anpp")
 
 write.csv(df1, "Data/CleanedData/Sites/ANPP csv/KUFS_E6_anpp.csv")
   
