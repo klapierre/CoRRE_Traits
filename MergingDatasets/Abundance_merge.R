@@ -3,6 +3,7 @@ library(gtools)
 library(reshape2)
 library(tidyr)
 library(dplyr)
+library(stringr)
 
 # nov 20, 2015 -checked all plots have recorded species, so the fitler abundance !=0 step will not remove any plots.
 
@@ -498,6 +499,16 @@ wenndex4 <- rbind(wenndex2, wenndex3)
 graze <- read.csv("SFREC_GrazePrecip.csv") %>%
   filter(abundance != 0)
 
+ton <- read.csv("SIU_TON.csv") %>%
+  mutate(community_type = 0) %>%
+  filter(genus_species != "Soil", 
+         genus_species != "Grass", 
+         genus_species != "Moss", 
+         genus_species != "Unknown 2",
+         genus_species != "Unknown 6", 
+         genus_species != "Poly 4", 
+         genus_species != "Mint")
+
 uk<-read.delim("SKY_UK.txt")%>%
   select(-id, -nutrients, -light, -carbon, -water, -other_manipulation, -num_manipulations, -temp, -precip, -plot_id1,   -plot_mani, -species_num)%>%
   gather(species_code, abundance, sp1:sp26)%>%
@@ -551,7 +562,8 @@ combine<-rbind(bffert2, bgp, biocon, bowman2, ccd2, clip2, clonal2, culardoch2, 
                herbwood2, imagine2, interaction2, irg2, kgfert2, lind2, lovegrass, lucero, mat22, megarich2,
                mnt2, mwatfer, nde, nfert2, nitadd, nitphos, nitrogen, nsfc4, oface2, pennings2, pme, pplots,
                pq2, ramps, rhps, rmapc2, sask, sev_edge, snfert3, snow, study1192, study2782, t72, ter, tface, 
-               tide2, tmece, uk2, wapaclip2, warmnut2, water, watering2, wenndex4, wet2, yu)
+               tide2, tmece, ton, uk2, wapaclip2, warmnut2, water, watering2, wenndex4, wet2, yu)
+combine$genus_species <- str_trim(combine$genus_species, "right")
 
 write.csv(combine, "~/Dropbox/CoRRE_database/Data/CompiledData/RawAbundance.csv")
 
@@ -572,6 +584,6 @@ relcov<-merge(totcov, combine, by=c("site_code", "project_name", "community_type
   mutate(relcov=abundance/totcov)%>%
   select(-abundance, -totcov)
 
-write.csv(relcov, "~/Dropbox/converge_diverge/datasets/LongForm/SpeciesRelativeAbundance_11232015.csv")
+write.csv(relcov, "~/Dropbox/CoRRE_database/Data/CompiledData/RelativeCover.csv")
 
 
