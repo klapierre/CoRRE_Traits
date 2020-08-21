@@ -79,11 +79,11 @@ rhps<-read.csv("KNZ_RHPs_anpp.csv")%>%
 gfp <- read.csv("KNZ_KNP_GFP_anpp.csv") %>%
   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp, community_type) %>%
   mutate(block = 0)
-##e2 <- read.csv("KUFS_E2_anpp.csv")%>%
-  select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp, community_type)
-##e6 <- read.csv("KUFS_E6_anpp.csv")%>%
-  select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp)%>%
+e2 <- read.csv("KUFS_E2_anpp.csv")%>%
+  select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp, block) %>%
   mutate(community_type = 0)
+e6 <- read.csv("KUFS_E6_anpp.csv")%>%
+  select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp, community_type, block)
 pme <- read.csv("LEFT_PME_anpp.csv")%>%
   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp, block) %>%
   mutate(community_type = 0)
@@ -129,6 +129,9 @@ snfert<-read.delim("SEV_NFert_anpp.txt")%>%
 wenndex<-read.delim("SEV_WENNDEx_anpp.txt")%>%
   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp)%>%
   mutate(community_type=0, block = 0)
+ton <- read.csv("SIU_TON_anpp.csv") %>%
+  select(-data_type) %>%
+  mutate(community_type = 0)
 uk<-read.delim("SKY_UK_anpp.txt")%>%
   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp, block)%>%
   mutate(community_type=0)
@@ -142,6 +145,6 @@ nitadd <- read.csv("YMN_NitAdd_anpp.csv")%>%
 
 anpp <- rbind(bgp, biocon, bowman, clonal, cxn, e001, e002, events, exp1, fireplots, gb, gfp, imagine, imgers, irg, kgfert, 
               lind, megarich, mnr,NDE, nfert, nit, nitadd, nitrogen, nsfc, nsfc2, oface, pme, pplots, ramps, rhps, rio, rmapc, 
-              snfert, snow, t7, tide, tmece, uk, wapaclip, water, watering, wenndex, wet)
+              snfert, snow, t7, tide, tmece, ton, uk, wapaclip, water, watering, wenndex, wet)
 
 write.csv(anpp, '~/Dropbox/CoRRE_database/Data/CompiledData/ANPP2020.csv')

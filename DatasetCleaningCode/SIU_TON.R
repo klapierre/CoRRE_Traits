@@ -60,6 +60,6 @@ df1$site_code <- "SIU"
 df1$project_name <- "TON"
 df1$treatment_year <- df1$calendar_year - 1995
 df1$data_type <-"biomass"
-names(df1)[5] <- "biomass"
+names(df1)[5] <- "anpp"
 
 write.csv(df1, "Data/CleanedData/Sites/ANPP csv/SIU_TON_anpp.csv", row.names = FALSE)
