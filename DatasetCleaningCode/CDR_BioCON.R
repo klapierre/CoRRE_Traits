@@ -28,6 +28,8 @@ df <- df[df$Month == 8,]
 # Create treatment year column 
 df$treatment_year <- df$calendar_year - 1997
 
+# Correct CO2 treatments
+df$CO2.Treatment[df$CO2.Treatment == "Cenriched "]<- "Cenrich"
 # Create treatment column
 df$treatment <- paste(df$CO2.Treatment, df$Nitrogen.Treatment, sep = "_")
 
