@@ -31,7 +31,7 @@ dat <- dat[-which(dat$sp_code == "bryophyt" | dat$sp_code == "lichens" | dat$sp_
 # it is a lichen so may take it out anyway
 
 dat$sp_code <- NULL
-dat$site <- "ANR"
+dat$site_code <- "ANR"
 dat$project_name <- "Fert1"
 dat$treatment_year <- dat$Year - 1989
 # a subset of treatments started one year after nutrient addition treatments
