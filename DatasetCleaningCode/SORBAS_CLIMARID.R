@@ -29,11 +29,24 @@ dat <- gather(dat, key = "measurement", value = "abundance", 4:10)
 
 dat$month <- lapply(strsplit(dat$measurement, "[.]"), "[[", 1)
 dat$calendar_year <- as.numeric(lapply(strsplit(dat$measurement, "[.]"), "[[", 2))
+# replace NA with 0 
+dat$abundance[which(is.na(dat$abundance))] <- 0
+# From Ivan: Our study system is kind of bimodal regarding growth, the main growth and 
+# activity period is Spring (between February and May) but there is a second growth period 
+# in autumn (Sept-Nov), probably lower in activity and growth than spring but still significant
+dat <- aggregate(dat$abundance, by = list(calendar_year = dat$calendar_year, treatment = dat$treatment, 
+                                           plot_id = dat$plot_id, genus_species = dat$genus_species),
+                  FUN = max)
+# Get rid of 2016 because only data from December
+dat <- dat[-which(dat$calendar_year == 2016),]
+# Get rid of 0's
+dat <- dat[which(dat$x > 0),]
 dat$site_code <- "SORBAS"
 dat$project_name <- "CLIMARID"
 dat$data_type <- "count"
 dat$treatment_year <- dat$calendar_year - 2010
 
+names(dat)[5] <- "abundance"
 
-### Need to figure out growing season so can calculate one value per season / year
+write.csv(dat, "Data/CleanedData/Sites/Species csv/SORBAS_CLIMARID.csv", row.names = FALSE)
 
