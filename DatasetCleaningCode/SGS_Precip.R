@@ -75,7 +75,7 @@ unmatched <- sp.match[which(is.na(sp.match$genus_species)),]
 # SPURGE = Unknown spurge
 # UNK = Unknown
 
-unmatched$genus_species <- c("Allium textile", "??", "Chrysothamnus viscidiflorus", "Unknown spurge", "Unknown")
+unmatched$genus_species <- c("Allium textile", "Aristida purpurea", "Chrysothamnus viscidiflorus", "Unknown spurge", "Unknown")
 sp.list <-sp.list[,c(1,6)]
 sp.list <- rbind(sp.list, unmatched)
 sp.match <- merge(sp.list, sp.dat, all.y = TRUE)

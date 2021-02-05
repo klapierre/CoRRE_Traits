@@ -587,3 +587,6 @@ relcov<-merge(totcov, combine, by=c("site_code", "project_name", "community_type
 write.csv(relcov, "~/Dropbox/CoRRE_database/Data/CompiledData/RelativeCover.csv")
 
 
+### For Habacuc - 3,000 names
+
+
