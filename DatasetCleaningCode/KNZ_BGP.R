@@ -36,6 +36,8 @@ write.csv(df, "Data/CleanedData/Sites/ANPP csv/KNZ_BGP_anpp.csv", row.names = FA
 
 file1 <- "https://pasta.lternet.edu/package/data/eml/knb-lter-knz/17/11/410e032a0651ce990c8c497be62c68f7"
 df1 <- read.csv(file1, header = TRUE)
+file2 <- "http://lter.konza.ksu.edu/file/1607/download"
+spdf <- read.csv(file2, header = TRUE)
 
 ## Convert cover class to mid-points
 # 1 = 0.5, 2 = 3.5, 3 = 15, 4 = 37.5, 5=62.5, 6 = 85, 7 = 97.5
@@ -51,12 +53,15 @@ df1$CoverClass[df1$CoverClass == 7] <- 97.5
 
  
 df1 <- aggregate(df1$CoverClass, 
-                  by = list(calendar_year = df1$RecYear, genus = df1$Ab_genus,
-                            species = df1$Ab_species, plot_id = df1$Plot), FUN = mean)
+                  by = list(calendar_year = df1$RecYear, gen = df1$Ab_genus,
+                            spec = df1$Ab_species, plot_id = df1$Plot), FUN = mean)
+
 names(df1)[5] <- "abundance"
 df1$site_code <- "KNZ"
 df1$project_name <- "BGP"
 df1$treatment_year <- df1$calendar_year - 1985
+
+df1 <- merge(df1, spdf, all.x = TRUE)
 df1$genus_species <- paste(df1$genus, df1$species, sep = " ")
 df1$data_type <- "cover"
 
@@ -64,7 +69,7 @@ df1$data_type <- "cover"
 trts <- unique(df[,c("treatment", "plot_id")])
 df2 <- merge(df1, trts, by = "plot_id", all.x = TRUE)
 
-df1 <- df2[,c(2,11,1,10,8,6,7,9,5)]
+df1 <- df2[,c(1,4:8,17:19)]
 
 write.csv(df1, "Data/CleanedData/Sites/Species csv/KNZ_BGP.csv", row.names = FALSE)
 

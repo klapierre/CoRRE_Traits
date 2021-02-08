@@ -331,7 +331,7 @@ kgfert2<-merge(kgfert, kgfert_names, by="species_code", all=T)%>%
 
 bgp<-read.csv("KNZ_BGP.csv")%>%
   mutate(community_type=0, block=0, version=ifelse(calendar_year<=2015, 1.0,2.0)) %>%
-  filter(abundance !=0) %>% filter(genus_species != " ")
+  filter(abundance !=0) %>% filter(genus_species != "NA NA")
 
 irg<-read.delim("KNZ_IRG.txt")%>%
   select(-id, -nutrients, -light, -carbon, -water, -other_manipulation, -num_manipulations, -experiment_year, -precip,  -plot_mani, -species_num)%>%
@@ -468,7 +468,9 @@ bowman2<-merge(bowman, bowman_names, by="species_code", all=T)%>%
 snow<-read.csv("NWT_snow.csv")%>%
   mutate(community_type=0, version=ifelse(calendar_year<=2012, 1.0,2.0))%>%
   filter(abundance!=0) %>% 
-  filter(genus_species != "Litter", genus_species != "Lichen", genus_species != "Moss")
+  filter(genus_species != "Litter", genus_species != "Lichen", 
+         genus_species != "Moss", genus_species != "bare ground", 
+         genus_species != "rock, fragments")
 
 oface<-read.delim("ORNL_FACE.txt")%>%
   select(-id, -nutrients, -light, -carbon, -water, -other_manipulation, -num_manipulations, -experiment_year, -c,   -plot_mani, -species_num, -plot_id1)%>%
