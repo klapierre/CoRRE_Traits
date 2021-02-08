@@ -17,7 +17,7 @@ myfiles <- lapply(tab_names, function(x) read_excel(path = "Data/OriginalData/20
 
 for (i in 1:length(myfiles)){
   myfiles[[i]] <- myfiles[[i]][-1,] # get rid of first row
-  names(myfiles[[i]])[c(1,2)] <- c("plot", "treatment") #add column names
+  names(myfiles[[i]])[c(1,2)] <- c("plot_id", "treatment") #add column names
   #wide to long format
   myfiles[[i]] <- gather(myfiles[[i]], key = "genus_species", value = "abundance",3:length(myfiles[[i]]))
   myfiles[[i]]$abundance <- as.numeric(myfiles[[i]]$abundance)

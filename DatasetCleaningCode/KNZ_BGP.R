@@ -61,8 +61,8 @@ df1$genus_species <- paste(df1$genus, df1$species, sep = " ")
 df1$data_type <- "cover"
 
 # need to add treatments from biomass data to cover data
-trts <- df[,c("treatment", "plot_id")]
-df2 <- merge(df1, trts, by = "plot_id")
+trts <- unique(df[,c("treatment", "plot_id")])
+df2 <- merge(df1, trts, by = "plot_id", all.x = TRUE)
 
 df1 <- df2[,c(2,11,1,10,8,6,7,9,5)]
 

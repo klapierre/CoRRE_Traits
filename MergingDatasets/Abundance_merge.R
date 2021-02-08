@@ -14,6 +14,7 @@ library(stringr)
 #gmce and gmce2 both have a lot of 'Â' symbols following the genus name; fert1 has this problem for just the species ' Carex canescensÂ'. we should fix this if it isn't something the name cleaning will understand
 # Kaitlin's notes: 
 # Ask e6 PI about unknown grass A etc sp. 
+# Konza BGP has several entries with missing species names. It is in the original datafile too...
 # nov 20, 2015 -checked all plots have recorded species, so the filter abundance !=0 step will not remove any plots.
 
 watering<-read.delim("ANG_watering.txt")%>%
@@ -25,10 +26,10 @@ watering2<-merge(watering, watering_names, by="species_code", all=T)%>%
   filter(abundance!=0) #this drops 3 plots in 2011 and 2013 (plots 3, 4, and 7) which had no pin hits but did have species
 
 fert1 <- read.csv("ANR_Fert1.csv") %>% 
-  mutate(version = 2.0, community = 0, block = 0)
+  mutate(version = 2.0, community_type = 0, block = 0)
   
 fert2 <- read.csv("ANR_Fert2.csv") %>%
-  mutate(version = 2.0, community = 0) #has "Other lichens" and "Pioneer mosses (unspecified), which make up a large part of the community
+  mutate(version = 2.0, community_type = 0) #has "Other lichens" and "Pioneer mosses (unspecified), which make up a large part of the community
 
 mat2<-read.delim("ARC_mat2.txt")%>%
   select(-id, -nutrients, -light, -carbon, -water, -other_manipulation, -num_manipulations, -experiment_year, -n, -p, -plot_mani, -species_num)%>%
@@ -75,7 +76,7 @@ exp12<-merge(exp1, exp1_names, by="species_code", all=T)%>%
   select(-species_code)
 
 eelplot <- read.csv("AZI_EELplot.csv")%>%
-  mutate(version = 2.0, community = 0)
+  mutate(version = 2.0, community_type = 0)
 
 nitphos <- read.csv("AZI_NitPhos.csv") %>%
   mutate(community_type = 0, block = 0, version=ifelse(calendar_year<=2014, 1, 2)) %>%
@@ -202,13 +203,13 @@ gap2<-read.csv("DCGS_gap.csv")%>%
   mutate(community_type=0, version=ifelse(calendar_year<=2008, 1.0,2.0)) %>% filter(abundance!=0)
 
 gcme <- read.csv("DCMIC_GCME.csv")%>%
-  mutate(version = 2.0, block = 0, community = 0)
+  mutate(version = 2.0, block = 0, community_type = 0)
 
 gcme2 <- read.csv("DCMIC_GCME2.csv")%>%
-  mutate(version = 2.0, block = 0, community = 0)
+  mutate(version = 2.0, block = 0, community_type = 0)
 
 d_precip <- read.csv("DCMIC_Precip.csv")%>%
-  mutate(version = 2.0, block = 0, community = 0)
+  mutate(version = 2.0, block = 0, community_type = 0)
 
 nsfc<-read.delim("DL_NSFC.txt")%>%
   select(-id, -nutrients, -light, -carbon, -water, -other_manipulation, -num_manipulations, -experiment_year, -n, -precip, -plot_mani, -species_num)%>%
@@ -242,14 +243,14 @@ face2<-merge(face, face_names, by="species_code", all=T)%>%
   select(-species_code)
 
 warmnit <- read.csv("Hayoka_WarmNit.csv")%>%
-  mutate(version = 2.0, community = 0, block = 0)
+  mutate(version = 2.0, community_type = 0, block = 0)
 
 h_precip <- read.csv("HAYS_Precip.csv")%>%
-  mutate(version = 2.0, community = 0) %>%
+  mutate(version = 2.0, community_type = 0) %>%
   filter(genus_species!="Cacti")
 
 phace <- read.csv("HPGRS_PHACE.csv")%>%
-  mutate(version = 2.0, community = 0)
+  mutate(version = 2.0, community_type = 0)
 
 nde <- read.csv("IMGERS_NDE.csv") %>% 
   mutate(community_type = 0, version = 1.0) %>% 
@@ -330,7 +331,7 @@ kgfert2<-merge(kgfert, kgfert_names, by="species_code", all=T)%>%
 
 bgp<-read.csv("KNZ_BGP.csv")%>%
   mutate(community_type=0, block=0, version=ifelse(calendar_year<=2015, 1.0,2.0)) %>%
-  filter(abundance !=0)
+  filter(abundance !=0) %>% filter(genus_species != " ")
 
 irg<-read.delim("KNZ_IRG.txt")%>%
   select(-id, -nutrients, -light, -carbon, -water, -other_manipulation, -num_manipulations, -experiment_year, -precip,  -plot_mani, -species_num)%>%
@@ -433,7 +434,7 @@ sask <- merge(ccd, ccd_names, by="species_code", all=T)%>%
   select(-species_code)
 
 nutnet <- read.csv("NutNet.csv")%>%
-  mutate(version = 2.0, community = 0) %>% select(-subplot) %>%
+  mutate(version = 2.0, community_type = 0) %>% select(-subplot) %>%
   filter(genus_species!="Bryophyte",
          genus_species!="Bryophyte ",
          genus_species!="Forb sp.",
@@ -488,7 +489,7 @@ tide2<-merge(tide, tide_names, by="species_code", all=T)%>%
   select(-species_code)
 
 nut <- read.csv("Rengen_Nut.csv")%>% #species '...41', what is this? ask PIs
-  mutate(version = 2.0, community = 0, block = 0)%>%
+  mutate(version = 2.0, community_type = 0, block = 0)%>%
   filter(!(genus_species %in% c('Cover of forbs', 'Cover of graminoids', 'Cover of legumes', 'Cover of short forbs', 'Cover of short forbs with legumes', 'Cover of short graminoids', 'Cover of tall graminoids', 'number of all species', 'number of species > 1%', 'short forbs (number of species)', 'short graminoids (number of species)', 'tall grasses (number of species)', 'Total cover', 'Cover of tall forbs', 'Cover of tall forbs with legumes', 'tall forbs (number of species)', 'number of woods', 'cover of woods')))%>%
   mutate(genus_species=ifelse(genus_species=='Picea abies seedling', 'Picea abies', as.character(genus_species)))
 
@@ -554,11 +555,11 @@ graze <- read.csv("SFREC_GrazePrecip.csv") %>%
   filter(abundance != 0) %>% mutate(version = 1.0)
 
 s_precip <- read.csv("SGS_Precip.csv")%>%
-  mutate(version = 2.0, community = 0, block = 0)%>%
+  mutate(version = 2.0, community_type = 0, block = 0)%>%
   filter(!(genus_species %in% c('Unknown')))
 
 nash <- read.csv("Sil_NASH.csv") %>%
-  mutate(version = 2.0, community = 0)
+  mutate(version = 2.0, community_type = 0)
 
 ton <- read.csv("SIU_TON.csv") %>%
   mutate(community_type = 0, version = 2.0) %>%
@@ -580,7 +581,7 @@ uk2<-merge(uk, uk_names, by="species_code", all=T)%>%
   select(-species_code)
 
 climarid <- read.csv("SORBAS_CLIMARID.csv") %>%
-  mutate(version = 2.0, community = 0, block = 0)
+  mutate(version = 2.0, community_type = 0, block = 0)
 
 nitrogen <- read.csv("SR_Nitrogen.csv") %>%
   mutate(version = 1.0) %>%
@@ -618,7 +619,7 @@ edge <- read.csv("USA_EDGE.csv") %>% ## Added new data 2020
   filter(abundance !=0)
 
 shet <- read.csv("WAG_SHet.csv") %>%
-  mutate(version = 2.0, community = 0)
+  mutate(version = 2.0, community_type = 0)
 
 nitadd <- read.csv("YMN_NitAdd.csv") %>%
   mutate(community_type = 0, block = 0, version = 1.0) %>%
@@ -632,13 +633,20 @@ combine<-rbind(bffert2, bgp, biocon, bowman2, ccd2, climarid, clip2, clonal2, cu
                oface2, pennings2, phace, pme, pplots, pq2, ramps, rhps, rmapc2, s_precip, sask, sev_edge, snfert3, snow, 
                study1192, study2782, t72, ter, tface, tide2, tmece, ton, uk2, wapaclip2, warmnut2, water, watering2, 
                wenndex4, wet2, yu)
-combine$genus_species <- str_trim(combine$genus_species, "right")
+
+combine <- combine %>% mutate(genus_species = trimws(genus_species, 'both')) %>%
+  mutate(genus_species = gsub("\\s\\s"," ",genus_species, perl = TRUE)) %>%
+  mutate(genus_species = gsub("\\s\\s"," ",genus_species, perl = TRUE)) %>%
+  mutate(genus_species = gsub("[.]"," ",genus_species)) 
+
+combine$genus_species <- str_trim(combine$genus_species, "right") # get rid of spaces after full species name
+combine$genus_species <- tolower(combine$genus_species)
 
 write.csv(combine, "~/Dropbox/CoRRE_database/Data/CompiledData/RawAbundance.csv")
 
 ###get species list
 species_list<-combine%>%
-  select(version, genus_species)%>%
+  select(genus_species)%>%
   unique()
 
 write.csv(species_list, "~/Dropbox/CoRRE_database/Data/CompiledData/SpeciesList.csv")
