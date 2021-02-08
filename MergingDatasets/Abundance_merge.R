@@ -1,12 +1,17 @@
 setwd("~/Dropbox/CoRRE_database/Data/CleanedData/Sites/Species csv")
 # Add your working directories here if this doesn't work for you
-# KIM
+setwd('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CleanedData\\Sites\\Species csv') #kim's laptop
 # MEGHAN
 library(gtools)
 library(reshape2)
 library(tidyr)
 library(dplyr)
 library(stringr)
+
+#kim's notes 2/8/2021: 
+#Rengen_Nut has a species called '...41', ask PIs what this is
+#SGS_Precip, I removed "Unknown", which had 9 entries. Might ask the PIs if this was a conglomerate of all unknowns or not. I left in "Unknown spurge", which I considered akin to something like Euphorbia sp.
+#gmce and gmce2 both have a lot of 'Â' symbols following the genus name; fert1 has this problem for just the species ' Carex canescensÂ'. we should fix this if it isn't something the name cleaning will understand
 
 # nov 20, 2015 -checked all plots have recorded species, so the filter abundance !=0 step will not remove any plots.
 
@@ -18,20 +23,11 @@ watering2<-merge(watering, watering_names, by="species_code", all=T)%>%
   select(-species_code) %>%
   filter(abundance!=0) #this drops 3 plots in 2011 and 2013 (plots 3, 4, and 7) which had no pin hits but did have species
 
-#### KIM
 fert1 <- read.csv("ANR_Fert1.csv") %>% 
   mutate(version = 2.0, community = 0, block = 0)
   
-  
-  
-  
-#### KIM
 fert2 <- read.csv("ANR_Fert2.csv") %>%
-  mutate(version = 2.0, community = 0)
-
-
-
-
+  mutate(version = 2.0, community = 0) #has "Other lichens" and "Pioneer mosses (unspecified), which make up a large part of the community
 
 mat2<-read.delim("ARC_mat2.txt")%>%
   select(-id, -nutrients, -light, -carbon, -water, -other_manipulation, -num_manipulations, -experiment_year, -n, -p, -plot_mani, -species_num)%>%
@@ -76,14 +72,9 @@ exp1_names<-read.delim("ASGA_Exp1_specieslist.txt")
 exp12<-merge(exp1, exp1_names, by="species_code", all=T)%>%
   filter(abundance!=0)%>% mutate(version = 1.0) %>%
   select(-species_code)
-#### KIM
+
 eelplot <- read.csv("AZI_EELplot.csv")%>%
   mutate(version = 2.0, community = 0)
-
-
-
-
-
 
 nitphos <- read.csv("AZI_NitPhos.csv") %>%
   mutate(community_type = 0, block = 0, version = 1.0) %>%
@@ -208,25 +199,15 @@ culardoch2<-merge(culardoch, culardoch_names, by="species_code", all=T)%>%
 
 gap2<-read.csv("DCGS_gap.csv")%>%
   mutate(community_type=0, version = 1.0) %>% filter(abundance!=0)
-#### MEGHAN
+
 gcme <- read.csv("DCMIC_GCME.csv")%>%
   mutate(version = 2.0, block = 0, community = 0)
 
-
-#### MEGHAN
 gcme2 <- read.csv("DCMIC_GCME2.csv")%>%
   mutate(version = 2.0, block = 0, community = 0)
 
-
-
-#### MEGHAN
 d_precip <- read.csv("DCMIC_Precip.csv")%>%
   mutate(version = 2.0, block = 0, community = 0)
-
-
-
-
-
 
 nsfc<-read.delim("DL_NSFC.txt")%>%
   select(-id, -nutrients, -light, -carbon, -water, -other_manipulation, -num_manipulations, -experiment_year, -n, -precip, -plot_mani, -species_num)%>%
@@ -258,7 +239,7 @@ face_names<-read.delim("GVN_FACE_specieslist.txt")
 face2<-merge(face, face_names, by="species_code", all=T)%>%
   filter(abundance!=0)%>%
   select(-species_code)
-#### MEGHAN
+
 warmnit <- read.csv("Hayoka_WarmNit.csv")%>%
   mutate(version = 2.0, community = 0, block = 0)
 
@@ -505,12 +486,11 @@ tide_names<-read.delim("PIE_Tide_specieslist.txt")
 tide2<-merge(tide, tide_names, by="species_code", all=T)%>%
   filter(abundance!=0)%>%
   select(-species_code)
-#### KIM
-nut <- read.csv("Rengen_Nut.csv")%>%
-  mutate(version = 2.0, community = 0, block = 0)
 
-
-
+nut <- read.csv("Rengen_Nut.csv")%>% #species '...41', what is this? ask PIs
+  mutate(version = 2.0, community = 0, block = 0)%>%
+  filter(!(genus_species %in% c('Cover of forbs', 'Cover of graminoids', 'Cover of legumes', 'Cover of short forbs', 'Cover of short forbs with legumes', 'Cover of short graminoids', 'Cover of tall graminoids', 'number of all species', 'number of species > 1%', 'short forbs (number of species)', 'short graminoids (number of species)', 'tall grasses (number of species)', 'Total cover', 'Cover of tall forbs', 'Cover of tall forbs with legumes', 'tall forbs (number of species)', 'number of woods', 'cover of woods')))%>%
+  mutate(genus_species=ifelse(genus_species=='Picea abies seedling', 'Picea abies', as.character(genus_species)))
 
 interaction<-read.delim("RIO_interaction.txt")%>%
   select(-n, -precip, -precip_vari, -plot_mani, -data_type)%>%
@@ -572,9 +552,10 @@ wenndex4 <- rbind(wenndex2, wenndex3)
 
 graze <- read.csv("SFREC_GrazePrecip.csv") %>%
   filter(abundance != 0) %>% mutate(version = 1.0)
-#### KIM
+
 s_precip <- read.csv("SGS_Precip.csv")%>%
-  mutate(version = 2.0, community = 0, block = 0)
+  mutate(version = 2.0, community = 0, block = 0)%>%
+  filter(!(genus_species %in% c('Unknown')))
 
 #### MEGHAN
 nash <- read.csv("Sil_NASH.csv") %>%
@@ -638,7 +619,7 @@ lovegrass <- read.csv("TRA_Lovegrass.csv") %>%
 edge <- read.csv("USA_EDGE.csv") %>% ## Added new data 2020
   mutate(data_type = "cover", version = 1.0)%>%
   filter(abundance !=0)
-#### KIM
+
 shet <- read.csv("WAG_SHet.csv") %>%
   mutate(version = 2.0, community = 0)
 
