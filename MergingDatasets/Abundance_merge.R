@@ -469,8 +469,8 @@ snow<-read.csv("NWT_snow.csv")%>%
   mutate(community_type=0, version=ifelse(calendar_year<=2012, 1.0,2.0))%>%
   filter(abundance!=0) %>% 
   filter(genus_species != "Litter", genus_species != "Lichen", 
-         genus_species != "Moss", genus_species != "bare ground", 
-         genus_species != "rock, fragments")
+         genus_species != "Moss", genus_species != "Bare Ground", 
+         genus_species != "Rock, fragments")
 
 oface<-read.delim("ORNL_FACE.txt")%>%
   select(-id, -nutrients, -light, -carbon, -water, -other_manipulation, -num_manipulations, -experiment_year, -c,   -plot_mani, -species_num, -plot_id1)%>%
