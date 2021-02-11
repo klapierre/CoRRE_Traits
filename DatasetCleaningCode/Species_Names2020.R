@@ -20,8 +20,8 @@ library(Taxonstand)
 # import data
 full.list <- read.csv ("Data/CompiledData/Species_lists/SpeciesList.csv", row.names = 1)
 oldsp <- read.csv("Data/CompiledData/CoRRE_TRY_species_list.csv", row.names = 1)
-moss <- read.delim("Data/OriginalData/Traits/Bryophytes.txt", sep = ",", header = FALSE) # from: http://www.mobot.org/mobot/tropicos/most/bryolist.shtml
-try2corre <- 
+moss <- read.delim("Data/OriginalData/Traits/Bryophytes.txt", sep = ",", header = FALSE) #from: http://www.mobot.org/mobot/tropicos/most/bryolist.shtml
+
 # Manipulating oldsp to prepare to merge with the new species list
 oldsp$oldsp <- 1 # create a column to indicate name was in old species list
 oldsp1 <- oldsp[,c(1,4)] # get rid of extra columns
@@ -104,6 +104,7 @@ unmatched.sp$species_matched[grepl("un ",fixed = TRUE, unmatched.sp$species_matc
 # change column names
 names(unmatched.sp)[1] <- "genus_species"
 # combine with matched species
+matched.sp <- read.csv("Data/CompiledData/Species_lists/good_sp.csv", row.names = 1)
 newsp.match <- rbind(matched.sp, unmatched.sp)
 
 
@@ -126,6 +127,9 @@ names(newsp.match)[4] <- "type"
 moss$Family <- sapply(strsplit(moss$V1, split = " "),`[`, 1, simplify=FALSE)
 moss <- moss[which(moss$Family != ""),]
 newsp.match$type[newsp.match$Family %in% moss$Family] <- "moss/lichen"
+newsp.match$type[newsp.match$Family == "Anastrophyllaceae"] <- "moss/lichen"
+
+
 
 full.splist <- rbind(newsp.match[,c(1,2,4)], oldsp[,c(1:3)])
 # caplitalize first letter of species names function modified from https://rstudio-pubs-static.s3.amazonaws.com/408658_512da947714740b99253228f084a08a9.html
@@ -146,11 +150,11 @@ names(full.splist)[1] <- "species"
 ## create a "remove" column where unknowns, etc can be removed easily
 
 full.splist$remove <- 0
-full.splist$remove[full.splist$species_matched == "Unknown NA"] <- 1
+full.splist$remove[full.splist$species_matched == "Unknown NA"] <- 3
 full.splist$remove[full.splist$type == "identified genus"] <- 1
-full.splist$remove[full.splist$type == "moss/lichen"] <- 1
+full.splist$remove[full.splist$type == "moss/lichen"] <- 2
 
-write.csv(full.splist, "Data/CompiledData/Species_lists/fullsp_list2020.csv")
+write.csv(full.splist, "Data/CompiledData/Species_lists/fullsp_list2020.csv", row.names = FALSE)
 ### Notes: lespedeza discola???
 ## dichelachne squamulosum???
 

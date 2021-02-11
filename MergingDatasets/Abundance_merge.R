@@ -639,7 +639,8 @@ combine<-rbind(bffert2, bgp, biocon, bowman2, ccd2, climarid, clip2, clonal2, cu
 combine <- combine %>% mutate(genus_species = trimws(genus_species, 'both')) %>%
   mutate(genus_species = gsub("\\s\\s"," ",genus_species, perl = TRUE)) %>%
   mutate(genus_species = gsub("\\s\\s"," ",genus_species, perl = TRUE)) %>%
-  mutate(genus_species = gsub("[.]"," ",genus_species)) 
+  mutate(genus_species = gsub("[.]"," ",genus_species))  %>%
+  mutate(genus_species = gsub("\u00A0", " ",genus_species, fixed = TRUE))
 
 combine$genus_species <- str_trim(combine$genus_species, "right") # get rid of spaces after full species name
 combine$genus_species <- tolower(combine$genus_species)
