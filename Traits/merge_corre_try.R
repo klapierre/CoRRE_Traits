@@ -3,19 +3,20 @@ library(data.table)
 library(Hmisc)
 library(utf8)
 
-#from Habacuc
+#Code originally from Habacuc
 
 #meghan's
-setwd("C:/Users/mavolio2/Dropbox/converge_diverge/datasets/LongForm/fixing species names")
-setwd("C:/Users/megha/Dropbox/converge_diverge/datasets/LongForm/fixing species names")
+setwd("C:/Users/mavolio2/Dropbox/CoRRE_database/Data")
+
 
 #kim's
-setwd('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\datasets\\LongForm\\fixing species names')
+setwd('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data')
 
-checkcorre<-read.csv("../SpeciesRelativeAbundance_Nov2019.csv")
+#I am not sure what thi is for....
+# checkcorre<-read.csv("../SpeciesRelativeAbundance_Nov2019.csv")
 
 #load clean taxonomy for try
-taxdat <- read_csv("taxon_updates.csv")
+taxdat <- read_csv("TRYCoRREMerge/taxon_updates.csv")
 
 #get rid of species matched by taxize
 ii <- is.na(taxdat$species_Taxonstand) & !is.na(taxdat$species_taxize)
@@ -23,34 +24,26 @@ ii <- is.na(taxdat$species_Taxonstand) & !is.na(taxdat$species_taxize)
 taxdat$species_matched[ii] <- taxdat$species[ii]
 
 #select species and matched species columns
-taxdat %>%
-  select(species, species_matched) -> taxdat
+taxdat<-taxdat %>%
+  select(species, species_matched)
 
-#load corre
-corre <- read_csv("CoRRE_SpList_Sept2019.csv")
+#load corre species
+corre <- read_csv("CompiledData/Species_lists/fullsp_list2020.csv")
+
 #preprocessing to utf8
-corre %>%
-  mutate(species= as_utf8(genus_species))->corre
-#capitalize all records
-corre$species <- Hmisc::capitalize(tolower(corre$genus_species))
+corre<-corre %>%
+  filter(remove==0)%>%#this filters out only to sp., unknowns, and non-vasular plants except ferns.
+  select(species, species_matched)%>%
+  rename(genus_species=species)
 
-#load taxonomy for corre
-taxcorre <- read_csv("Species_to_check_cleaned_2.csv")%>%
-  filter(remove==0)#this filters out only to sp., unknowns, and non-vasular plants except ferns.
 #get rid of taxize matches - we manually did all this
 # ii <- is.na(taxcorre$species_Taxonstand) & !is.na(taxcorre$species_taxize)
 # 
 # taxcorre$species_matched[ii] <- taxcorre$species[ii]
 #select submitted name and matched name
-taxcorre %>%
-  select(species, species_matched) -> taxcorre
-#join corre to updated taxonomy
-corre2 <- left_join(corre, taxcorre)%>%
-  select(-species)%>%
-  na.omit()
 
 #read try 
-try <- fread("TryAccSpecies.txt",sep = "\t",data.table = FALSE,stringsAsFactors = FALSE,strip.white = TRUE)
+try <- fread("TRYCoRREMerge/TryAccSpecies.txt",sep = "\t",data.table = FALSE,stringsAsFactors = FALSE,strip.white = TRUE)
 #preprocess try
 try %>%
   mutate(species= as_utf8(AccSpeciesName))->try
@@ -63,10 +56,10 @@ try <- left_join(try,taxdat, by = c("AccSpeciesName"="species"))%>%
   select(-species)
 
 #join corre to try
-corre2try <- left_join(corre2,try, by="species_matched")%>%
+corre2try <- left_join(corre,try, by="species_matched")%>%
   unique()
 
-# write_csv(corre2try, path = "corre2trykey.csv")
+write.csv(corre2try, "TRYCoRREMerge/corre2trykey.csv", row.names=F)
 
 #make comma separted row to submit to try 
 
@@ -79,14 +72,15 @@ try_list <- corre2try[["AccSpeciesID"]][!is.na(corre2try$AccSpeciesID)]
 
 ###generating list for phylogeney
 #want to include all columns, and indicate where a moss/lichen, plus include anything that is identified to genera
-taxcorreAll <- read.csv("Species_to_check_cleaned_2.csv")%>%
+taxcorreAll <- read.csv("CompiledData/Species_lists/fullsp_list2020.csv")%>%
   filter(remove!=3)%>% #this filters out unknowns, but keeps mosses/lichens and anything that was IDed to genus.
   select(species, species_matched, remove)%>%
   mutate(type=ifelse(remove==2, 'moss/lichen', ifelse(remove==1, 'identified genus', 'identified species')))%>%
   select(-remove)
-#join corre to updated taxonomy
-correTaxonomyAll <- left_join(corre, taxcorreAll)%>%
-  select(-species)%>%
+
+correTaxonomyAll <- taxcorreAll%>%
   na.omit()%>%
-  unique()
-# write.csv(correTaxonomyAll, 'CoRRE_TRY_species_list.csv')
+  unique()%>%
+  rename(genus_species=species)
+
+write.csv(correTaxonomyAll, 'TRYCoRREMerge/CoRRE_TRY_species_list.csv')
