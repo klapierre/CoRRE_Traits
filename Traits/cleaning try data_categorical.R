@@ -4,15 +4,14 @@ library(data.table)
 theme_set(theme_bw(12))
 
 #meghan's
-setwd("C://Users/mavolio2/Dropbox/converge_diverge/datasets/Traits/Try Data Nov 2019")
-setwd("C://Users/megha/Dropbox/converge_diverge/datasets/Traits/Try Data Nov 2019")
+setwd("C:/Users/mavolio2/Dropbox/CoRRE_database/Data/")
 
 #kim's desktop
 setwd('C:\\Users\\komatsuk\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\datasets\\Traits\\Try Data Nov 2019')
 #kim's laptop
 setwd('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\datasets\\Traits\\Try Data Nov 2019')
 
-dat<-fread("7764.txt",sep = "\t",data.table = FALSE,stringsAsFactors = FALSE,strip.white = TRUE)
+dat<-fread("TRYCoRREMerge/7764.txt",sep = "\t",data.table = FALSE,stringsAsFactors = FALSE,strip.white = TRUE)
 
 #generate list of units for ALL TRY traits
 units <- dat%>%
@@ -29,7 +28,7 @@ dat2<-dat%>%
   filter(!is.na(TraitID))
 
 #mering corre with try
-key<-read.csv("corre2trykey.csv")%>%
+key<-read.csv("TRYCoRREMerge/corre2trykey.csv")%>%
   select(species_matched, AccSpeciesID, AccSpeciesName)%>%
   unique()
 
@@ -38,6 +37,13 @@ length(unique(key$species_matched))
 splist<-key%>%
   select(species_matched)%>%
   unique
+
+##subset out only new species
+new<-read.csv("CompiledData/Species_lists/newsp2020.csv")%>%
+  select(-X, -new.sp, -old.sp, -Family)
+
+keyNew<-key%>%
+  right_join(new)
 
 dat3<-dat2%>%
   right_join(key)%>%
