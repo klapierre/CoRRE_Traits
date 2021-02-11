@@ -6,7 +6,7 @@ library(utf8)
 #Code originally from Habacuc
 
 #meghan's
-setwd("C:/Users/mavolio2/Dropbox/CoRRE_database/Data")
+setwd("C:/Users/mavolio2/Dropbox/CoRRE_database/Data/")
 
 
 #kim's
@@ -30,7 +30,6 @@ taxdat<-taxdat %>%
 #load corre species
 corre <- read_csv("CompiledData/Species_lists/fullsp_list2020.csv")
 
-#preprocessing to utf8
 corre<-corre %>%
   filter(remove==0)%>%#this filters out only to sp., unknowns, and non-vasular plants except ferns.
   select(species, species_matched)%>%
@@ -59,16 +58,25 @@ try <- left_join(try,taxdat, by = c("AccSpeciesName"="species"))%>%
 corre2try <- left_join(corre,try, by="species_matched")%>%
   unique()
 
-write.csv(corre2try, "TRYCoRREMerge/corre2trykey.csv", row.names=F)
+#write.csv(corre2try, "TRYCoRREMerge/corre2trykey.csv", row.names=F)
 
 #make comma separted row to submit to try 
 
 try_list <- corre2try[["AccSpeciesID"]][!is.na(corre2try$AccSpeciesID)]
 
-# write_delim(x = as.data.frame(t(try_list)), "list_for_try.csv",delim = ",",col_names = FALSE)
+#write_delim(x = as.data.frame(t(try_list)), "TRYCoRREMerge/splist_for_try_request.csv",delim = ",",col_names = FALSE)
 
+#do this for just new species
 
+new<-read.csv("CompiledData/Species_lists/newsp2020.csv")%>%
+  select(-X, -new.sp, -old.sp, -Family)
 
+try_list_new<-corre2try%>%
+  right_join(new)
+
+try_list_new2 <- try_list_new[["AccSpeciesID"]][!is.na(try_list_new$AccSpeciesID)]
+
+write_delim(x = as.data.frame(t(try_list_new2)), "TRYCoRREMerge/splist_for_try_request_Feb2021.csv",delim = ",",col_names = FALSE)
 
 ###generating list for phylogeney
 #want to include all columns, and indicate where a moss/lichen, plus include anything that is identified to genera
