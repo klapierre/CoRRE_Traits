@@ -1,48 +1,68 @@
 ###########################
 ### Species cleaning ####
 ########################
+
+## In this script the species names are cleaned so that they are standardized
+## between experiments and to be merged with TRY.
+## Two files are read in - the full species list created in the Abundance_merge.R
+## file and the list of the corrected names from version 1.0 (note: no code for this
+## because a lot of the cleaning for this list was done by hand)
+## the full species list is run through the TPL() function from Taxonstand
+## to save time so the species list does not always have to be run through TPL()
+## intermediate stages are saved to run the rest of the code
+
+# Set working directory
 setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database/")
 
 # load libraries
 library(Taxonstand)
 
 # import data
-full.list <- read.csv ("Data/CompiledData/SpeciesList.csv", row.names = 1)
+full.list <- read.csv ("Data/CompiledData/Species_lists/SpeciesList.csv", row.names = 1)
 oldsp <- read.csv("Data/CompiledData/CoRRE_TRY_species_list.csv", row.names = 1)
 
+# Manipulating oldsp to prepare to merge with the new species list
 oldsp$oldsp <- 1 # create a column to indicate name was in old species list
 oldsp1 <- oldsp[,c(1,4)] # get rid of extra columns
 
-merged.list<- merge(full.list, oldsp1, all.x = TRUE) #merge new list with old list
+# Merge new list with old list
+merged.list<- merge(full.list, oldsp1, all.x = TRUE) 
 
 # get species that are not in old list 
 unidentified.sp <- data.frame(genus_species=merged.list[which(is.na(merged.list$oldsp)),1])
 
+# Run species which were not identified in the old list through the TPL function to match with accepted species names
 clean.list <- TPL(unidentified.sp$genus_species)
 
+# Pull out matched species (i.e. those that had a match in The Plant List) -
+# These do not need to nbe checked further. 
 matched.sp <- clean.list[clean.list$Plant.Name.Index == TRUE | clean.list$Taxonomic.status == "Accepted",]
-matched.sp$species_matched <- paste(matched.sp$New.Genus, matched.sp$New.Species, sep = " ")
-matched.sp <- matched.sp[,c(1,27)]
-names(matched.sp)[1] <- "genus_species"
-matched.sp <- matched.sp[-which(is.na(matched.sp$genus_species)),]
-write.csv(matched.sp, "good_sp.csv")
+matched.sp$species_matched <- paste(matched.sp$New.Genus, matched.sp$New.Species, sep = " ") # creating column with cleaned name
+matched.sp <- matched.sp[,c(1,27)] # getting two relevant columns
+names(matched.sp)[1] <- "genus_species" #renaming column
+matched.sp <- matched.sp[-which(is.na(matched.sp$genus_species)),] # one na value.. not sure why
+write.csv(matched.sp, "Data/CompiledData/Species_lists/good_sp.csv") # saving to load back in later
+
+## Pull out species with no match in TPL to hand fix names
 unmatched.sp <- clean.list[clean.list$Plant.Name.Index == FALSE & clean.list$Taxonomic.status != "Accepted",]
-unmatched.sp$species_matched <- paste(unmatched.sp$New.Genus, unmatched.sp$New.Species, sep = " ")
-unmatched.sp <- unmatched.sp[,c(1,27)]
+unmatched.sp$species_matched <- paste(unmatched.sp$New.Genus, unmatched.sp$New.Species, sep = " ") # creating column with "cleaned" name
+unmatched.sp <- unmatched.sp[,c(1,27)] # getting necessary columns
 unmatched.sp <- unmatched.sp[-which(is.na(unmatched.sp$Taxon)),]
-write.csv(unmatched.sp, "sp_fix.csv")
+write.csv(unmatched.sp, "Data/CompiledData/Species_lists/sp_fix.csv") # save intermediate file 
 
 
 # cleaning unmatched species
-
+# Read ing unmatched.sp
+unmatched.sp <- read.csv("Data/CompiledData/Species_lists/sp_fix.csv", row.names = 1)
 # 1. change spp to sp
-unmatched.sp$species_matched <- gsub("spp", "sp", unmatched.sp$species_matched)
+unmatched.sp$species_matched <- gsub("spp", "sp.", unmatched.sp$species_matched)
+unmatched.sp$species_matched <- gsub("sp", "sp.", unmatched.sp$species_matched)
 # 2. change species to sp
-unmatched.sp$species_matched <- gsub("species", "sp", unmatched.sp$species_matched)
+unmatched.sp$species_matched <- gsub("species", "sp.", unmatched.sp$species_matched)
 # 3. Change NA to sp
-unmatched.sp$species_matched <- gsub(" NA", " sp", unmatched.sp$species_matched)
+unmatched.sp$species_matched <- gsub(" NA", " sp.", unmatched.sp$species_matched)
 # 4. Change family to sp
-unmatched.sp$species_matched <- gsub(" family", " sp", unmatched.sp$species_matched)
+unmatched.sp$species_matched <- gsub(" family", " sp.", unmatched.sp$species_matched)
 # 4. Fix individual species
 unmatched.sp$species_matched <- gsub("salsolacollina collina", "Salsola collina", unmatched.sp$species_matched)
 unmatched.sp$species_matched <- gsub("aristida_caput medusae", "Aristida caput-medusae", unmatched.sp$species_matched)
@@ -65,6 +85,22 @@ unmatched.sp$species_matched <- gsub("rubus pennsylvanicus", "Rubus pensilvanicu
 unmatched.sp$species_matched <- gsub("silene jenisseensis", "Silene jenisseensis", unmatched.sp$species_matched)
 unmatched.sp$species_matched <- gsub("symphyotrichum novae", "Symphyotrichum novae-angliae", unmatched.sp$species_matched)
 unmatched.sp$species_matched[unmatched.sp$species_matched == "pycnan vir"] <- "Pycnanthemum virginianum"
+unmatched.sp$species_matched[unmatched.sp$species_matched == "solanum grascilens bonariensis blanco"] <- "Solanum chenopodioides"
+unmatched.sp$species_matched[unmatched.sp$species_matched == "marsilea cocinea"] <- "Marsilea ancylopoda"
+unmatched.sp$species_matched[unmatched.sp$species_matched == "gliseria peruviana"] <- "Glyceria multiflora"
+unmatched.sp$species_matched[unmatched.sp$species_matched == "unkown big leaf"] <- "Unknown"
+unmatched.sp$species_matched[grepl("unknown",fixed = TRUE, unmatched.sp$species_matched)] <- "Unknown"
+unmatched.sp$species_matched[grepl("forb",fixed = TRUE, unmatched.sp$species_matched)] <- "Unknown"
+unmatched.sp$species_matched[grepl("unknown",fixed = TRUE, unmatched.sp$species_matched)]<- "Unknown"
+unmatched.sp$species_matched[grepl("unidentified",fixed = TRUE, unmatched.sp$species_matched)]<- "Unknown"
+unmatched.sp$species_matched[grepl("unk",fixed = TRUE, unmatched.sp$species_matched)]<- "Unknown"
+unmatched.sp$species_matched[grepl("grass",fixed = TRUE, unmatched.sp$species_matched)]<- "Unknown"
+unmatched.sp$species_matched[grepl("legume",fixed = TRUE, unmatched.sp$species_matched)]<- "Unknown"
+unmatched.sp$species_matched[grepl("dicot",fixed = TRUE, unmatched.sp$species_matched)]<- "Unknown"
+unmatched.sp$species_matched[grepl("lichen", unmatched.sp$species_matched)]<- "Unknown"
+unmatched.sp$species_matched[grepl("rush",fixed = TRUE, unmatched.sp$species_matched)]<- "Unknown"
+unmatched.sp$species_matched[grepl("un ",fixed = TRUE, unmatched.sp$species_matched)]<- "Unknown"
+
 # change column names
 names(unmatched.sp)[1] <- "genus_species"
 # combine with matched species
@@ -78,19 +114,26 @@ all.sp$new.sp[which(is.na(all.sp$new.sp))] <- 0
 
 need.traits <- all.sp[which(all.sp$new.sp ==1 & all.sp$old.sp ==0),]
 need.traits <- need.traits[!grepl(" sp",fixed = TRUE, need.traits$species_matched),]
-need.traits <- need.traits[!grepl("forb",fixed = TRUE, need.traits$species_matched),]
-need.traits <- need.traits[!grepl("unknown",fixed = TRUE, need.traits$species_matched),]
-need.traits <- need.traits[!grepl("unidentified",fixed = TRUE, need.traits$species_matched),]
-need.traits <- need.traits[!grepl("unk",fixed = TRUE, need.traits$species_matched),]
-need.traits <- need.traits[!grepl("grass",fixed = TRUE, need.traits$species_matched),]
-need.traits <- need.traits[!grepl("legume",fixed = TRUE, need.traits$species_matched),]
-need.traits <- need.traits[!grepl("dicot",fixed = TRUE, need.traits$species_matched),]
-need.traits <- need.traits[!grepl("lichen", need.traits$species_matched),]
-need.traits <- need.traits[!grepl("rush",fixed = TRUE, need.traits$species_matched),]
-need.traits <- need.traits[!grepl("un ",fixed = TRUE, need.traits$species_matched),]
+need.traits <- need.traits[!grepl("Unknown",fixed = TRUE, need.traits$species_matched),]
 
-### Notes: lespedeza discola???, marsilea cocinea??? solanum grascilens bonariensis blanco???
-## dichelachne squamulosum, gliseria peruviana
+write.csv(need.traits, "Data/CompiledData/Species_lists/newsp2020.csv")
+
+
+#### Create a dataframe with full species list by combining old sp with new sp. 
+full.splist <- rbind(newsp.match, oldsp[,c(1,2)])
+# caplitalize first letter of species names function modified from https://rstudio-pubs-static.s3.amazonaws.com/408658_512da947714740b99253228f084a08a9.html
+CapStr <- function(y) { 
+  c <- strsplit(y, " ")[[1]][1]
+  d <- strsplit(y, " ")[[1]][2]
+  paste(paste(toupper(substring(c, 1,1)), substring(c, 2),
+        sep="", collapse=" "), d, sep = " ")
+}
+full.splist$species_matched <- sapply(full.splist$species_matched, CapStr)
+
+names(full.splist)[1] <- "species"
+write.csv(full.splist, "Data/CompiledData/Species_lists/fullsp_list2020.csv")
+### Notes: lespedeza discola???
+## dichelachne squamulosum???
 
 ### herbdiv na values, gap 	pr_vi
 

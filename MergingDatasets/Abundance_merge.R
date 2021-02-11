@@ -651,7 +651,7 @@ species_list<-combine%>%
   select(genus_species)%>%
   unique()
 
-write.csv(species_list, "~/Dropbox/CoRRE_database/Data/CompiledData/SpeciesList.csv")
+write.csv(species_list, "~/Dropbox/CoRRE_database/Data/CompiledData/Species_lists/SpeciesList.csv")
 
 ###Getting Relative Cover
 totcov<-combine%>%

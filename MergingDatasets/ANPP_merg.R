@@ -14,6 +14,9 @@ clonal<-read.delim("ASGA_Clonal_anpp.txt")%>%
   mutate(community_type=0)
 exp1<-read.delim("ASGA_Exp1_anpp.txt")%>%
   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp, community_type, block)
+eel <- read.csv("AZI_EELplot_anpp.csv")%>%
+  select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp)%>%
+  mutate(community_type=0, block = 0)
 nit <- read.csv("AZI_NitPhos.csv") %>%
   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp) %>%
   mutate(community_type = 0, block = 0)
@@ -47,6 +50,9 @@ nsfc<-read.delim("DL_NSFC_anpp.txt")%>%
 nsfc2<-read.csv("DL_NSFC_anpp20132016.csv")%>%
   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp, block)%>%
   mutate(community_type=0)
+phace <- read.csv("HPGRS_PHACE_anpp.csv")%>%
+  select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, block) %>%
+  mutate(community_type = 0)
 NDE <- read.csv("IMGERS_NDE_anpp.csv") %>%
   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp, block)%>%
   mutate(community_type=0)
@@ -99,6 +105,9 @@ wet<-read.delim("NANT_wet_anpp.txt")%>%
 gb<-read.delim("NGBER_gb_anpp.txt")%>%
   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp, block)%>%
   mutate(community_type=0)
+nutnet <- read.csv("NutNet_anpp.csv")%>%
+  select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp, block)%>%
+  mutate(community_type=0)
 nfert<-read.delim("NWT_246NFert_anpp.txt")%>%
   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp, block)%>%
   mutate(community_type=0)
@@ -129,6 +138,9 @@ snfert<-read.delim("SEV_NFert_anpp.txt")%>%
 wenndex<-read.delim("SEV_WENNDEx_anpp.txt")%>%
   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp)%>%
   mutate(community_type=0, block = 0)
+nash <- read.csv("Sil_NASH_anpp.csv")%>%
+  select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp, block)%>%
+  mutate(community_type=0)
 ton <- read.csv("SIU_TON_anpp.csv") %>%
   select(-data_type) %>%
   mutate(community_type = 0)
@@ -139,6 +151,9 @@ nitrogen <- read.csv("SR_Nitrogen_anpp.csv")%>%
   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp, community_type, block)
 water <- read.csv("SR_Water_anpp.csv")%>%
   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp, community_type, block)
+shet <- read.csv("WAG_Shet_anpp.csv")%>%
+  select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp, block)%>%
+  mutate(community_type=0)
 nitadd <- read.csv("YMN_NitAdd_anpp.csv")%>%
   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp)%>%
   mutate(community_type = 0, block = 0)
@@ -148,3 +163,5 @@ anpp <- rbind(bgp, biocon, bowman, clonal, cxn, e001, e002, events, exp1, firepl
               snfert, snow, t7, tide, tmece, ton, uk, wapaclip, water, watering, wenndex, wet)
 
 write.csv(anpp, '~/Dropbox/CoRRE_database/Data/CompiledData/ANPP2020.csv')
+
+## NA values in MNR watfer and KNZ GFP

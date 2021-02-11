@@ -5,18 +5,25 @@ setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database")
 
 # biomass data
 file <- "https://portal.edirepository.org/nis/dataviewer?packageid=knb-lter-knz.57.10&entityid=eaf1b05d4c7578a1fe1efc5173b80953"
-df <- read.csv(file, header = TRUE)
+df <- read.csv(file, header = TRUE, na.strings = c(NA, ""))
+
+
+df$CUYRDD[df$CUYRDD == "."] <- 0
+df$CUYRDD[which(is.na(df$CUYRDD))] <- 0
 df$CUYRDD <- as.numeric(df$CUYRDD)
 
+# change n+p to b to fit metadata
 for (i in 1:nrow(df)){
   if(df$NUTRIENT[i] == "n+p"){
     df$NUTRIENT[i] = "b"
   }
 }
 
+# combine treatment data into single column
 df$treatment <- paste(df$BURN, df$MOW, df$NUTRIENT, sep = "_")
-
 df <- df[df$MOW == "u",]
+
+df <- df[-which(is.na(df$FORBS) & is.na(df$LVGRASS)),]
 
 df$anpp <- df$LVGRASS + df$FORBS + df$CUYRDD
 
