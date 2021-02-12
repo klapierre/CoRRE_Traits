@@ -11,7 +11,11 @@ setwd('C:\\Users\\komatsuk\\Dropbox (Smithsonian)\\working groups\\CoRRE\\conver
 #kim's laptop
 setwd('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\datasets\\Traits\\Try Data Nov 2019')
 
-dat<-fread("TRYCoRREMerge/7764.txt",sep = "\t",data.table = FALSE,stringsAsFactors = FALSE,strip.white = TRUE)
+
+#Choose which 
+dat<-fread("TRYCoRREMerge/TRY_Traits_Download_Nov2019.txt",sep = "\t",data.table = FALSE,stringsAsFactors = FALSE,strip.white = TRUE)
+
+
 
 #generate list of units for ALL TRY traits
 units <- dat%>%
