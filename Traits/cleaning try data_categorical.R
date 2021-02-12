@@ -3,6 +3,10 @@ library(data.table)
 
 theme_set(theme_bw(12))
 
+###notes
+#code was originally done for Nov2019 TRY pull. Then in Feb 2021 we added more species, and code was modified for this. When we changed the code (generally the second pull was much lower and some trait values were not found,) the lines from the original code that no longer work are pasted below the updated code
+
+
 #meghan's
 setwd("C:/Users/mavolio2/Dropbox/CoRRE_database/Data/")
 
@@ -11,7 +15,12 @@ setwd('C:\\Users\\komatsuk\\Dropbox (Smithsonian)\\working groups\\CoRRE\\conver
 #kim's laptop
 setwd('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\datasets\\Traits\\Try Data Nov 2019')
 
-dat<-fread("TRYCoRREMerge/7764.txt",sep = "\t",data.table = FALSE,stringsAsFactors = FALSE,strip.white = TRUE)
+
+#Choose which dataset to read in
+dat<-fread("TRYCoRREMerge/TRY_Traits_Download_Nov2019.txt",sep = "\t",data.table = FALSE,stringsAsFactors = FALSE,strip.white = TRUE)
+
+dat<-fread("TRYCoRREMerge/TRY_Traits_Download_Feb2021.txt",sep = "\t",data.table = FALSE,stringsAsFactors = FALSE,strip.white = TRUE)
+
 
 #generate list of units for ALL TRY traits
 units <- dat%>%
@@ -40,10 +49,11 @@ splist<-key%>%
 
 ##subset out only new species
 new<-read.csv("CompiledData/Species_lists/newsp2020.csv")%>%
-  select(-X, -new.sp, -old.sp, -Family)
+  select(-X, -new.sp, -old.sp)
 
 keyNew<-key%>%
-  right_join(new)
+  right_join(new)%>%
+  select(-Family)
 
 dat3<-dat2%>%
   right_join(key)%>%
@@ -51,7 +61,7 @@ dat3<-dat2%>%
 
 
 ##how many traits for sp
-sdivtrt<-read.csv("TRY_traits_type_11252019.csv")
+sdivtrt<-read.csv("TRYCoRREMerge/TRY_traits_type_11252019.csv")
 
 traitnum<-dat3%>%
   select(species_matched, TraitID)%>%
@@ -148,6 +158,14 @@ trait42_problem<-trait42%>%
   filter(n!=1)%>%
   select(-n)
 
+#bind this one
+trait42_problem_new<-trait42_problem[c(1:5),]%>%
+  mutate(CleanTraitValue=ifelse(species_matched=="Bromus sterilis", "graminiod",
+                         ifelse(species_matched=="Cornus suecica", "forb",
+                         ifelse(species_matched=="Cynanchum thesioides", "forb",
+                         ifelse(species_matched=="Lespedeza bicolor","woody",
+                         ifelse(species_matched=="Oxalis corniculata", "forb",999))))))
+#bind this one
 trait42_probelm3<-trait42_problem[c(1:40),]%>%
   mutate(CleanTraitValue=ifelse(species_matched=="Amorpha canescens", "woody",
                           ifelse(species_matched=="Artemisia annua", "forb",
@@ -190,6 +208,7 @@ trait42_probelm3<-trait42_problem[c(1:40),]%>%
                           ifelse(species_matched=="Lonicera japonica", "vine",
                           ifelse(species_matched=="Lonicera periclymenum", "vine", 999)))))))))))))))))))))))))))))))))))))))))
 
+#bind this one
 trait42_probelm4<-trait42_problem[c(41:72),]%>%
   mutate(CleanTraitValue=ifelse(species_matched=="Mollugo verticillata", "vine",
                           ifelse(species_matched=="Moneses uniflora", "woody",
@@ -222,20 +241,20 @@ trait42_probelm4<-trait42_problem[c(41:72),]%>%
                           ifelse(species_matched=="Vicia cracca", "vine",
                           ifelse(species_matched=="Vicia tetrasperma", "vine",
                           ifelse(species_matched=="Vicia villosa", "vine", NA))))))))))))))))))))))))))))))))
-              
-trait42_probelm2<-trait42%>%
-  right_join(trait42_problem)%>%
+#check one value for each            
+trait42_probelm2_new<-trait42%>%
+  right_join(trait42_problem_new)%>%
   select(species_matched, CleanTraitValue, DatasetID)%>%
   unique()%>%
   spread(CleanTraitValue, CleanTraitValue)
 
-  
+#not sure what this does  
 trait42_test_messy<-trait42%>%
   filter(TraitID==42&OrigValueStr!=""&OrigValueStr!="?"&OriglName!="CONSENSUS")%>%
   select(OriglName, OrigValueStr, species_matched, CleanTraitValue)%>%
   unique()
 
-trait42_clean<-rbind(trait42_fern, trait42_forb, trait42_gram, trait42_vine, trait42_woody, trait42_probelm3, trait42_probelm4)%>%
+trait42_clean<-rbind(trait42_fern, trait42_forb, trait42_gram, trait42_vine, trait42_woody,  trait42_problem_new)%>%
   mutate(CleanTraitName="lifeform", CleanTraitUnit=NA, source='TRY_42')
 
 
@@ -249,30 +268,37 @@ trait22<-dat3%>%
   select(species_matched, CleanTraitValue)%>%
   unique()%>%
   spread(CleanTraitValue, CleanTraitValue)%>%
-  mutate(CleanTraitValue=ifelse(is.na(C3)&is.na(C4), "CAM", ifelse(is.na(CAM)&is.na(C3), "C4", ifelse(is.na(C4)&is.na(CAM), "C3", NA))))%>%
+  mutate(CleanTraitValue=ifelse(is.na(C3), "C4", ifelse(is.na(C4), "C3", NA)))%>%
   filter(!is.na(CleanTraitValue))%>%
   select(species_matched, CleanTraitValue)%>%
   mutate(CleanTraitName="photo_pathway", CleanTraitUnit=NA, source='TRY_22')
 
-
+##code for full dataset with CAM
+# mutate(CleanTraitValue=ifelse(is.na(C3)&is.na(C4), "CAM", ifelse(is.na(CAM)&is.na(C3), "C4", ifelse(is.na(C4)&is.na(CAM), "C3", NA))))%>%
 
 ##stem support
 trait1188_clean <- dat3%>%
   filter(TraitID==1188)%>%
-  mutate(CleanTraitValue=ifelse(OrigValueStr=='self', 'self-supporting', ifelse(OrigValueStr=='creeping', 'prostrate', ifelse(OrigValueStr=='procumbent', 'prostrate', ifelse(OrigValueStr=='twining', 'climbing', ifelse(OrigValueStr=='tendrils', 'climbing', ifelse(OrigValueStr=='scrambling', 'climbing', OrigValueStr)))))))%>%
+  mutate(CleanTraitValue=ifelse(OrigValueStr=='self', 'self-supporting', ifelse(OrigValueStr=='creeping', 'prostrate', ifelse(OrigValueStr=='procumbent', 'prostrate',  OrigValueStr))))%>%
   mutate(CleanTraitName='stem_support', CleanTraitUnit=NA)%>%
   select(species_matched, CleanTraitName, CleanTraitValue, CleanTraitUnit)%>%
   unique()%>%
-  mutate(CleanTraitValue2=ifelse(CleanTraitValue=='self-supporting', 'self_supporting', CleanTraitValue))%>%
+  mutate(CleanTraitValue2=ifelse(CleanTraitValue=='self-supporting'|CleanTraitValue=="self supporting", 'self_supporting', CleanTraitValue))%>%
   select(-CleanTraitValue)%>%
   spread(CleanTraitValue2, CleanTraitValue2, fill='fix')%>%
-  mutate(CleanTraitValue2=paste(climbing, decumbent, prostrate, self_supporting, sep=','))%>%
-  mutate(CleanTraitValue=ifelse(CleanTraitValue2 %in% c('climbing,decumbent,fix,fix','climbing,fix,fix,fix'), 'climbing', ifelse(CleanTraitValue2 %in% c('fix,decumbent,fix,fix', 'fix,decumbent,prostrate,fix'), 'decumbent', ifelse(CleanTraitValue2=='fix,fix,prostrate,fix', 'prostrate', 'self-supporting'))))%>%
+  mutate(CleanTraitValue2=paste(decumbent, prostrate, self_supporting, sep=','))%>%
+  mutate(CleanTraitValue=ifelse(CleanTraitValue2 %in% c('decumbent,fix,fix', 'decumbent,prostrate,fix'), 'decumbent', ifelse(CleanTraitValue2=='fix,prostrate,fix', 'prostrate', 'self-supporting')))%>%
   select(species_matched, CleanTraitName, CleanTraitValue, CleanTraitUnit)%>%
   mutate(source='TRY_1188')
 
 table(trait1188_clean$CleanTraitValue)
 
+###old code for when there were climbing species
+# ifelse(OrigValueStr=='twining', 'climbing', ifelse(OrigValueStr=='tendrils', 'climbing', ifelse(OrigValueStr=='scrambling', 'climbing',
+
+# mutate(CleanTraitValue2=paste(climbing, decumbent, prostrate, self_supporting, sep=','))
+
+# mutate(CleanTraitValue=ifelse(CleanTraitValue2 %in% c('climbing,decumbent,fix,fix','climbing,fix,fix,fix'), 'climbing', ifelse(CleanTraitValue2 %in% c('fix,decumbent,fix,fix', 'fix,decumbent,prostrate,fix'), 'decumbent', ifelse(CleanTraitValue2=='fix,fix,prostrate,fix', 'prostrate', 'self-supporting'))))
 
 
 #clonal growth
@@ -443,16 +469,21 @@ trait29 <- dat3%>%
   filter(!is.na(CleanTraitValue2))%>%
   unique()%>%
   spread(CleanTraitValue2, CleanTraitValue2)%>%
-  mutate(CleanTraitValue=ifelse(animal=="animal"&is.na(wind)&is.na(water)&is.na(self), "animal",
-                                ifelse(wind=="wind"&is.na(animal)&is.na(water)&is.na(self),"wind",
-                                       ifelse(self=="self"&is.na(animal)&is.na(wind)&is.na(water), "self",
-                                              ifelse(water=="water"&is.na(animal)&is.na(wind)&is.na(self), "water", "combination")))))%>%
+  mutate(CleanTraitValue=ifelse(animal=="animal"&is.na(wind)&is.na(self), "animal",
+                         ifelse(wind=="wind"&is.na(animal)&is.na(self),"wind",
+                         ifelse(self=="self"&is.na(animal)&is.na(wind), "self", "combination"))))%>%
   select(CleanTraitName, species_matched, CleanTraitValue, source, CleanTraitUnit)
 
 
+#old code
+# mutate(CleanTraitValue=ifelse(animal=="animal"&is.na(wind)&is.na(water)&is.na(self), "animal",
+#                               ifelse(wind=="wind"&is.na(animal)&is.na(water)&is.na(self),"wind",
+#                                      ifelse(self=="self"&is.na(animal)&is.na(wind)&is.na(water), "self",
+#                                             ifelse(water=="water"&is.na(animal)&is.na(wind)&is.na(self), "water", "combination")))))%>%
+
 
 ##mycorrhizal traits
-mycorr<-read.csv('mycorr_Species_match_for_Kim.csv')%>%
+mycorr<-read.csv('TRYCoRREMerge/mycorr_Species_match_for_Kim.csv')%>%
   select(species_matched, Mycorrhizal.type)%>%
   unique()%>%
   mutate(CleanTraitValue=ifelse(Mycorrhizal.type %in% c('AM', 'EcM', 'ErM', 'OM', 'EcM-AM', 'double_AM_EcM', 'NM-AM', 'NM-AM, rarely EcM'), 'yes', ifelse(Mycorrhizal.type=='NM', 'no', ifelse(Mycorrhizal.type=='uncertain', 'uncertain', ''))))%>%
@@ -466,7 +497,7 @@ mycorr<-read.csv('mycorr_Species_match_for_Kim.csv')%>%
   filter(!is.na(CleanTraitValue))%>%
   select(CleanTraitName, species_matched, CleanTraitValue, source, CleanTraitUnit)
 
-mycorrType<-read.csv('mycorr_Species_match_for_Kim.csv')%>%
+mycorrType<-read.csv('TRYCoRREMerge/mycorr_Species_match_for_Kim.csv')%>%
   select(species_matched, Mycorrhizal.type)%>%
   unique()%>%
   mutate(CleanTraitValue=ifelse(Mycorrhizal.type=='AM', 'arbuscular', ifelse(Mycorrhizal.type=='EcM', 'ecto', ifelse(Mycorrhizal.type=='ErM', 'ericaceous', ifelse(Mycorrhizal.type=='OM', 'orchidaceous', ifelse(Mycorrhizal.type=='EcM-AM', 'double_AM_EcM', ifelse(Mycorrhizal.type=='NM', 'none', ifelse(Mycorrhizal.type=='NM-AM', 'facultative_AM', ifelse(Mycorrhizal.type=='NM-AM, rarely EcM', 'facultative_AM_EcM', ifelse(Mycorrhizal.type=='uncertain', 'uncertain', ''))))))))))%>%
@@ -475,19 +506,19 @@ mycorrType<-read.csv('mycorr_Species_match_for_Kim.csv')%>%
   select(CleanTraitName, species_matched, CleanTraitValue, source, CleanTraitUnit)
 
 #n-fixation
-nFix <- read.csv('CoRRE_TRY_species_list_N-fixers.csv')%>%
+nFix <- read.csv('TRYCoRREMerge/CoRRE_TRY_species_list_N-fixers.csv')%>%
   select(species_matched, fixer)%>%
   mutate(CleanTraitValue=ifelse(fixer==1, 'yes', 'no'))%>%
   mutate(CleanTraitName="n_fixation", CleanTraitUnit="", source='Werner 2014')%>%
   select(CleanTraitName, species_matched, CleanTraitValue, source, CleanTraitUnit)
 
-rhizobial <- read.csv('CoRRE_TRY_species_list_N-fixers.csv')%>%
+rhizobial <- read.csv('TRYCoRREMerge/CoRRE_TRY_species_list_N-fixers.csv')%>%
   select(species_matched, fixer, act)%>%
   mutate(CleanTraitValue=ifelse(fixer==1 & act==0, 'yes', 'no'))%>%
   mutate(CleanTraitName="rhizobial", CleanTraitUnit="", source='Werner 2014')%>%
   select(CleanTraitName, species_matched, CleanTraitValue, source, CleanTraitUnit)
 
-actinorhizal <- read.csv('CoRRE_TRY_species_list_N-fixers.csv')%>%
+actinorhizal <- read.csv('TRYCoRREMerge/CoRRE_TRY_species_list_N-fixers.csv')%>%
   select(species_matched, act)%>%
   mutate(CleanTraitValue=ifelse(act==1, 'yes', 'no'))%>%
   mutate(CleanTraitName="actinorhizal", CleanTraitUnit="", source='Werner 2014')%>%
@@ -496,7 +527,9 @@ actinorhizal <- read.csv('CoRRE_TRY_species_list_N-fixers.csv')%>%
 
 
 ###combine traits
-traitsCat <- rbind(trait59, trait42_clean, trait22, mycorr, mycorrType, trait1188_clean, clonality, trait28, trait17, trait29, nFix, rhizobial, actinorhizal)%>%
+#need to add, nFix, rhizobial, actinorhizal, mycorr, mycorrType, 
+
+traitsCat <- rbind(trait59, trait42_clean, trait22, trait1188_clean, clonality, trait28, trait17, trait29)%>%
   mutate(trait_source=paste(CleanTraitValue, source, sep='::'))%>%
   unique()%>%
   select(-CleanTraitUnit, -source, -CleanTraitValue)%>%
@@ -506,19 +539,22 @@ traitsCat <- rbind(trait59, trait42_clean, trait22, mycorr, mycorrType, trait118
   separate(clonal, c('clonal', 'clonal_source'), sep='::')%>%
   separate(dispersal_mode, c('dispersal_mode', 'dispersal_mode_source'), sep='::')%>%
   separate(leaf_compoundness, c('leaf_compoundness', 'leaf_compoundness_source'), sep='::')%>%
-  separate(mycorrhizal, c('mycorrhizal', 'mycorrhizal_source'), sep='::')%>%
-  separate(mycorrhizal_type, c('mycorrhizal_type', 'mycorrhizal_type_source'), sep='::')%>%
+  #separate(mycorrhizal, c('mycorrhizal', 'mycorrhizal_source'), sep='::')%>%
+  #separate(mycorrhizal_type, c('mycorrhizal_type', 'mycorrhizal_type_source'), sep='::')%>%
   separate(photo_pathway, c('photo_pathway', 'photo_pathway_source'), sep='::')%>%
   separate(pollination, c('pollination', 'pollination_source'), sep='::')%>%
   separate(stem_support, c('stem_support', 'stem_support_source'), sep='::')%>%
-  separate(n_fixation, c('n_fixation', 'n_fixation_source'), sep='::')%>%
-  separate(rhizobial, c('rhizobial', 'rhizobial_source'), sep='::')%>%
-  separate(actinorhizal, c('actinorhizal', 'actinorhizal_source'), sep='::')%>%
-  full_join(splist)%>%
-  left_join(read.csv('species_families.csv'))
+  #separate(n_fixation, c('n_fixation', 'n_fixation_source'), sep='::')%>%
+  #separate(rhizobial, c('rhizobial', 'rhizobial_source'), sep='::')%>%
+  #separate(actinorhizal, c('actinorhizal', 'actinorhizal_source'), sep='::')%>%
+  full_join(new)
+
+#old code
+# %>%
+#   left_join(read.csv('species_families.csv'))
 
 
-# write.csv(traitsCat, 'categorical_traits_tofillin.csv', row.names=F)
+write.csv(traitsCat, 'TRYCoRREMerge/categorical_traits_tofillin_Feb2021.csv', row.names=F)
 
 
 # write.csv(traits_cat, "C://Users/mavolio2/Dropbox/SDiv_sCoRRE_shared/CoRRE - community and anpp data/TRY_trait_data_categorical.csv", row.names = F)
