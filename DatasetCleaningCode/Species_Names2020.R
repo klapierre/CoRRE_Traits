@@ -168,8 +168,6 @@ write.csv(tree.spnew,"Data/TRYCoRREMerge/species_families_trees_compelete_2020.c
 
 #### Create a dataframe with full species list by combining old sp with new sp. 
 names(newsp.match)[4] <- "type"
-moss$Family <- sapply(strsplit(moss$V1, split = " "),`[`, 1, simplify=FALSE)
-moss <- moss[which(moss$Family != ""),]
 newsp.match$type[newsp.match$Family %in% moss$Family] <- "moss/lichen"
 newsp.match$type[newsp.match$Family == "Anastrophyllaceae"] <- "moss/lichen"
 
