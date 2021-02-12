@@ -123,7 +123,6 @@ all.sp$old.sp[which(is.na(all.sp$old.sp))] <- 0
 all.sp$new.sp[which(is.na(all.sp$new.sp))] <- 0
 
 need.traits <- all.sp[which(all.sp$new.sp ==1 & all.sp$old.sp ==0),]
-need.traits <- need.traits[!grepl(" sp",fixed = TRUE, need.traits$species_matched),]
 need.traits <- need.traits[!grepl("Unknown",fixed = TRUE, need.traits$species_matched),]
 need.traits <- merge(need.traits, unique(newsp.match[,c(2,3)]), all.x = TRUE)
 need.traits <- need.traits[-which(need.traits$species_matched == "pioneer mosses"),]
@@ -174,18 +173,16 @@ newsp.match$type[newsp.match$Family == "Anastrophyllaceae"] <- "moss/lichen"
 
 
 full.splist <- rbind(newsp.match[,c(1,2,4)], oldsp[,c(1:3)])
+fix <- which(!grepl( " sp\\.", full.splist$species_matched) & grepl(" species", full.splist$genus_species))
+full.splist$species_matched[fix]<- full.splist$genus_species[fix]
+full.splist$species_matched <- gsub("species", "sp.", full.splist$species_matched)
 # caplitalize first letter of species names function modified from https://rstudio-pubs-static.s3.amazonaws.com/408658_512da947714740b99253228f084a08a9.html
-CapStr <- function(y) { 
-  c <- strsplit(y, " ")[[1]][1]
-  d <- strsplit(y, " ")[[1]][2]
-  paste(paste(toupper(substring(c, 1,1)), substring(c, 2),
-        sep="", collapse=" "), d, sep = " ")
-}
+
 full.splist$species_matched <- sapply(full.splist$species_matched, CapStr)
 
 full.splist$type[full.splist$type == "Species"] <- 'identified species'
 full.splist$type[full.splist$type == "Genus"] <- 'identified genus'
-
+full.splist$type[fix] <- "identified genus"
 names(full.splist)[1] <- "species"
 
 
@@ -196,6 +193,7 @@ full.splist$remove[full.splist$species_matched == "Unknown NA"] <- 3
 full.splist$remove[full.splist$type == "identified genus"] <- 1
 full.splist$remove[full.splist$type == "moss/lichen"] <- 2
 full.splist$remove[full.splist$species_matched == "Pioneer mosses"] <- 2
+
 
 write.csv(full.splist, "Data/CompiledData/Species_lists/fullsp_list2020.csv", row.names = FALSE)
 ### Notes: lespedeza discola???
