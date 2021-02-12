@@ -1,5 +1,6 @@
 library(tidyverse)
 library(data.table)
+library(Taxonstand)
 
 theme_set(theme_bw(12))
 
@@ -7,16 +8,20 @@ theme_set(theme_bw(12))
 ##we are adding new species with the CoRRE database 2.0 update
 
 #meghan's
-setwd("C://Users/mavolio2/Dropbox/converge_diverge/datasets/Traits/Try Data Nov 2019")
-setwd("C://Users/megha/Dropbox/converge_diverge/datasets/Traits/Try Data Nov 2019")
+setwd("C:/Users/mavolio2/Dropbox/CoRRE_database/Data/")
+
 #kim's desktop
 setwd('C:\\Users\\komatsuk\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\datasets\\Traits\\Try Data Nov 2019')
 
 #kim's laptop
 setwd('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\datasets\\Traits\\Try Data Nov 2019')
 
-#read in try data
-dat<-fread("7764.txt",sep = "\t",data.table = FALSE,stringsAsFactors = FALSE,strip.white = TRUE)
+#read in both datasets
+dat1<-fread("TRYCoRREMerge/TRY_Traits_Download_Nov2019.txt",sep = "\t",data.table = FALSE,stringsAsFactors = FALSE,strip.white = TRUE)
+
+dat2<-fread("TRYCoRREMerge/TRY_Traits_Download_Feb2021.txt",sep = "\t",data.table = FALSE,stringsAsFactors = FALSE,strip.white = TRUE)
+
+dat<-rbind(dat1, dat2)
 
 #generate list of units for ALL TRY traits
 units <- dat%>%
@@ -35,9 +40,10 @@ dat2<-dat%>%
 #mering corre with try
 
 #read in species links to merge try with core
-key<-read.csv("corre2trykey.csv")%>%
+key<-read.csv("TRYCoRREMerge/corre2trykey.csv")%>%
   select(species_matched, AccSpeciesID, AccSpeciesName)%>%
   unique()
+
 
 #merge list of species in Corre with TRY
 dat3<-dat2%>%
@@ -207,7 +213,7 @@ cont_traits<-dat3%>%
   filter(!is.na(StdValue))
 
 #testing consistent units for each trait and ranking traits by proirity
-priority<-read.csv("trait_priority.csv")%>%
+priority<-read.csv("TRYCoRREMerge/trait_priority.csv")%>%
   rename(TraitID=TRY.trait.ID)
 
 Traits_Units<-cont_traits%>%
@@ -217,7 +223,7 @@ Traits_Units<-cont_traits%>%
   select(-UnitName)%>%
   left_join(priority)
 
-write.csv(Traits_Units, "For Franzi/ContTraitUnits.csv", row.names = F)
+#write.csv(Traits_Units, "For Franzi/ContTraitUnits.csv", row.names = F)
 
 #subset out dead plants
 #get list of dead plants
@@ -233,12 +239,12 @@ health<-dat%>%
 table(health$OrigValueStr)
 
 #merge with our list, there is no overalp
-healthy<-cont_traits2%>%
+healthy<-cont_traits%>%
   full_join(health)
 
 ##drop out trees that not seedlings
 #read in which species are trees
-treesp<-read.csv("species_families_trees_compelete.csv")%>%
+treesp<-read.csv("TRYCoRREMerge/species_families_trees_compelete_2020.csv")%>%
   mutate(AccSpeciesName=species_matched)
 
 #get list of tree observations that were made on seedlings
@@ -256,7 +262,7 @@ develop<-dat%>%
 table(unique(develop$drop))
 
 #merge to drop tree obseravtions that are not seedlings - none were.
-developed<-cont_traits2%>%
+developed<-cont_traits%>%
   full_join(develop)
 
 ##drop out plant that were not measured in natural conditions - there is no overlap
@@ -275,17 +281,28 @@ table(setting$drop)
 
 
 #merge with out traits - there is no overalp
-settings<-cont_traits2%>%
+settings<-cont_traits%>%
   full_join(setting)
 
 
 #add info on genus family
-fam<-read.csv("species_families.csv")
+
+#drop non fully id'd to species
+treesp_clean <- treesp[!grepl(" sp\\.",fixed = TRUE, treesp$species_matched),]
+
+familylist<-TPL(splist[1:10,])#pull our taxon<-what I entered, genus and family
+
+
 
 splist<-key%>%
   select(species_matched)%>%
   unique%>%
-  left_join(fam)%>%
+  left_join(treesp_clean)
+
+
+
+
+  rename(family=family)%>%
   separate(remove=F, species_matched, into=c("genus", "species"), sep=" ")%>%
   select(family, genus, species_matched)%>%
   left_join(treesp)
