@@ -53,15 +53,18 @@ try$match<-ifelse(try$species==try$AccSpeciesName,1,0)
 #join try to updated taxonomu
 try2 <- left_join(try,taxdat, by = c("AccSpeciesName"="species"))%>%
   select(-species)%>%
-  mutate(Genus = sapply(strsplit(try2$species_matched, split = " "),`[`, 1, simplify=FALSE))%>%
-  mutate(Species = sapply(strsplit(try2$species_matched, split = " "),`[`, 2, simplify=FALSE))%>%
+  mutate(Genus = sapply(strsplit(species_matched, split = " "),`[`, 1, simplify=FALSE))%>%
+  mutate(Species = sapply(strsplit(species_matched, split = " "),`[`, 2, simplify=FALSE))%>%
   rename(old=species_matched)%>%
-  mutate(species_matched=paste(Genus, Species, sep=' '))
+  mutate(species_matched=paste(Genus, Species, sep=' '))%>%
+  select(-Genus, -Species)
 
 #join corre to try
 corre2try <- left_join(corre,try2, by="species_matched")%>%
   unique()
 
+
+str(corre2try)
 #write.csv(corre2try, "TRYCoRREMerge/corre2trykey.csv", row.names=F)
 
 #make comma separted row to submit to try 
