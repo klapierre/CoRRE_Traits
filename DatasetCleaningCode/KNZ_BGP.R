@@ -45,6 +45,7 @@ file1 <- "https://pasta.lternet.edu/package/data/eml/knb-lter-knz/17/11/410e032a
 df1 <- read.csv(file1, header = TRUE)
 file2 <- "http://lter.konza.ksu.edu/file/1607/download"
 spdf <- read.csv(file2, header = TRUE)
+trtdf <- read.csv("Data/OriginalData/Sites/KNZ_BGP/BGP_treatments.csv")
 
 ## Convert cover class to mid-points
 # 1 = 0.5, 2 = 3.5, 3 = 15, 4 = 37.5, 5=62.5, 6 = 85, 7 = 97.5
@@ -73,10 +74,10 @@ df1$genus_species <- paste(df1$genus, df1$species, sep = " ")
 df1$data_type <- "cover"
 
 # need to add treatments from biomass data to cover data
-trts <- unique(df[,c("treatment", "plot_id")])
-df2 <- merge(df1, trts, by = "plot_id", all.x = TRUE)
+df2 <- merge(df1, trtdf, by = "plot_id", all.x = TRUE)
+df2$treatment <- paste(df2$burned, df2$mowed, df2$nutrient, sep = "_")
 
-df1 <- df2[,c(1,4:8,17:19)]
+df1 <- df2[,c(1,4:8,17,18,22)]
 
 write.csv(df1, "Data/CleanedData/Sites/Species csv/KNZ_BGP.csv", row.names = FALSE)
 
