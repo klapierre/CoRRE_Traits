@@ -45,6 +45,6 @@ dat$project_name <- "GCME2"
 dat$data_type <- "cover"
 
 dat <- merge(dat, sp)
-dat <- dat[,-9]
+dat <- dat[,-1]
 
 write.csv(dat, "Data/CleanedData/Sites/Species csv/DCMIC_GCME2.csv", row.names = FALSE)

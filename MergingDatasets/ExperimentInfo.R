@@ -51,6 +51,71 @@ watering<-read.delim("ANG_watering.txt")%>%
   mutate(trt_type=ifelse(treatment %in% c('W','S'), 'irr', 'control'))%>%
   unique()
 
+fert1<-read.csv("ANR_Fert1.csv")%>%
+  select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
+  mutate(community_type=0, 
+         nutrients=1, light=0, carbon=0, water=0, other_manipulation=1,
+         n= ifelse(treatment %in% c('KNO3','NH4PO4', 'NH4NO3', 'full_nut'), 5, 0), 
+         p= ifelse(treatment == 'full_nut', 1, 0), 
+         k= ifelse(treatment == 'full_nut', 2.8,0), 
+         CO2=0,
+         precip=0, 
+         temp=0, 
+         mow_clip=0, 
+         burn=0, 
+         herb_removal=0,
+         management=0,
+         other_trt=ifelse(treatment=='ACTIVATED CARBON', 'activated carbon addition', ifelse(treatment=='GLUCOS', 'glucose addition',
+                   ifelse(treatment=='PROTEIN', 'BAS organic N addition', ifelse(treatment=='CACO3', 'lime addition',ifelse(treatment=='micronut', '0.25 g m2 of micronutrient solution added',  
+                   ifelse(treatment=='REDUCTION', 'Empetrum trimmed',0)))))), 
+         trt_details=0,
+         successional=0, 
+         plant_mani=0,
+         plant_trt= ifelse(treatment == 'REDUCTION', 1, 0),
+         pulse= ifelse(treatment == 'REDUCTION', 1, 0)) %>%
+  mutate(plot_mani=ifelse(treatment == 'control', 0, 1))%>%
+  mutate(resource_mani= ifelse(treatment == "REDUCTION", 0, 1))%>%
+  mutate(max_trt=1)%>%
+  mutate(public=0)%>%
+  mutate(factorial=0)%>%
+  mutate(trt_type=ifelse(treatment == 'control', 'control', ifelse(treatment == 'REDUCTION', 'plant_mani', ifelse(treatment %in% c('micronut', 'full_nut'), 'mult_nutrient', ifelse(treatment == "ACTIVATED CARBON", 'C', ifelse(treatment == 'CACO3', 'lime', ifelse(treatment == 'PROTEIN', 'protein', 'N')))))))%>%
+  unique()
+
+fert2<-read.csv("ANR_Fert2.csv")%>%
+  select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
+  mutate(community_type=0, 
+         nutrients=1, light=0, carbon=0, water=0, other_manipulation=1,
+         n= ifelse(treatment %in% c("full_nut_Dflex_removal","full_nut_full_removal","full_nut_no_removal",
+                                    "NH4NO3_Dflex_removal", "NH4NO3_full_removal", "NH4NO3_no_removal",
+                                    "KNO3_Dflex_removal", "KNO3_full_removal", "KNO3_no_removal", 
+                                    "NH4PO4_Dflex_removal", "NH4PO4_full_removal", "NH4PO4_no_removal",
+                                    "full_nut_Eherm_removal", "NH4NO3_Eherm_removal", "KNO3_Eherm_removal",
+                                    "NH4PO4_Eherm_removal"), 5, 0), 
+         p= ifelse(treatment %in% c('full_nut_Dflex_removal', "full_nut_full_removal","full_nut_no_removal", "full_nut_Eherm_removal"), 1, 0), 
+         k= ifelse(treatment %in% c('full_nut_Dflex_removal', "full_nut_full_removal","full_nut_no_removal", "full_nut_Eherm_removal"), 2.8, 0), 
+         CO2=0,
+         precip=0, 
+         temp=0, 
+         mow_clip=0, 
+         burn=0, 
+         herb_removal=0,
+         management=0,
+         other_trt= 0, 
+         trt_details=0, 
+         successional=0, 
+         plant_mani=0,
+         plant_trt= ifelse(treatment %in% c('full_nut_no_removal', 'NH4NO3_no_removal', 'KNO3_no_removal', 'NH4PO4_no_removal', 'control_no_removal'), 0 , 1),
+         pulse= ifelse(treatment %in% c('full_nut_full_removal', 'NH4NO3_full_removal', 'KNO3_full_removal', 'NH4PO4_full_removal', 'control_full_removal'), 1, 0)) %>%
+  mutate(plot_mani=ifelse(treatment == 'control_no_removal', 0,ifelse(treatment %in% c('control_Dflex_removal', 'control_Eherm_removal', 'control_full_removal'), 1, 2)))%>%
+  mutate(resource_mani=1)%>%
+  mutate(max_trt= ifelse(treatment %in% c("full_nut_Eherm_removal", 'full_nut_Dflex_removal', "full_nut_full_removal", 'control_no_removal'),1,0))%>%
+  mutate(public=0)%>%
+  mutate(factorial=0)%>%
+  mutate(trt_type=ifelse(treatment == 'control_no_removal', 'control', ifelse(treatment %in% c("full_nut_Eherm_removal", 'full_nut_Dflex_removal', "full_nut_full_removal"), 'mult_nutrient*removal',
+                  ifelse(treatment %in% c("control_Eherm_removal", 'control_Dflex_removal', "control_full_removal"), 'removal', 'N*removal'))))%>%
+  unique()
+
+
 mat2<-read.delim("ARC_mat2.txt")%>%
   select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
   mutate(community_type=0, 
@@ -162,6 +227,36 @@ exp1<-read.delim("ASGA_Exp1.txt")%>%
   mutate(factorial=1)%>%
   mutate(trt_type=ifelse(treatment %in% c('1_0_PA','1_0_UN'), 'N', ifelse(treatment %in% c('2_0_PA','2_0_UN'), 'N*disturbance', ifelse(treatment %in% c('1_1_PA','1_1_UN'), 'N*plant_mani', ifelse(treatment=='2_1_CO', 'plant_mani*disturbance', ifelse(treatment %in% c('2_1_PA','2_1_UN'), 'N*plant_mani*disturbance', ifelse(treatment=='2_0_CO', 'disturbance', ifelse(treatment=='1_1_CO', 'plant_mani', 'control'))))))))%>%
   unique()
+
+eelplot <- read.csv("AZI_EELplot.csv")%>%
+  select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
+  mutate(community_type=0, 
+         nutrients=1, light=0, carbon=0, water=0, other_manipulation=1, 
+         n=ifelse(treatment %in% c("N", "F+N", "F+N+W", "N+W"), 12, 0), 
+         p= 0, 
+         k=0, 
+         CO2=0, 
+         precip=0, 
+         temp= ifelse(treatment %in% c("W", "F+N+W", "N+W", "F+W"), 1.47, 0), 
+         mow_clip=0, 
+         burn=0, 
+         herb_removal=0,
+         management=0,
+         other_trt= ifelse(treatment %in% c("F", "F+N", "F+W+N", "F+W"), 'fungicide', 0),
+         trt_details=0,
+         successional=0, 
+         plant_mani=0, 
+         plant_trt=0,
+         pulse=0)%>%
+  mutate(plot_mani=ifelse(treatment=='C', 0, ifelse(treatment %in% c("N", "F", "W"), 1, ifelse(treatment == "F+N+W", 3, 2))))%>%
+  mutate(resource_mani=ifelse(treatment == "F", 0, 1))%>%
+  mutate(max_trt=1)%>%
+  mutate(public=0)%>%
+  mutate(factorial=1)%>%
+  mutate(trt_type=ifelse(treatment=='C', 'control', ifelse(treatment == "N", 'N', ifelse(treatment == "W", 'temp', ifelse(treatment == "F", 'fungicide',
+                  ifelse(treatment == "F+N", "N*fungicide", ifelse(treatment == "N+W", "N*temp", ifelse(treatment == "F+W", "temp*fungicide", "N*temp*fungicide"))))))))%>%
+  unique()
+
 
 nitphos<-read.csv("AZI_NitPhos.csv")%>%
   select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
@@ -373,7 +468,7 @@ e001<-read.csv("CDR_e001.csv")%>%
          burn=0, 
          herb_removal=0,
          management=1,
-         other_trt=ifelse(treatment=='9', 0, "mirconutrients and lime added"), 
+         other_trt=ifelse(treatment=='9', 0, "micronutrients and lime added"), 
          trt_details=0,
          successional=0, 
          plant_mani=0,  
@@ -527,6 +622,95 @@ gap2<-read.csv("DCGS_gap.csv")%>%
   mutate(trt_type=ifelse(treatment=='_000', 'control', 'light'))%>%
   unique()
 
+gcme<- read.csv("DCMIC_GCME.csv")%>%
+  select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
+  mutate(community_type=0, 
+         nutrients=1, light=0, carbon=0, water=0, other_manipulation=1, 
+         n=ifelse(treatment %in% c("N", "MNP", "NP", "MN"), 10, 0), 
+         p=ifelse(treatment %in% c("MP", "MNP", "NP", "P"), 5, 0),
+         k=0, 
+         CO2=0, 
+         precip=0, 
+         temp=0, 
+         mow_clip= ifelse(treatment %in% c("MP", "MNP", "M", "MN"), 1, 0), 
+         burn=0, 
+         herb_removal=0,
+         management=0,
+         other_trt=0,
+         trt_details=0,
+         successional=0, 
+         plant_mani=0, 
+         plant_trt=0,
+         pulse=0)%>%
+  mutate(plot_mani=ifelse(treatment=='C', 0, ifelse(treatment %in% c("N", "M", "P"),1, ifelse(treatment=="MNP", 3, 2))))%>%
+  mutate(resource_mani= ifelse(treatment == "M", 0, 1))%>%
+  mutate(max_trt=1)%>%
+  mutate(public=0)%>%
+  mutate(factorial=1)%>%
+  mutate(trt_type=ifelse(treatment == "C", "control", ifelse(treatment == "N", "N", ifelse(treatment == "M", 'mow_clip', 
+                  ifelse(treatment == "P", "P", ifelse(treatment == "MP", "P*mow_clip", ifelse(treatment == "MNP", "N*P*mow_clip",
+                  ifelse(treatment == "NP", "N*P", "N*mow_clip"))))))))%>%
+  unique()
+
+gcme2<- read.csv("DCMIC_GCME2.csv")%>%
+  select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
+  mutate(community_type=0, 
+         nutrients=1, light=0, carbon=0, water=1, other_manipulation=1, 
+         n=ifelse(treatment %in% c("N", "MNP", "NP", "MN"), 10, 0), 
+         p=0,
+         k=0, 
+         CO2=0, 
+         precip=ifelse(treatment %in% c("MP", "MNP", "NP", "P"), 120, 0), 
+         temp=0, 
+         mow_clip= ifelse(treatment %in% c("MP", "MNP", "M", "MN"), 1, 0), 
+         burn=0, 
+         herb_removal=0,
+         management=0,
+         other_trt=0,
+         trt_details=0,
+         successional=0, 
+         plant_mani=0, 
+         plant_trt=0,
+         pulse=0)%>%
+  mutate(plot_mani=ifelse(treatment=='C', 0, ifelse(treatment %in% c("N", "M", "P"),1, ifelse(treatment=="MNP", 3, 2))))%>%
+  mutate(resource_mani=ifelse(treatment == "M", 0, 1))%>%
+  mutate(max_trt=1)%>%
+  mutate(public=0)%>%
+  mutate(factorial=1)%>%
+  mutate(trt_type=ifelse(treatment == "C", "control", ifelse(treatment == "N", "N", ifelse(treatment == "M", 'mow_clip', 
+                  ifelse(treatment == "P", "irr", ifelse(treatment == "MP", "irr*mow_clip", ifelse(treatment == "MNP", "N*irr*mow_clip",
+                  ifelse(treatment == "NP", "N*irr", "N*mow_clip"))))))))%>%
+  unique()
+
+precip<- read.csv("DCMIC_Precip.csv")%>%
+  select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
+  mutate(community_type=0, 
+         nutrients=0, light=0, carbon=0, water=1, other_manipulation=0, 
+         n=0, 
+         p=0,
+         k=0, 
+         CO2=0, 
+         precip=ifelse(treatment == "P-6", -60, ifelse(treatment == "P-4", -40, ifelse(treatment =="P-2", -20,
+                ifelse(treatment == "CK", 0, ifelse(treatment == "P+2", 20, ifelse(treatment == "P+4", 40, 60)))))), 
+         temp=0, 
+         mow_clip= 0, 
+         burn=0, 
+         herb_removal=0,
+         management=0,
+         other_trt=0,
+         trt_details=0,
+         successional=0, 
+         plant_mani=0, 
+         plant_trt=0,
+         pulse=0)%>%
+  mutate(plot_mani=ifelse(treatment=='CK', 0, 1))%>%
+  mutate(resource_mani=1)%>%
+  mutate(max_trt= ifelse(treatment %in% c("P-6", "P+6", "CK"), 1, 0))%>%
+  mutate(public=0)%>%
+  mutate(factorial=0)%>%
+  mutate(trt_type=ifelse(treatment == "CK", "control", ifelse(treatment %in% c("P-6", "P-4", "P-2"), "drought", "irr")))%>%
+  unique()
+
 nsfc<-read.delim("DL_NSFC.txt")%>%
   select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
   mutate(community_type=0, 
@@ -610,6 +794,34 @@ warmnut<-read.delim("Finse_WarmNut.txt")%>%
   mutate(trt_type=ifelse(treatment=='nutrient addition', 'mult_nutrient', ifelse(treatment=='warming', 'temp', ifelse(treatment=='warming + nutrient addition', 'mult_nutrient*temp', 'control'))))%>%
   unique()
 
+gfert<- read.csv("Glen_Fert.csv")%>%
+  select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
+  mutate(community_type=0, 
+         nutrients=1, light=0, carbon=0, water=0, other_manipulation=0, 
+         n=ifelse(treatment %in% c("N", "NP"), 7.5, 0), 
+         p=ifelse(treatment %in% c("P", "NP"), 5, 0),
+         k=0, 
+         CO2=0, 
+         precip=0, 
+         temp=0, 
+         mow_clip= 0, 
+         burn=0, 
+         herb_removal=0,
+         management=0,
+         other_trt=0,
+         trt_details=0,
+         successional=0, 
+         plant_mani=0, 
+         plant_trt=0,
+         pulse=0)%>%
+  mutate(plot_mani=ifelse(treatment=='C', 0, ifelse(treatment == "NP", 2, 1)))%>%
+  mutate(resource_mani=1)%>%
+  mutate(max_trt=1)%>%
+  mutate(public=0)%>%
+  mutate(factorial=1)%>%
+  mutate(trt_type=ifelse(treatment == "C", "control", ifelse(treatment == "N", "N", ifelse(treatment == "P", "P", "NP"))))%>%
+  unique()
+
 face<-read.delim("GVN_FACE.txt")%>%
   select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
   mutate(community_type=0, 
@@ -636,6 +848,90 @@ face<-read.delim("GVN_FACE.txt")%>%
   mutate(public=0)%>%
   mutate(factorial=0)%>%
   mutate(trt_type=ifelse(treatment=='A', 'CO2', 'control'))%>%
+  unique()
+
+warmnit <- read.csv("Hayoka_WarmNit.csv")%>%
+  select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
+  mutate(community_type=0, 
+         nutrients=1, light=0, carbon=0, water=0, other_manipulation=1,
+         n=ifelse(treatment %in% c("Nitrogen", "Winter warming + Nitrogen"), 0.5, 0), 
+         p=0, 
+         k=0,
+         CO2=0,
+         precip=0, 
+         temp=ifelse(treatment %in% c("Winter warming", "Winter warming + Nitrogen"), 5, 0),
+         mow_clip=0, 
+         burn=0, 
+         herb_removal=0,
+         management=0,
+         other_trt=0, 
+         trt_details=0,
+         successional=0, 
+         plant_mani=0,  
+         plant_trt=0,
+         pulse=0)%>%
+  mutate(plot_mani=ifelse(treatment == "Control", 0, ifelse(treatment == "Winter warming + Nitrogen", 2, 1)))%>%
+  mutate(resource_mani=ifelse(treatment == "Winter warming", 0, 1))%>%
+  mutate(max_trt=1)%>%
+  mutate(public=0)%>%
+  mutate(factorial=0)%>%
+  mutate(trt_type=ifelse(treatment=="Control", "Control", ifelse(treatment == "Nitrogen", "N", ifelse(treatment == "Winter warming", "temp", "N*temp"))))%>%
+  unique()
+
+hprecip <- read.csv("HAYS_Precip.csv") %>%
+  select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
+  mutate(community_type=0, 
+         nutrients=0, light=0, carbon=0, water=1, other_manipulation=0,
+         n=0, 
+         p=0, 
+         k=0,
+         CO2=0,
+         precip= ifelse(treatment == "reduction", -50, ifelse(treatment == "add", 61, 0)), 
+         temp=0,
+         mow_clip=0, 
+         burn=0, 
+         herb_removal=0,
+         management=0,
+         other_trt=0, 
+         trt_details=0,
+         successional=0, 
+         plant_mani=0,  
+         plant_trt=0,
+         pulse=0)%>%
+  mutate(plot_mani=ifelse(treatment == "Control", 0, 1))%>%
+  mutate(resource_mani=1)%>%
+  mutate(max_trt=1)%>%
+  mutate(public=0)%>%
+  mutate(factorial=0)%>%
+  mutate(trt_type=ifelse(treatment=="Control", "Control", ifelse(treatment == "reduction", "drought", "irr"))) %>%
+  unique()
+
+phace <- read.csv("HPGRS_PHACE.csv")%>%
+  select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
+  mutate(community_type=0, 
+         nutrients=0, light=0, carbon=1, water=0, other_manipulation=1,
+         n=0, 
+         p=0, 
+         k=0,
+         CO2= ifelse(treatment %in% c("Ct", "CT"), 600,0),
+         precip=0, 
+         temp=ifelse(treatment %in% c("cT", "CT"), 1.5, 0), # 1.5 in the day 3 at night
+         mow_clip=0, 
+         burn=0, 
+         herb_removal=0,
+         management=0,
+         other_trt=0, 
+         trt_details=0,
+         successional=0, 
+         plant_mani=0,  
+         plant_trt=0,
+         pulse=0)%>%
+  mutate(plot_mani=ifelse(treatment == "ct", 0, ifelse(treatment == "CT", 2, 1)))%>%
+  mutate(resource_mani=ifelse(treatment == "cT", 0, 1))%>%
+  mutate(max_trt=1)%>%
+  mutate(public=0)%>%
+  mutate(factorial=0)%>%
+  mutate(trt_type=ifelse(treatment=="ct", "Control", ifelse(treatment == "Ct", "CO2", ifelse(treatment == "cT", "temp", "CO2*temp")))) %>%
   unique()
 
 nde<-read.csv("IMGERS_NDE.csv")%>%
@@ -1085,8 +1381,8 @@ e2 <- read.csv("KUFS_E2.csv")%>%
   mutate(plot_mani= ifelse(treatment == 'N0S0H0', 0, 
                            ifelse(treatment == 'N1S1H1', 3,
                                   ifelse(treatment %in% c('N1S0H0', 'N0S1H0', 'N0S0H1'), 1, 2))))%>%
-  mutate(resource_mani=1)%>%
-  mutate(max_trt=ifelse(treatment %in% c('N0P0S0'), 1, 0))%>%
+  mutate(resource_mani=ifelse(treatment %in% c("N0S1H0", "N0S1H1", "N0S1H1", "N0S0H1"), 0, 1))%>%
+  mutate(max_trt=1)%>%
   mutate(public=0)%>%
   mutate(factorial=1)%>%
   mutate(trt_type=ifelse(treatment=='N0S0H0', 'control',
@@ -1123,7 +1419,7 @@ e6<-read.csv("KUFS_E6.csv")%>%
   mutate(plot_mani=ifelse(treatment=='N0P0S0', 0, 
                           ifelse(treatment %in% c('N4P0S0','N8P0S0','N16P0S0','N0P8S0'), 1, 
                                  ifelse(treatment %in% c("N4P8S1", "N8P8S1", "N16P8S1"), 3, 2))))%>%
-  mutate(resource_mani=1)%>%
+  mutate(resource_mani=ifelse(treatment == "N0P0S1", 0,1))%>%
   mutate(max_trt=ifelse(treatment %in% c('N0P0S0','N16P0S0','N0P8S0','N16P8S0'), 1, 0))%>%
   mutate(public=0)%>%
   mutate(factorial=1)%>%
@@ -1387,6 +1683,43 @@ ccd<-read.delim("NTG_CCD.txt")%>%
   mutate(trt_type=ifelse(treatment=='CNA', 'control', ifelse(treatment=='CN-', 'drought', ifelse(treatment %in% c('CH-','CL-'), 'drought*mow_clip', ifelse(treatment=='WN-', 'drought*temp', ifelse(treatment %in% c('WH-','WL-'),'drought*temp*mow_clip', ifelse(treatment=='CN+', 'irr', ifelse(treatment %in% c('CH+','CL+'), 'irr*mow_clip', ifelse(treatment=='WN+', 'irr*temp', ifelse(treatment %in% c('WH+','WL+'), 'irr*temp*mow_clip', ifelse(treatment %in% c('CHA','CLA'), 'mow_clip', ifelse(treatment=='WNA', 'temp', 'temp*mow_clip'))))))))))))%>%
   unique()
 
+nutnet <- read.csv("NutNet.csv") %>%
+  select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
+  mutate(community_type=0, 
+         nutrients=1, light=0, carbon=0, water=0, other_manipulation=1,
+         n=ifelse(treatment %in% c("NPK+Fence", "N", "NK", "NP", "NPK"), 10, 0),
+         p=ifelse(treatment %in% c("NPK+Fence", "PK", "P", "NP", "NPK"), 10, 0), 
+         k=ifelse(treatment %in% c("NPK+Fence", "PK", "NK", "K", "NPK"), 10, 0), 
+         CO2=0, 
+         precip=0, 
+         temp=0,
+         mow_clip=0, 
+         burn=0, 
+         herb_removal=ifelse(treatment %in% c("NPK+Fence", "Fence"), 1, 0),
+         management=0,
+         other_trt=0, 
+         trt_details=0,
+         successional=0, 
+         plant_mani=0,  
+         plant_trt=0,
+         pulse=0)%>%
+  mutate(plot_mani=ifelse(treatment=="Control", 0, 
+                          ifelse(treatment == "NPK+Fence", 4, 
+                                 ifelse(treatment %in% c("N", "P", "K", "Fence"), 1, 
+                                        ifelse(treatment == "NPK", 3, 2)))))%>%
+  mutate(resource_mani=ifelse(treatment == "Fence", 0,1))%>%
+  mutate(max_trt=1)%>%
+  mutate(public=0)%>%
+  mutate(factorial=0)%>%
+  mutate(trt_type=ifelse(treatment== "Control", "control", 
+                         ifelse(treatment == "N", "N", 
+                                ifelse(treatment == "P", "P", 
+                                       ifelse(treatment == "K", "K", 
+                                              ifelse(treatment == "NP", "N*P", 
+                                                     ifelse(treatment == "Fence", "herb_removal", 
+                                                            ifelse(treatment == "NPK+Fence", "mult_nutrient*herb_removal", "mult_nutrient"))))))))%>%
+  unique()
+
 nfert<-read.delim("NWT_246NFert.txt")%>%
   select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
   mutate(community_type=0, 
@@ -1524,6 +1857,34 @@ tide<-read.delim("PIE_Tide.txt")%>%
   mutate(public=1)%>%
   mutate(factorial=0)%>%
   mutate(trt_type=ifelse(treatment=='Reference', 'control', 'N'))%>%
+  unique()
+
+nut <- read.csv("Rengen_Nut.csv") %>%
+  select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
+  mutate(community_type=0, 
+         nutrients=1, light=0, carbon=0, water=0, other_manipulation=0,
+         n=ifelse(treatment %in% c("Control", "Ca"), 0, 10),
+         p=ifelse(treatment %in% c("CaNP", "CaNP-KCl", "CaNP-K2SO4"), 3.5, 0), 
+         k=ifelse(treatment %in% c("CaNP-KCl", "CaNP-K2SO4"), 13.3, 0), 
+         CO2=0, 
+         precip=0, 
+         temp=0,
+         mow_clip=0, 
+         burn=0, 
+         herb_removal=0,
+         management=0,
+         other_trt=ifelse(treatment == "Control", 0, ifelse(treatment == "Ca", "Ca addition", "Ca + Mg addition")), 
+         trt_details=0,
+         successional=0, 
+         plant_mani=0,  
+         plant_trt=0,
+         pulse=0)%>%
+  mutate(plot_mani=ifelse(treatment== "Control", 0, ifelse(treatment == "Ca", 1, ifelse(treatment == "CaN", 3, ifelse(treatment == "CaNP", 4, 5)))))%>%
+  mutate(resource_mani=1)%>%
+  mutate(max_trt=ifelse(treatment == "Ca", 0, 1))%>%
+  mutate(public=0)%>%
+  mutate(factorial=0)%>%
+  mutate(trt_type=ifelse(treatment== "Control", "control", ifelse(treatment == "Ca","Ca addition", "mult_nutrient")))%>%
   unique()
 
 interaction<-read.delim("RIO_interaction.txt")%>%
@@ -1747,15 +2108,15 @@ grazeprecip<-read.csv("SFREC_GrazePrecip.csv")%>%
   mutate(trt_type=ifelse(treatment=='C', 'control', ifelse(treatment=='W', 'irr', 'drought')))%>%
   unique()
 
-ton <- read.csv("SIU_TON.csv")%>%
+sprecip <- read.csv("SGS_Precip.csv") %>%
   select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
   mutate(community_type=0, 
-         nutrients=1, light=0, carbon=0, water=0, other_manipulation=1,
-         n=ifelse(treatment=='F', 10, 0),
+         nutrients=0, light=0, carbon=0, water=1, other_manipulation=0,
+         n=0,
          p=0, 
          k=0, 
          CO2=0, 
-         precip=0, 
+         precip=ifelse(treatment == "reduction", -60, ifelse(treatment == "add", 50,0)), 
          temp=0,
          mow_clip=0, 
          burn=0, 
@@ -1767,12 +2128,325 @@ ton <- read.csv("SIU_TON.csv")%>%
          plant_mani=0,  
          plant_trt=0,
          pulse=0)%>%
-  mutate(plot_mani=ifelse(treatment %in% c('1C', 'AC', 'CS', 'CB'), 1, ifelse(treatment == "CC", 0, 2)))%>%
+  mutate(plot_mani=ifelse(treatment=="control", 0, 1))%>%
   mutate(resource_mani=1)%>%
+  mutate(max_trt=1)%>%
+  mutate(public=1)%>%
+  mutate(factorial=0)%>%
+  mutate(trt_type=ifelse(treatment=="control", "control", ifelse(treatment == "add", "irr", "drought")))%>%
+  unique()
+
+nash <- read.csv("Sil_NASH.csv")%>% 
+  select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
+  mutate(community_type=0, 
+         nutrients=1, light=0, carbon=0, water=0, other_manipulation=1,
+         n=ifelse(grepl("all.nutr", treatment, fixed = T),10,
+                  ifelse(grepl("plus.N", treatment, fixed = T),10,
+                         ifelse(grepl("min.pk", treatment, fixed = T),10,
+                                ifelse(grepl("min.p", treatment, fixed = T),10,
+                                       ifelse(grepl("min.k", treatment, fixed = T),10,
+                                              ifelse(grepl("min.mg", treatment, fixed = T),10, 0)))))),
+         p=ifelse(grepl("all.nutr", treatment, fixed = T),3.5,
+                  ifelse(grepl("plus.p", treatment, fixed = T),3.5,
+                         ifelse(grepl("plus.pk", treatment, fixed = T),3.5,
+                                ifelse(grepl("min.n", treatment, fixed = T),3.5,
+                                       ifelse(grepl("min.k", treatment, fixed = T),3.5,
+                                              ifelse(grepl("min.mg", treatment, fixed = T),3.5,0)))))), 
+         k=ifelse(grepl("all.nutr", treatment, fixed = T),22.5,
+                  ifelse(grepl("plus.k", treatment, fixed = T),22.5,
+                         ifelse(grepl("plus.pk", treatment, fixed = T),22.5,
+                                ifelse(grepl("min.n", treatment, fixed = T),22.5,
+                                       ifelse(grepl("min.p", treatment, fixed = T),22.5,
+                                              ifelse(grepl("min.mg", treatment, fixed = T),22.5,0)))))), 
+         CO2=0, 
+         precip=0, 
+         temp=0,
+         mow_clip=0, 
+         burn=0, 
+         herb_removal=ifelse(grepl("spray", treatment, fixed = T),1,
+                             ifelse(grepl("pellets", treatment, fixed = T),1,
+                                    ifelse(grepl("fenced", treatment, fixed = T),1,0))),
+         management=0,
+         other_trt=ifelse(grepl("limed.control", treatment, fixed = T),"limed",
+                          ifelse(grepl("unlimed.min.herb", treatment, fixed = T),"herb-specific herbicide",
+                                 ifelse(grepl("unlimed.min.grass", treatment, fixed = T), "grass-specific herbicide",
+                                        ifelse(grepl("limed.min.herb", treatment, fixed = T),"lime + herb-specific herbicide",
+                                               ifelse(grepl("limed.min.grass", treatment, fixed = T),"lime + grass-specific herbicide",0))))), 
+         trt_details=0,
+         successional=0, 
+         plant_mani=0,  
+         plant_trt=0,
+         pulse= ifelse(grepl("min.herb", treatment, fixed = T),1,ifelse(grepl("min.grass", treatment, fixed = T), 1, 0)))%>%
+  mutate(plot_mani=ifelse(treatment== "insects.molluscs.rabbits.unlimed.control.no.nutr", 0,
+                          ifelse(treatment %in% c("insects.molluscs.rabbits.unlimed.control.plus.n", "insects.molluscs.rabbits.unlimed.control.plus.p",
+                                                  "insects.molluscs.rabbits.unlimed.control.plus.k", "insects.molluscs.rabbits.unlimed.control.plus.mg",
+                                                  "insects.molluscs.rabbits.unlimed.min.herb.no.nutr", "insects.molluscs.rabbits.unlimed.min.grass.no.nutr",
+                                                  "insects.molluscs.rabbits.limed.control.no.nutr","insects.molluscs.fence.unlimed.control.no.nutr",
+                                                  "insects.pellets.rabbits.unlimed.control.no.nutr","spray.molluscs.rabbits.unlimed.control.no.nutr"), 1,
+                                 ifelse(treatment %in% c("spray.pellets.rabbits.unlimed.control.no.nutr","spray.molluscs.fenced.unlimed.control.no.nutr",
+                                                         "spray.molluscs.rabbits.limed.control.no.nutr","spray.molluscs.rabbits.unlimed.min.herb.no.nutr",
+                                                         "spray.molluscs.rabbits.unlimed.min.grass.no.nutr","spray.molluscs.rabbits.unlimed.control.plus.n",
+                                                         "spray.molluscs.rabbits.unlimed.control.plus.p","spray.molluscs.rabbits.unlimed.control.plus.k",
+                                                         "spray.molluscs.rabbits.unlimed.control.plus.mg","insects.pellets.fenced.unlimed.control.no.nutr",
+                                                         "insects.pellets.rabbits.limed.control.no.nutr","insects.pellets.rabbits.unlimed.min.herb.no.nutr",
+                                                         "insects.pellets.rabbits.unlimed.min.grass.no.nutr", "insects.pellets.rabbits.unlimed.control.plus.n",
+                                                         "insects.pellets.rabbits.unlimed.control.plus.p", "insects.pellets.rabbits.unlimed.control.plus.k",
+                                                         "insects.pellets.rabbits.unlimed.control.plus.mg","insects.molluscs.fenced.limed.control.no.nutr",
+                                                         "insects.molluscs.fenced.unlimed.min.herb.no.nutr","insects.molluscs.fenced.unlimed.min.grass.no.nutr",
+                                                         "insects.molluscs.fenced.unlimed.control.plus.n","insects.molluscs.fenced.unlimed.control.plus.p",
+                                                         "insects.molluscs.fenced.unlimed.control.plus.k","insects.molluscs.fenced.unlimed.control.plus.mg",
+                                                         "insects.molluscs.rabbits.limed.min.herb.no.nutr", "insects.molluscs.rabbits.limed.min.grass.no.nutr",
+                                                         "insects.molluscs.rabbits.limed.control.plus.n","insects.molluscs.rabbits.limed.control.plus.p",
+                                                         "insects.molluscs.rabbits.limed.control.plus.k","insects.molluscs.rabbits.limed.control.plus.mg",
+                                                         "insects.molluscs.rabbits.unlimed.min.herb.plus.n","insects.molluscs.rabbits.unlimed.min.herb.plus.p",
+                                                         "insects.molluscs.rabbits.unlimed.min.herb.plus.k","insects.molluscs.rabbits.unlimed.min.herb.plus.mg",
+                                                         "insects.molluscs.rabbits.unlimed.min.grass.plus.n","insects.molluscs.rabbits.unlimed.min.grass.plus.p",
+                                                         "insects.molluscs.rabbits.unlimed.min.grass.plus.k","insects.molluscs.rabbits.unlimed.min.grass.plus.mg",
+                                                         "insects.molluscs.rabbits.unlimed.control.plus.pk","insects.molluscs.rabbits.unlimed.control.min.pk"),2,
+                                        ifelse(treatment %in% c("spray.pellets.fenced.unlimed.control.no.nutr","spray.pellets.rabbits.limed.control.no.nutr",
+                                                                "spray.pellets.rabbits.unlimed.min.grass.no.nutr","spray.pellets.rabbits.unlimed.min.herb.no.nutr",
+                                                                "spray.pellets.rabbits.unlimed.control.plus.n","spray.pellets.rabbits.unlimed.control.plus.p",
+                                                                "spray.pellets.rabbits.unlimed.control.plus.k","spray.pellets.rabbits.unlimed.control.plus.mg",
+                                                                "spray.molluscs.fenced.limed.control.no.nutr","spray.molluscs.fenced.unlimed.min.grass.no.nutr",
+                                                                "spray.molluscs.fenced.unlimed.min.herb.no.nutr","spray.molluscs.fenced.unlimed.control.plus.n",
+                                                                "spray.molluscs.fenced.unlimed.control.plus.p","spray.molluscs.fenced.unlimed.control.plus.k",
+                                                                "spray.molluscs.fenced.unlimed.control.plus.mg","spray.molluscs.rabbits.limed.min.grass.no.nutr",
+                                                                "spray.molluscs.rabbits.limed.min.herb.no.nutr","spray.molluscs.rabbits.limed.control.plus.n",
+                                                                "spray.molluscs.rabbits.limed.control.plus.p","spray.molluscs.rabbits.limed.control.plus.k",
+                                                                "spray.molluscs.rabbits.limed.control.plus.mg","spray.molluscs.rabbits.unlimed.min.grass.plus.n",
+                                                                "spray.molluscs.rabbits.unlimed.min.grass.plus.p","spray.molluscs.rabbits.unlimed.min.grass.plus.k",
+                                                                "spray.molluscs.rabbits.unlimed.min.grass.plus.mg","spray.molluscs.rabbits.unlimed.min.herb.plus.n",
+                                                                "spray.molluscs.rabbits.unlimed.min.herb.plus.p","spray.molluscs.rabbits.unlimed.min.herb.plus.k",
+                                                                "spray.molluscs.rabbits.unlimed.min.herb.plus.mg","spray.molluscs.rabbits.unlimed.control.plus.pk",
+                                                                "spray.molluscs.rabbits.unlimed.control.min.pk","insects.pellets.fenced.limed.control.no.nutr",
+                                                                "insects.pellets.fenced.unlimed.min.grass.no.nutr", "insects.pellets.fenced.unlimed.min.herd.no.nutr",
+                                                                "insects.pellets.fenced.unlimed.control.plus.n", "insects.pellets.fenced.unlimed.control.plus.p",
+                                                                "insects.pellets.fenced.unlimed.control.plus.k","insects.pellets.fenced.unlimed.control.plus.mg",
+                                                                "insects.pellets.rabbits.limed.min.grass.no.nutr", "insects.pellets.rabbits.limed.min.herb.no.nutr",
+                                                                "insects.pellets.rabbits.limed.control.plus.n","insects.pellets.rabbits.limed.control.plus.p",
+                                                                "insects.pellets.rabbits.limed.control.plus.k","insects.pellets.rabbits.limed.control.plus.mg",
+                                                                "insects.pellets.rabbits.unlimed.min.grass.plus.n","insects.pellets.rabbits.unlimed.min.grass.plus.p",
+                                                                "insects.pellets.rabbits.unlimed.min.grass.plus.k","insects.pellets.rabbits.unlimed.min.grass.plus.mg",
+                                                                "insects.pellets.rabbits.unlimed.min.herb.plus.n","insects.pellets.rabbits.unlimed.min.herb.plus.p",
+                                                                "insects.pellets.rabbits.unlimed.min.herb.plus.k","insects.pellets.rabbits.unlimed.min.herb.plus.mg",
+                                                                "insects.pellets.rabbits.unlimed.control.plus.pk","insects.pellets.rabbits.unlimed.control.min.pk",
+                                                                "insects.molluscs.fenced.limed.min.grass.no.nutr", "insects.molluscs.fenced.limed.min.herb.no.nutr",
+                                                                "insects.molluscs.fenced.limed.control.plus.n","insects.molluscs.fenced.limed.control.plus.p",
+                                                                "insects.molluscs.fenced.limed.control.plus.k","insects.molluscs.fenced.limed.control.plus.mg",
+                                                                "insects.molluscs.fenced.unlimed.min.grass.plus.n","insects.molluscs.fenced.unlimed.min.grass.plus.p",
+                                                                "insects.molluscs.fenced.unlimed.min.grass.plus.k","insects.molluscs.fenced.unlimed.min.grass.plus.mg",
+                                                                "insects.molluscs.fenced.unlimed.min.herb.plus.n","insects.molluscs.fenced.unlimed.min.herb.plus.p",
+                                                                "insects.molluscs.fenced.unlimed.min.herb.plus.k","insects.molluscs.fenced.unlimed.min.herb.plus.mg",
+                                                                "insects.molluscs.fenced.unlimed.control.plus.pk","insects.molluscs.fenced.unlimed.control.min.pk",
+                                                                "insects.molluscs.rabbits.limed.min.grass.plus.n","insects.molluscs.rabbits.limed.min.grass.plus.p",
+                                                                "insects.molluscs.rabbits.limed.min.grass.plus.k","insects.molluscs.rabbits.limed.min.grass.plus.mg",
+                                                                "insects.molluscs.rabbits.limed.min.herb.plus.n","insects.molluscs.rabbits.limed.min.herb.plus.p",
+                                                                "insects.molluscs.rabbits.limed.min.herb.plus.k","insects.molluscs.rabbits.limed.min.herb.plus.mg",
+                                                                "insects.molluscs.rabbits.limed.control.plus.pk","insects.molluscs.rabbits.unlimed.control.min.n",
+                                                                "insects.molluscs.rabbits.unlimed.control.min.p","insects.molluscs.rabbits.unlimed.control.min.k",
+                                                                "insects.molluscs.rabbits.unlimed.control.min.mg"),3, 
+                                               ifelse(treatment %in% c("spray.pellets.fenced.limed.min.grass.no.nutr","spray.pellets.fenced.limed.min.herb.no.nutr",
+                                                                       "spray.pellets.fenced.limed.control.plus.n","spray.pellets.fenced.limed.control.plus.p",
+                                                                       "spray.pellets.fenced.limed.control.plus.k", "spray.pellets.fenced.limed.control.plus.mg",
+                                                                       "spray.pellets.fenced.unlimed.min.grass.plus.n","spray.pellets.fenced.unlimed.min.grass.plus.p",
+                                                                       "spray.pellets.fenced.unlimed.min.grass.plus.k","spray.pellets.fenced.unlimed.min.grass.plus.mg",
+                                                                       "spray.pellets.fenced.unlimed.min.herb.plus.n","spray.pellets.fenced.unlimed.min.herb.plus.p",
+                                                                       "spray.pellets.fenced.unlimed.min.herb.plus.k", "spray.pellets.fenced.unlimed.min.herb.plus.mg",
+                                                                       "spray.pellets.rabbits.limed.min.grass.plus.n", "spray.pellets.rabbits.limed.min.grass.plus.p",
+                                                                       "spray.pellets.rabbits.limed.min.grass.plus.k","spray.pellets.rabbits.limed.min.grass.plus.mg",
+                                                                       "spray.pellets.rabbits.limed.min.herb.plus.n","spray.pellets.rabbits.limed.min.herb.plus.p",
+                                                                       "spray.pellets.rabbits.limed.min.herb.plus.k","spray.pellets.rabbits.limed.min.herb.plus.mg",
+                                                                       "insects.pellets.fenced.limed.min.grass.plus.n","insects.pellets.fenced.limed.min.grass.plus.p",
+                                                                       "insects.pellets.fenced.limed.min.grass.plus.k","insects.pellets.fenced.limed.min.grass.plus.mg",
+                                                                       "insects.pellets.fenced.limed.min.herb.plus.n", "insects.pellets.fenced.limed.min.herb.plus.p",
+                                                                       "insects.pellets.fenced.limed.min.herb.plus.k", "insects.pellets.fenced.limed.min.herb.plus.mg",
+                                                                       "spray.pellets.fenced.unlimed.control.plus.pk", "spray.pellets.fenced.unlimed.control.min.pk",
+                                                                       "spray.molluscs.fenced.limed.control.plus.pk","spray.molluscs.fenced.limed.control.min.pk",
+                                                                       "spray.molluscs.rabbits.limed.min.grass.plus.pk","spray.molluscs.rabbits.limed.min.grass.min.pk",
+                                                                       "spray.molluscs.rabbits.limed.min.herb.plus.pk","spray.molluscs.rabbits.limed.min.herb.min.pk",
+                                                                       "insects.pellets.fenced.limed.control.plus.pk","insects.pellets.fenced.limed.control.min.pk",
+                                                                       "insects.pellets.fenced.unlimed.min.grass.plus.pk","insects.pellets.fenced.unlimed.min.grass.min.pk",
+                                                                       "insects.pellets.fenced.unlimed.min.herb.plus.pk","insects.pellets.fenced.unlimed.min.herb.min.pk",
+                                                                       "insects.pellets.rabbits.limed.min.grass.plus.pk","insects.pellets.rabbits.limed.min.grass.min.pk",
+                                                                       "insects.pellets.rabbits.limed.min.herb.plus.pk","insects.pellets.rabbits.limed.min.herb.min.pk",
+                                                                       "insects.molluscs.fenced.limed.min.grass.plus.pk","insects.molluscs.fenced.limed.min.grass.min.pk",
+                                                                       "insects.molluscs.fenced.limed.min.herb.plus.pk","insects.molluscs.fenced.limed.min.herb.min.pk",
+                                                                       "spray.pellets.rabbits.unlimed.control.min.n","spray.pellets.rabbits.unlimed.control.min.p",
+                                                                       "spray.pellets.rabbits.unlimed.control.min.k", "spray.pellets.rabbits.unlimed.control.min.mg",
+                                                                       "spray.molluscs.fenced.unlimed.control.min.n","spray.molluscs.fenced.unlimed.control.min.p",
+                                                                       "spray.molluscs.fenced.unlimed.control.min.k","spray.molluscs.fenced.unlimed.control.min.mg",
+                                                                       "spray.molluscs.rabbits.limed.control.min.n","spray.molluscs.rabbits.limed.control.min.p",
+                                                                       "spray.molluscs.rabbits.limed.control.min.k","spray.molluscs.rabbits.limed.control.min.mg",
+                                                                       "spray.molluscs.rabbits.unlimed.min.grass.min.n","spray.molluscs.rabbits.unlimed.min.grass.min.p",
+                                                                       "spray.molluscs.rabbits.unlimed.min.grass.min.k","spray.molluscs.rabbits.unlimed.min.grass.min.mg",
+                                                                       "spray.molluscs.rabbits.unlimed.min.herb.min.n","spray.molluscs.rabbits.unlimed.min.herb.min.p",
+                                                                       "spray.molluscs.rabbits.unlimed.min.herb.min.k","spray.molluscs.rabbits.unlimed.min.herb.min.mg",
+                                                                       "insects.pellets.fenced.unlimed.control.min.n","insects.pellets.rabbits.limed.control.min.n",
+                                                                       "insects.pellets.rabbits.unlimed.min.grass.min.n","insects.pellets.rabbits.unlimed.min.herb.min.n",
+                                                                       "insects.molluscs.fenced.limed.control.min.n","insects.molluscs.fenced.unlimed.min.grass.min.n",
+                                                                       "insects.molluscs.fences.unlimed.min.herb.min.n","insects.molluscs.rabbits.limed.min.grass.min.n", 
+                                                                       "insects.molluscs.rabbits.limed.min.herb.min.n","insects.pellets.fenced.unlimed.control.min.p",
+                                                                       "insects.pellets.rabbits.limed.control.min.p","insects.pellets.rabbits.unlimed.min.grass.min.p",
+                                                                       "insects.pellets.rabbits.unlimed.min.herb.min.p","insects.molluscs.fenced.limed.control.min.p",
+                                                                       "insects.molluscs.fenced.unlimed.min.grass.min.p","insects.molluscs.fences.unlimed.min.herb.min.p",
+                                                                       "insects.molluscs.rabbits.limed.min.grass.min.p", "insects.molluscs.rabbits.limed.min.herb.min.p",
+                                                                       "insects.pellets.fenced.unlimed.control.min.k","insects.pellets.rabbits.limed.control.min.k",
+                                                                       "insects.pellets.rabbits.unlimed.min.grass.min.k","insects.pellets.rabbits.unlimed.min.herb.min.k",
+                                                                       "insects.molluscs.fenced.limed.control.min.k","insects.molluscs.fenced.unlimed.min.grass.min.k",
+                                                                       "insects.molluscs.fences.unlimed.min.herb.min.k","insects.molluscs.rabbits.limed.min.grass.min.k", 
+                                                                       "insects.molluscs.rabbits.limed.min.herb.min.k","insects.pellets.fenced.unlimed.control.min.mg",
+                                                                       "insects.pellets.rabbits.limed.control.min.mg","insects.pellets.rabbits.unlimed.min.grass.min.mg",
+                                                                       "insects.pellets.rabbits.unlimed.min.herb.min.mg","insects.molluscs.fenced.limed.control.min.mg",
+                                                                       "insects.molluscs.fenced.unlimed.min.grass.min.mg","insects.molluscs.fences.unlimed.min.herb.min.mg",
+                                                                       "insects.molluscs.rabbits.limed.min.grass.min.mg", "insects.molluscs.rabbits.limed.min.herb.min.mg", 
+                                                                       "spray.molluscs.rabbits.unlimed.control.all.nutr", "insects.pellets.rabbits.unlimed.control.all.nutr",
+                                                                       "insects.molluscs.fenced.unlimed.control.all.nutr", "insects.molluscs.rabbits.limed.control.all.nutr",
+                                                                       "insects.molluscs.rabbits.unlimed.min.grass.all.nutr", "insects.molluscs.rabbits.unlimed.min.grass.all.nutr"),5,
+                                                      ifelse(treatment %in% c("spray.pellets.fenced.limed.min.grass.plus.n","spray.pellets.fenced.limed.min.grass.plus.p",
+                                                                              "spray.pellets.fenced.limed.min.grass.plus.k","spray.pellets.fenced.limed.min.grass.plus.mg",
+                                                                              "spray.pellets.fenced.limed.min.herb.plus.n","spray.pellets.fenced.limed.min.herb.plus.p",
+                                                                              "spray.pellets.fenced.limed.min.herb.plus.k","spray.pellets.fenced.limed.min.herb.plus.mg",
+                                                                              "spray.pellets.fenced.limed.control.plus.pk",  "spray.pellets.fenced.unlimed.min.grass.plus.pk", 
+                                                                              "spray.pellets.fenced.unlimed.min.herb.plus.pk","spray.pellets.rabbits.limed.min.grass.plus.pk",
+                                                                              "spray.pellets.rabbits.limed.min.herb.plus.pk","spray.molluscs.fenced.limed.min.grass.plus.pk",
+                                                                              "spray.molluses.fenced.limed.min.herb.plus.pk","insects.pellets.fenced.limed.min.grass.plus.pk", 
+                                                                              "insects.pellets.fenced.limed.min.herb.plus.pk","spray.pellets.fenced.limed.control.min.pk", 
+                                                                              "spray.pellets.fenced.unlimed.min.grass.min.pk", "spray.pellets.fenced.unlimed.min.herb.min.pk",
+                                                                              "spray.pellets.rabbits.limed.min.grass.min.pk","spray.pellets.rabbits.limed.min.herb.min.pk",
+                                                                              "spray.molluscs.fenced.limed.min.grass.min.pk","spray.molluses.fenced.limed.min.herb.min.pk", 
+                                                                              "insects.pellets.fenced.limed.min.grass.min.pk", "insects.pellets.fenced.limed.min.herb.min.pk",
+                                                                              "spray.pellets.fenced.unlimed.control.min.n","spray.pellets.rabbits.limed.control.min.n", 
+                                                                              "spray.pellets.rabbits.unlimed.min.grass.min.n", "spray.pellets.rabbits.unlimed.min.herb.min.n",
+                                                                              "spray.molluscs.fenced.limed.control.min.n","spray.molluscs.fenced.unlimed.min.grass.min.n", 
+                                                                              "spray.molluscs.fenced.unlimed.min.herb.min.n","spray.molluscs.fenced.limed.control.min.n",
+                                                                              "spray.molluscs.fenced.unlimed.min.grass.min.n","spray.molluscs.fenced.unlimed.min.herb.min.n",
+                                                                              "spray.molluscs.rabbits.limed.min.grass.min.n","spray.molluscs.rabbits.limed.min.herb.min.n",
+                                                                              "insects.pellets.fenced.limed.control.min.n","insects.pellets.fenced.unlimed.min.grass.min.n",
+                                                                              "insects.pellets.fenced.unlimed.min.herb.min.n","insects.pellets.rabbits.limed.min.grass.min.n",
+                                                                              "insects.pellets.rabbits.limed.min.herb.min.n","insects.molluscs.fenced.limed.min.grass.min.n",
+                                                                              "insects.molluscs.fenced.limed.min.herb.min.n", "spray.pellets.fenced.unlimed.control.min.p",
+                                                                              "spray.pellets.rabbits.limed.control.min.p", "spray.pellets.rabbits.unlimed.min.grass.min.p",
+                                                                              "spray.pellets.rabbits.unlimed.min.herb.min.p","spray.molluscs.fenced.limed.control.min.p",
+                                                                              "spray.molluscs.fenced.unlimed.min.grass.min.p", "spray.molluscs.fenced.unlimed.min.herb.min.p",
+                                                                              "spray.molluscs.fenced.limed.control.min.p","spray.molluscs.fenced.unlimed.min.grass.min.p",
+                                                                              "spray.molluscs.fenced.unlimed.min.herb.min.p","spray.molluscs.rabbits.limed.min.grass.min.p",
+                                                                              "spray.molluscs.rabbits.limed.min.herb.min.p","insects.pellets.fenced.limed.control.min.p",
+                                                                              "insects.pellets.fenced.unlimed.min.grass.min.p","insects.pellets.fenced.unlimed.min.herb.min.p",
+                                                                              "insects.pellets.rabbits.limed.min.grass.min.p", "insects.pellets.rabbits.limed.min.herb.min.p",
+                                                                              "insects.molluscs.fenced.limed.min.grass.min.p","insects.molluscs.fenced.limed.min.herb.min.p",
+                                                                              "spray.pellets.fenced.unlimed.control.min.k","spray.pellets.rabbits.limed.control.min.k", 
+                                                                              "spray.pellets.rabbits.unlimed.min.grass.min.k","spray.pellets.rabbits.unlimed.min.herb.min.k",
+                                                                              "spray.molluscs.fenced.limed.control.min.k","spray.molluscs.fenced.unlimed.min.grass.min.k", 
+                                                                              "spray.molluscs.fenced.unlimed.min.herb.min.k","spray.molluscs.fenced.limed.control.min.k",
+                                                                              "spray.molluscs.fenced.unlimed.min.grass.min.k","spray.molluscs.fenced.unlimed.min.herb.min.k",
+                                                                              "spray.molluscs.rabbits.limed.min.grass.min.k","spray.molluscs.rabbits.limed.min.herb.min.k",
+                                                                              "insects.pellets.fenced.limed.control.min.k","insects.pellets.fenced.unlimed.min.grass.min.k",
+                                                                              "insects.pellets.fenced.unlimed.min.herb.min.k","insects.pellets.rabbits.limed.min.grass.min.k",
+                                                                              "insects.pellets.rabbits.limed.min.herb.min.k","insects.molluscs.fenced.limed.min.grass.min.k",
+                                                                              "insects.molluscs.fenced.limed.min.herb.min.k","spray.pellets.fenced.unlimed.control.min.mg",
+                                                                              "spray.pellets.rabbits.limed.control.min.mg","spray.pellets.rabbits.unlimed.min.grass.min.mg",
+                                                                              "spray.pellets.rabbits.unlimed.min.herb.min.mg","spray.molluscs.fenced.limed.control.min.mg",
+                                                                              "spray.molluscs.fenced.unlimed.min.grass.min.mg", "spray.molluscs.fenced.unlimed.min.herb.min.mg",
+                                                                              "spray.molluscs.fenced.limed.control.min.mg","spray.molluscs.fenced.unlimed.min.grass.min.mg",
+                                                                              "spray.molluscs.fenced.unlimed.min.herb.min.mg","spray.molluscs.rabbits.limed.min.grass.min.mg",
+                                                                              "spray.molluscs.rabbits.limed.min.herb.min.mg","insects.pellets.fenced.limed.control.min.mg",
+                                                                              "insects.pellets.fenced.unlimed.min.grass.min.mg","insects.pellets.fenced.unlimed.min.herb.min.mg",
+                                                                              "insects.pellets.rabbits.limed.min.grass.min.mg","insects.pellets.rabbits.limed.min.herb.min.mg",
+                                                                              "insects.molluscs.fenced.limed.min.grass.min.mg", "insects.molluscs.fenced.limed.min.herb.min.mg",
+                                                                              "spray.pellets.rabbits.unlimed.control.all.nutr", "spray.molluscs.fenced.unlimed.control.all.nutr", 
+                                                                              "spray.molluscs.rabbits.limed.control.all.nutr", "spray.molluscs.rabbits.unlimed.min.grass.all.nutr",
+                                                                              "spray.molluscs.rabbits.unlimed.min.her.all.nutr", "insects.pellets.fenced.unlimed.control.all.nutr",
+                                                                              "insects.pellets.rabbits.limed.control.all.nutr", "insects.pellets.rabbits.unlimed.min.grass.all.nutr", 
+                                                                              "insects.pellets.rabbits.unlimed.min.herb.all.nutr", "insects.molluscs.fenced.limed.control.all.nutr", 
+                                                                              "insects.molluscs.fenced.unlimed.min.grass.all.nutr", "insects.molluscs.fenced.unlimed.min.herb.all.nutr",
+                                                                              "insects.molluscs.rabbits.limed.min.grass.all.nutr", "insects.molluscs.rabbits.limed.min.herb.all.nutr"),6,
+                                                             ifelse(treatment %in% c("spray.pellets.fenced.limed.min.herb.plus.pk","spray.pellets.fenced.limed.min.herb.min.pk",
+                                                                                     "spray.pellets.fenced.limed.min.grass.plus.pk","spray.pellets.fenced.limed.min.grass.min.pk",
+                                                                                     "spray.pellets.fenced.limed.control.min.n","spray.pellets.fenced.unlimed.min.grass.min.n",
+                                                                                     "spray.pellets.rabbits.limed.min.grass.min.n","spray.molluscs.fenced.limed.min.grass.min.n",
+                                                                                     "insects.pellets.fenced.limed.min.grass.min.n","spray.pellets.fenced.unlimed.min.herb.min.n",
+                                                                                     "spray.pellets.rabbits.limed.min.herb.min.n","spray.molluscs.fenced.limed.min.herb.min.n",
+                                                                                     "insects.pellets.fenced.limed.min.herb.min.n","spray.pellets.fenced.limed.control.min.p",
+                                                                                     "spray.pellets.fenced.unlimed.min.grass.min.p","spray.pellets.rabbits.limed.min.grass.min.p",
+                                                                                     "spray.molluscs.fenced.limed.min.grass.min.p","insects.pellets.fenced.limed.min.grass.min.p",
+                                                                                     "spray.pellets.fenced.unlimed.min.herb.min.p","spray.pellets.rabbits.limed.min.herb.min.p",
+                                                                                     "spray.molluscs.fenced.limed.min.herb.min.p","insects.pellets.fenced.limed.min.herb.min.p",
+                                                                                     "spray.pellets.fenced.limed.control.min.k","spray.pellets.fenced.unlimed.min.grass.min.k",
+                                                                                     "spray.pellets.rabbits.limed.min.grass.min.k","spray.molluscs.fenced.limed.min.grass.min.k",
+                                                                                     "insects.pellets.fenced.limed.min.grass.min.k","spray.pellets.fenced.unlimed.min.herb.min.k",
+                                                                                     "spray.pellets.rabbits.limed.min.herb.min.k","spray.molluscs.fenced.limed.min.herb.min.k",
+                                                                                     "insects.pellets.fenced.limed.min.herb.min.k","spray.pellets.fenced.limed.control.min.mg",
+                                                                                     "spray.pellets.fenced.unlimed.min.grass.min.mg","spray.pellets.rabbits.limed.min.grass.min.mg",
+                                                                                     "spray.molluscs.fenced.limed.min.grass.min.mg","insects.pellets.fenced.limed.min.grass.min.mg",
+                                                                                     "spray.pellets.fenced.unlimed.min.herb.min.mg","spray.pellets.rabbits.limed.min.herb.min.mg",
+                                                                                     "spray.molluscs.fenced.limed.min.herb.min.mg", "insects.pellets.fenced.limed.min.herb.min.mg", 
+                                                                                     "spray.pellets.fenced.unlimed.control.all.nutr", "spray.pellets.rabbits.limed.control.all.nutr", 
+                                                                                     "spray.pellets.rabbits.unlimed.min.grass.all.nutr", "spray.pellets.rabbits.unlimed.min.herb.all.nutr",
+                                                                                     "spray.molluscs.fenced.limed.control.all.nutr", "spray.molluscs.fenced.unlimed.min.grass.all.nutr",
+                                                                                     "spray.molluscs.fenced.unlimed.min.herb.all.nutr", "spray.molluscs.rabbits.limed.min.grass.all.nutr",
+                                                                                     "spray.molluscs.rabbits.limed.min.herb.all.nutr", "insects.pellets.fenced.limed.control.all.nutr",
+                                                                                     "insects.pellets.fenced.unlimed.min.grass.all.nutr", "insects.pellets.fenced.unlimed.min.herb.all.nutr",
+                                                                                     "insects.molluscs.fenced.limed.min.grass.all.nutr", "insects.molluscs.fenced.limed.min.herb.all.nutr"),7,
+                                                                    ifelse(treatment %in% c("spray.pellets.fenced.limed.min.herb.min.n","spray.pellets.fenced.limed.min.grass.min.n",
+                                                                                            "spray.pellets.fenced.limed.min.herb.min.p","spray.pellets.fenced.limed.min.grass.min.p",
+                                                                                            "spray.pellets.fenced.limed.min.herb.min.k","spray.pellets.fenced.limed.min.grass.min.k",
+                                                                                            "spray.pellets.fenced.limed.min.herb.min.mg","spray.pellets.fenced.limed.min.grass.min.mg",
+                                                                                            "spray.pellets.fenced.limed.control.all.nutr", "spray.pellets.fenced.unlimed.min.grass.all.nutr", 
+                                                                                            "spray.pellets.fenced.unlimed.min.herb.all.nutr", "spray.pellets.rabbits.limed.min.grass.all.nutr",
+                                                                                            "spray.pellets.rabbits.limed.min.herb.all.nutr","spary.molluscs.fenced.limed.min.grass.all.nutr",
+                                                                                            "spray.molluscs.fenced.limed.min.herb.all.nutr", "insects.pellets.fenced.limed.min.grass.all.nutr",
+                                                                                            "insects.pellets.fenced.limed.min.herb.all.nutr"),8,
+                                                                           ifelse(treatment %in% c("spray.pellets.fenced.limed.min.grass.all.nutr", "spray.pellets.fenced.limed.min.herb.all.nutr"), 9, 4 ))))))))))%>%
+  mutate(resource_mani=ifelse(grepl("no.nutr", treatment, fixed = T),0,1))%>%
   mutate(max_trt=1)%>%
   mutate(public=0)%>%
   mutate(factorial=0)%>%
-  mutate(trt_type=ifelse(treatment=='F', 'N', 'control'))%>%
+  mutate(trt_type=ifelse(treatment== "insects.molluscs.rabbits.unlimed.control.no.nutr", 'control', 
+                         ifelse(treatment %in% c("spray.molluscs.rabbits.unlimed.control.no.nutr","spray.pellets.rabbits.unlimed.control.no.nutr","spray.molluscs.fenced.unlimed.control.no.nutr","spray.pellets.fenced.unlimed.control.no.nutr", "insects.pellets.rabbits.unlimed.control.no.nutr","insects.pellets.fenced.unlimed.control.no.nutr","insects.molluscs.fenced.unlimed.control.no.nutr"),"herb_removal",
+                                ifelse(treatment == "insects.molluscs.rabbits.limed.control.no.nutr", "lime", 
+                                       ifelse(treatment %in% c("insects.molluscs.rabbits.unlimed.min.herb.no.nutr", "insects.molluscs.rabbits.unlimed.min.grass.no.nutr"), "herbicide",
+                                              ifelse(treatment  == "insects.molluscs.rabbits.unlimed.control.plus.n", "N", 
+                                                     ifelse(treatment == "insects.molluscs.rabbits.unlimed.control.plus.p", "P", 
+                                                            ifelse(treatment == "insects.molluscs.rabbits.unlimed.control.plus.k", "K", 
+                                                                   ifelse(treatment == "insects.molluscs.rabbits.unlimed.control.plus.mg", "Mg", 
+                                                                          ifelse(treatment %in% c("insects.molluscs.rabbits.unlimed.control.min.n", "insects.molluscs.rabbits.unlimed.control.min.p", "insects.molluscs.rabbits.unlimed.control.min.k", "insects.molluscs.rabbits.unlimed.control.min.mg", "insects.molluscs.rabbits.unlimed.control.all.nutr"), "mult_nutrient", "other"))))))))))%>%
+  unique()
+
+ton <- read.csv("SIU_TON.csv")%>%
+  select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
+  mutate(community_type=0, 
+         nutrients=1, light=0, carbon=0, water=0, other_manipulation=1,
+         n=ifelse(treatment %in% c("AC", "AS", "AB"), 9.8, 
+                  ifelse(treatment %in% c("1C", "1S", "1B") & treatment_year %in% c(1,6,11,17,22),2.8,0)),
+         p=ifelse(treatment %in% c("AC", "AS", "AB"), 3.97, 
+                  ifelse(treatment %in% c("1C", "1S", "1B") & treatment_year %in% c(1,6,11,17,22),2.8,0)), 
+         k=ifelse(treatment %in% c("AC", "AS", "AB"), 8.74, 
+                  ifelse(treatment %in% c("1C", "1S", "1B") & treatment_year %in% c(1,6,11,17,22),2.8,0)), 
+         CO2=0, 
+         precip=0, 
+         temp=0,
+         mow_clip=ifelse(treatment %in% c("CC", "1C", "AC"), 0, 1), 
+         burn=0, 
+         herb_removal=0,
+         management=0,
+         other_trt=0, 
+         trt_details=ifelse(treatment == "1C", "fertilized every 5 years",
+                            ifelse(treatment %in% c("CS","AS"), "spring mowing", 
+                                   ifelse(treatment == "1S", "fertilized every 5 years + spring mowing", 
+                                          ifelse(treatment %in% c("CB", "AB"), "spring and fall mowing", 
+                                                 ifelse(treatment == "1B", "fertilized every 5 years + spring and fall mowing", 0))))),
+         successional=0,
+         plant_mani=0,  
+         plant_trt=0,
+         pulse=0)%>%
+  mutate(plot_mani=ifelse(treatment %in% c('1C', 'AC', 'CS', 'CB'), 1, ifelse(treatment == "CC", 0, 2)))%>%
+  mutate(resource_mani=ifelse(treatment %in% c("CS", "CB"), 0, 1))%>%
+  mutate(max_trt= 1)%>%
+  mutate(public=0)%>%
+  mutate(factorial=1)%>%
+  mutate(trt_type=ifelse(treatment== "CC", "control", 
+                         ifelse(treatment %in% c("CS", "CB"), "mow_clip",
+                                ifelse(treatment %in% c("1C, AC"), "mult_nutrient", "mult_nutrient*mow_clip"))))%>%
   unique()
 
 uk<-read.delim("SKY_UK.txt")%>%
@@ -1803,6 +2477,35 @@ uk<-read.delim("SKY_UK.txt")%>%
   mutate(trt_type=ifelse(treatment=='C', 'control', ifelse(treatment=='H', 'temp', ifelse(treatment=='P', 'irr', 'irr*temp'))))%>%
   unique()
 
+clima <- read.csv("SORBAS_CLIMARID.csv") %>%
+  select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
+  mutate(community_type = 0,
+         nutrients=0, light=0, carbon=0, water=1, other_manipulation=1,
+         n=0,
+         p=0, 
+         k=0, 
+         CO2=0, 
+         precip=ifelse(treatment %in% c("RR", "W+RR"), -30, 0), 
+         temp=ifelse(treatment %in% c("W", "W+RR"), 3, 0),
+         mow_clip=0, 
+         burn=0, 
+         herb_removal=0,
+         management=0,
+         other_trt=0, 
+         trt_details=0,
+         successional=1, 
+         plant_mani=0,  
+         plant_trt=0,
+         pulse=0)%>%
+  mutate(plot_mani=ifelse(treatment=="C", 0, ifelse(treatment=='W+RR',2,1)))%>%
+  mutate(resource_mani= ifelse(treatment == "W", 0,1))%>%
+  mutate(max_trt=1)%>%
+  mutate(public=0)%>%
+  mutate(factorial=1)%>%
+  mutate(trt_type=ifelse(treatment=="C", "control", ifelse(treatment == "RR", "drought", ifelse(treatment == "W", "temp", "drought*temp"))))%>%
+  unique()
+  
+  
 nitrogen<-read.csv("SR_Nitrogen.csv")%>%
   select(site_code, project_name, calendar_year, treatment_year, treatment, community_type)%>%
   mutate(nutrients=1, light=0, carbon=0, water=0, other_manipulation=1,
@@ -2025,6 +2728,12 @@ nitadd<-read.csv("YMN_NitAdd.csv")%>%
   unique()
 
 ###merge all datasets
-combine<-rbind(bffert, bgp, biocon, bowman, ccd, clip, clonal, culardoch, cxn, e001, e002, e2, e6, edge, events, exp1, face, fireplots, gane, gap2, gb, gce, gfp, grazeprecip, herbdiv, herbwood, imagine, interaction, irg, kgfert, lind, lovegrass, lucero, mat2, megarich, mnt, mwatfer, nde, nfert, nitadd, nitphos, nitrogen,nsfc, nsfc2, oface, pennings, pplots,pme, pq, ramps, rhps, rmapc, sedge, snfert, snow, study119, study278, t7, ter, tface,tide,tmece, uk, wapaclip, warmnut, water, watering, wenndex, wet, yu)
+combine<-rbind(bffert, bgp, biocon, bowman, ccd, clip, clima, clonal, culardoch, cxn, e001, e002, 
+               e2, e6, edge, eelplot, events, exp1, face, fert1, fert2, fireplots, gane, gap2, gb, 
+               gce, gcme, gcme2, gfp, grazeprecip, herbdiv, herbwood, hprecip, imagine, interaction, 
+               irg, kgfert, lind, lovegrass, lucero, mat2, megarich, mnt, mwatfer, nash, nde, nfert, 
+               nitadd, nitphos,  nitrogen,nsfc, nsfc2, nut, nutnet, oface, pennings, phace, pme, 
+               pplots, pq, ramps, rhps, rmapc, sedge, snfert, snow, sprecip, study119, study278, t7, 
+               ter, tface,tide,tmece,ton, uk, wapaclip, warmnit, warmnut, water, watering, wenndex, wet, yu)
 
 write.csv(combine, "~/Dropbox/CoRRE_database/Data/CompiledData/ExperimentInfo.csv")

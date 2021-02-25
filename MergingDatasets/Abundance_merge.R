@@ -164,7 +164,7 @@ e002<-read.delim("CDR_e002.txt")%>%
 e002_names<-read.delim("CDR_e002_specieslist.txt")%>%
   mutate(species_code=tolower(species_code))
 e0022<-merge(e002, e002_names,by="species_code", all=T)%>%
-  filter(abundance!=0, calendar_year<1992)%>%##drops everything once cessation starts
+  filter(abundance!=0, calendar_year<1992)%>% ##drops everything once cessation starts
   mutate(spcode=genus_species)%>%
   select(-species_code, -genus_species)
 e001_names <- read.csv("CDR_e001_e002_specieslist.csv")
@@ -434,7 +434,7 @@ sask <- merge(ccd, ccd_names, by="species_code", all=T)%>%
   select(-species_code)
 
 nutnet <- read.csv("NutNet.csv")%>%
-  mutate(version = 2.0, community_type = 0) %>% select(-subplot) %>%
+  mutate(version = 2.0, community_type = 0) %>% 
   filter(genus_species!="Bryophyte",
          genus_species!="Bryophyte ",
          genus_species!="Forb sp.",
@@ -540,18 +540,19 @@ snfert3 <- read.csv("SEV_NFERT20.csv") %>%
   filter(abundance!= 0)
 snfert4 <- rbind(snfert2,snfert3)
   
-wenndex<-read.delim("SEV_WENNDEx.txt")%>%
-  select(-id, -nutrients, -light, -carbon, -water, -other_manipulation, -num_manipulations, -experiment_year, -n, -temp, -precip,   -plot_mani, -species_num)%>%
-  gather(species_code, abundance, sp1:sp232)%>%
-  mutate(community_type=0, block=0, version = 1)
-wenndex_names<-read.delim("SEV_WENNDEx_specieslist.txt")
-wenndex2<-merge(wenndex, wenndex_names, by="species_code", all=T)%>%
-  filter(abundance!=0)%>% 
-  select(-species_code)
+# wenndex<-read.delim("SEV_WENNDEx.txt")%>%
+#   select(-id, -nutrients, -light, -carbon, -water, -other_manipulation, -num_manipulations, -experiment_year, -n, -temp, -precip,   -plot_mani, -species_num)%>%
+#   gather(species_code, abundance, sp1:sp232)%>%
+#   mutate(community_type=0, block=0, version = 1)
+# wenndex_names<-read.delim("SEV_WENNDEx_specieslist.txt")
+# wenndex2<-merge(wenndex, wenndex_names, by="species_code", all=T)%>%
+#   filter(abundance!=0)%>% 
+#   select(-species_code) 
+### Removing old file because ANPP per species is based on cover of species. 
 wenndex3 <- read.csv("SEV_WENNDEx20.csv") %>%
   mutate(community_type = 0, block = 0, version = 2) %>%
   filter(abundance !=0)
-wenndex4 <- rbind(wenndex2, wenndex3)
+# wenndex4 <- rbind(wenndex2, wenndex3)
 
 graze <- read.csv("SFREC_GrazePrecip.csv") %>%
   filter(abundance != 0) %>% mutate(version = 1.0)
@@ -634,7 +635,7 @@ combine<-rbind(bffert2, bgp, biocon, bowman2, ccd2, climarid, clip2, clonal2, cu
                lucero, mat22, megarich2, mnt2, mwatfer, nash, nde, nfert2, nitadd, nitphos, nitrogen, nsfc4, nut, nutnet,
                oface2, pennings2, phace, pme, pplots, pq2, ramps, rhps, rmapc2, s_precip, sask, sev_edge, snfert3, snow, 
                study1192, study2782, t72, ter, tface, tide2, tmece, ton, uk2, wapaclip2, warmnut2, water, watering2, 
-               wenndex4, wet2, yu)
+               wenndex3, wet2, yu)
 
 combine <- combine %>% mutate(genus_species = trimws(genus_species, 'both')) %>%
   mutate(genus_species = gsub("\\s\\s"," ",genus_species, perl = TRUE)) %>%
@@ -660,10 +661,16 @@ totcov<-combine%>%
   group_by(site_code, project_name, community_type, calendar_year, treatment_year, treatment, block, plot_id, data_type)%>%
   summarise(totcov=sum(abundance))
 
-relcov<-merge(totcov, combine, by=c("site_code", "project_name", "community_type", "calendar_year", "treatment_year", "treatment", "block", "plot_id"))%>%
+relcov<-merge(totcov, combine, by=c("site_code", "project_name", "community_type", "calendar_year", "treatment_year", "treatment", "block", "plot_id", "data_type"))%>%
   mutate(relcov=abundance/totcov)%>%
   select(-abundance, -totcov)
 
 write.csv(relcov, "~/Dropbox/CoRRE_database/Data/CompiledData/RelativeCover.csv")
 
 
+##### Relative cover and raw abundance for sCoRRE
+
+sCoRRERaw <- combine[-which(combine$project_name %in% c("BioCON", "EELplot", "NASH") & combine$data_type == "cover"),]
+write.csv(sCoRRERaw, "~/Dropbox/sDiv_sCoRRE_shared/CoRRE data/CoRRE data/community composition/CoRRE_RawAbundance_Feb2021.csv", row.names = FALSE)  
+sCoRRERel <- relcov[-which(relcov$project_name %in% c("BioCON", "EELplot", "NASH") & relcov$data_type == "cover"),]
+write.csv(sCoRRERel, "~/Dropbox/sDiv_sCoRRE_shared/CoRRE data/CoRRE data/community composition/CoRRE_RelativeAbundance_Feb2021.csv", row.names = FALSE)  

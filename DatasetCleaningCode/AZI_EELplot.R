@@ -20,6 +20,7 @@ bio_dat <- dat[,-6]
 
 dat <- gather(dat, key = "data_type", value = "abundance", 6:7)
 dat$data_type[dat$data_type == "abundance"] <- "cover"
+dat <- dat[which(dat$abundance> 0),]
 
 write.csv(dat, "Data/CleanedData/Sites/Species csv/AZI_EELplot.csv", row.names = FALSE)
 

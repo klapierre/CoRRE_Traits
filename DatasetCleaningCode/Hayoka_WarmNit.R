@@ -16,12 +16,14 @@ dat <- dat[,-7]
 # Update column names
 
 names(dat) <- c("genus_species", "treatment", "2013_pin", "2104_pin", "2015_pin", "2016_pin",
-                        "2013_cover", "2104_cover", "2015_cover", "2016_cover")
+                        "2013_cover", "2014_cover", "2015_cover", "2016_cover")
 # Get rid of first row
 dat <- dat[-1,]
 
 # going to use cover instead of pin hits
 dat <- dat[,-c(3:6)]
+# add in plot_id
+dat$plot_id <- rep(c(1:24), 10)
 # wide to long
 dat <- gather(dat, key= calendar_year, value = abundance, 3:6)
 

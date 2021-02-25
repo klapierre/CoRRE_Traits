@@ -5,7 +5,7 @@
 setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database")
 
 #### Cover ####
-df <- read.csv("Data/OriginalData/2020 update/SIU_TON/TON_Div.csv")
+df <- read.csv("Data/OriginalData/2020 update/Data/SIU_TON/TON_Div.csv")
 
 # Convert from cover classes to cover
 # Using only cover measured from cov.1 (cover under 1 m off the ground)
@@ -32,13 +32,15 @@ df$treatment_year <- df$Year - 1995
 df$data_type <- "cover"
 df <- df[,c(1,2,5,9,12,15:19)]
 names(df)[c(3:5)] <- c("genus_species", "calendar_year", "abundance")
-
+# get rid of block 1 because was destroyed in 2013
+df <- df[which(df$block != 1),]
+df <- df[which(df$abundance >0),]
 write.csv(df, "Data/CleanedData/Sites/Species csv/SIU_TON.csv", row.names = FALSE)
 
 
 #### Biomass ####
 
-df1 <- read.csv("Data/OriginalData/2020 update/SIU_TON/TON_Biomass.csv")
+df1 <- read.csv("Data/OriginalData/2020 update/Data/SIU_TON/TON_Biomass.csv")
 
 df1$treatment <- paste(df1$trt.fert, df1$trt.mow, sep = "") # make treatment column
 names(df1)[5] <- "block" #change PL column to block so can merge over plts df from cover data

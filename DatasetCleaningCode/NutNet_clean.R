@@ -16,13 +16,13 @@ bio_dat <- read.csv("Data/OriginalData/2020 update/Data/NutNet/nutnet_anpp_01275
 
 
 # fix names & get rid of unnecessary columns
-dat <- dat[,-c(2,9,12:17)] #check with Kim on subplot column
-names(dat) <- c("calendar_year", "site_code", "block", "plot_id", "subplot", "treatment_year",
+dat <- dat[,-c(2,6,9,12:17)] #check with Kim on subplot column
+names(dat) <- c("calendar_year", "site_code", "block", "plot_id",  "treatment_year",
                 "treatment", "genus_species", "live", "abundance")
 
 # get live abundance
 dat <- dat[which(dat$live == 1),]
-dat <- dat[,-9]# get rid of "live" column
+dat <- dat[,-8]# get rid of "live" column
 
 # Species names to first letter capital only
 dat$genus_species <- tolower(dat$genus_species)
@@ -40,8 +40,8 @@ bio_dat <- bio_dat[which(bio_dat$live ==1),]
 
 bio_dat <- aggregate(bio_dat$mass, by = list(calendar_year = bio_dat$year, treatment_year = bio_dat$year_trt,
                                              treatment = bio_dat$trt, site_code = bio_dat$site_code, block = bio_dat$block,
-                                             plot_id = bio_dat$plot, subplot = bio_dat$subplot), FUN = sum)
-names(bio_dat)[8] <- "anpp"
+                                             plot_id = bio_dat$plot), FUN = sum)
+names(bio_dat)[7] <- "anpp"
 # add in other information
 bio_dat$project_name <- "NutNet"
 bio_dat$data_type <- "biomass"

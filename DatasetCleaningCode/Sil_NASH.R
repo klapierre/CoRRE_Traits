@@ -39,6 +39,11 @@ dat[,c(4:9)] <- NULL
 
 names(dat)[c(1,2,3)] <- c("calendar_year", "data_type", "block")
 
+repcount <- as.data.frame(table(dat$treatment[dat$calendar_year== 1997]))
+exclude <- as.character(repcount[which(repcount$Freq <3),1])
+
+dat<- dat[-which(dat$treatment %in% exclude),]
+
 # save abundance data
 write.csv(dat, "Data/CleanedData/Sites/Species csv/Sil_NASH.csv", row.names = FALSE)
 

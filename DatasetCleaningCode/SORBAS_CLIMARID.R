@@ -48,5 +48,8 @@ dat$treatment_year <- dat$calendar_year - 2010
 
 names(dat)[5] <- "abundance"
 
+## "RR " coming up as a unique treatment - fixing that
+dat$treatment[dat$treatment =="RR "] <- "RR"
+
 write.csv(dat, "Data/CleanedData/Sites/Species csv/SORBAS_CLIMARID.csv", row.names = FALSE)
 

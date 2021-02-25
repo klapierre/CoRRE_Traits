@@ -16,7 +16,7 @@ df$anpp <- rowSums(df[,-c(1,2)])
 #adding other columns
 df$site_code <- "DL"
 df$project_name <- "NSFC"
-df$data_type <- "biomass"
+df$data_type <- "ANPP"
 df$treatment_year <- df$Y - 2005
 
 # making a unique plot number for each treatment-plot combination
@@ -33,7 +33,7 @@ df <- merge(df, trt_plot)
 df1 <- gather(df, key = genus_species, value = abundance, 3:58)
 df1 <- df1[,c(2,4:12)]
 names(df1)[1] <- "calendar_year"
-
+df1 <- df1[which(df1$abundance > 0),]
 write.csv(df1, "Data/CleanedData/Sites/Species csv/DL_NSFC20132016.csv", row.names = FALSE)
 
 ## pull out anpp dataset
