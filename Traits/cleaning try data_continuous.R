@@ -6,6 +6,8 @@ theme_set(theme_bw(12))
 
 ##update Feb 2021
 ##we are adding new species with the CoRRE database 2.0 update
+## we also found we were missing species in the Nov 2019 datapull b/c of naming inconsistencies so we now redoing traits for all species.
+
 
 #meghan's
 setwd("C:/Users/mavolio2/Dropbox/CoRRE_database/Data/")
@@ -17,11 +19,11 @@ setwd('C:\\Users\\komatsuk\\Dropbox (Smithsonian)\\working groups\\CoRRE\\conver
 setwd('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\datasets\\Traits\\Try Data Nov 2019')
 
 #read in both datasets
-dat1<-fread("TRYCoRREMerge/TRY_Traits_Download_Nov2019.txt",sep = "\t",data.table = FALSE,stringsAsFactors = FALSE,strip.white = TRUE)
+# dat1<-fread("TRYCoRREMerge/TRY_Traits_Download_Nov2019.txt",sep = "\t",data.table = FALSE,stringsAsFactors = FALSE,strip.white = TRUE)
+# 
+# dat2<-fread("TRYCoRREMerge/TRY_Traits_Download_Feb2021.txt",sep = "\t",data.table = FALSE,stringsAsFactors = FALSE,strip.white = TRUE)
 
-dat2<-fread("TRYCoRREMerge/TRY_Traits_Download_Feb2021.txt",sep = "\t",data.table = FALSE,stringsAsFactors = FALSE,strip.white = TRUE)
-
-dat<-rbind(dat1, dat2)
+dat<-fread("TRYCoRREMerge/TRY_Traits_Download_Feb15_2021.txt",sep = "\t",data.table = FALSE,stringsAsFactors = FALSE,strip.white = TRUE)
 
 #generate list of units for ALL TRY traits
 units <- dat%>%
@@ -53,6 +55,8 @@ dat3<-dat2%>%
 
 ####selecting desired continuous traits
 #figuring out how clean traits are
+###FEB 15 
+
 tests<-dat3%>%
   filter(TraitID %in% c(3109))%>%
   #select(TraitID, OrigUnitStr, UnitName)%>%
@@ -60,7 +64,7 @@ tests<-dat3%>%
   select(TraitID, UnitName, OrigUnitStr, OriglName, TraitName)%>%
   #filter(UnitName!="g/m2/d")%>%
   group_by(TraitID, UnitName, OrigUnitStr, OriglName, TraitName)%>%
-   summarize(n=length(TraitID))
+  summarize(n=length(TraitID))
 
 #subsetting out traits and naming them
 #if origlname or unit is blank but there are no duplicates we are keepping it.
@@ -165,7 +169,8 @@ cont_traits<-dat3%>%
                  ifelse(TraitID==186&OriglName=="", 1,
                  ifelse(TraitID==186&OriglName=="Vcmax_a_25", 1, 0))))))))))))))))))))))))))))))))))))))))))))))))))%>%
   mutate(remove3=ifelse(TraitID==186&OriglName=="Vcmax25Rog", 1,
-                 ifelse(TraitID==3120&OrigUnitStr=="mmol/g", 1, 0)))%>%#remove problem data where there are replicates for ObservationID
+                 ifelse(TraitID==3120&OrigUnitStr=="mmol/g", 1, 
+                 ifelse(TraitID==26&OriglName=="SeedMassMax"|OriglName=="SeedMassMin",1, 0))))%>%#remove problem data where there are replicates for ObservationID
   filter(remove==0)%>%
   filter(remove2==0)%>%
   filter(remove3==0)%>%
@@ -288,33 +293,28 @@ settings<-cont_traits%>%
 #add info on genus family
 
 #drop non fully id'd to species
-treesp_clean <- treesp[!grepl(" sp\\.",fixed = TRUE, treesp$species_matched),]
-
-familylist<-TPL(splist[1:10,])#pull our taxon<-what I entered, genus and family
-
-
-
 splist<-key%>%
   select(species_matched)%>%
   unique%>%
-  left_join(treesp_clean)
+  left_join(treesp)%>%
+  na.omit()
 
 
-
-
-  rename(family=family)%>%
-  separate(remove=F, species_matched, into=c("genus", "species"), sep=" ")%>%
-  select(family, genus, species_matched)%>%
-  left_join(treesp)
-
+##drop trees
 cont_traits2<-cont_traits%>%
-  left_join(splist)%>%
-  filter(tree.non.tree=="non-tree")%>%
-  select(-tree.non.tree)
+  left_join(splist, by="species_matched")%>%
+  mutate(remove=ifelse(tree.non.tree=="non-tree", 0, 1))%>%
+  filter(remove==0)%>%
+  select(-tree.non.tree, -AccSpeciesName.y, -remove)%>%
+  rename(AccSpeciesName=AccSpeciesName.x)
 
-
+#get genus info and select desired columns
 cont_traits3<-cont_traits2%>%
-  select(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue)
+  select(DatasetID, ObservationID, family, species_matched, CleanTraitName, StdValue)%>%
+  separate(remove = F, species_matched, into = c("genus", "species"), sep=" ")%>%
+  select(-species)
+
+
 ###getting dataset to give to Frazni
 
 #investigating problem traits
@@ -328,7 +328,7 @@ d428<-cont_traits3%>% #this dataset has two height values per plant, we are taki
   group_by(DatasetID, ObservationID, species_matched, CleanTraitName, family, genus)%>%
   summarise(StdValue=max(StdValue))
 
-
+#dropping probelm datasets and reappending clean ones
 cont_traits4<-cont_traits3%>%
   filter(DatasetID!=453)%>%
   mutate(remove=ifelse(DatasetID==428&CleanTraitName=="plant_height_vegetative", 1, 
@@ -337,12 +337,14 @@ cont_traits4<-cont_traits3%>%
   select(-remove)%>%
   bind_rows(d453)%>%
   bind_rows(d428)
-  
+
+#making sure there is just on measuremnt per variable.  
 cont_traits5<-cont_traits4%>%
   mutate(present=1)%>%
   group_by(DatasetID, ObservationID, species_matched, CleanTraitName)%>%
-  summarize(n=sum(present))
+  summarise(n=sum(present))
 
+#troubleshooting the problems
 probtraits<-subset(cont_traits5, n>1)%>%
   ungroup()%>%
   select(CleanTraitName, n)%>%
@@ -355,5 +357,5 @@ ttraits<-cont_traits4%>%
   spread(CleanTraitName, StdValue, fill=NA)
   
 
-write.csv(ttraits, "For Franzi/TRY_trait_data_continuous.csv", row.names = F)
-write.csv(cont_traits4, "For Franzi/TRY_trait_data_continuous_long.csv", row.names = F)
+write.csv(ttraits, "C:/Users/mavolio2/Dropbox/sDiv_sCoRRE_shared/TRY/For Franzi/TRY_trait_data_continuous_Feb2021.csv", row.names = F)
+write.csv(cont_traits4, "C:/Users/mavolio2/Dropbox/sDiv_sCoRRE_shared/TRY/For Franzi/TRY_trait_data_continuous_long.csv_Feb2021", row.names = F)
