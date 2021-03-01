@@ -12,7 +12,7 @@ dat <- read.csv("Data/OriginalData/2020 update/Data/NutNet/nutnet_cover_01272021
 bio_dat <- read.csv("Data/OriginalData/2020 update/Data/NutNet/nutnet_anpp_012752021.csv", row.names = 1)
 # sites included in this dataset:
 # "cdcr.us", "cbgb.us", "lake.us", "lancaster.uk", "chilcas.ar" , "potrok.ar", 
-# "shps.us","sier.us", "temple.us", "veluwe.nl",  "yarra.au"
+# "shps.us","sier.us", "temple.us", "veluwe.nl",  "yarra.au", "bayr.de"
 
 
 # fix names & get rid of unnecessary columns
@@ -31,6 +31,8 @@ dat$genus_species <- capitalize(dat$genus_species)
 # add in other information
 dat$project_name <- "NutNet"
 dat$data_type <- "cover"
+dat$site_code[dat$site_code == "bayr.de"] <- "Bt"
+dat$site_code[dat$site_code == "cdcr.us"] <- "CDR"
 
 write.csv(dat, "Data/CleanedData/Sites/Species csv/NutNet.csv", row.names = FALSE)
 
@@ -45,6 +47,8 @@ names(bio_dat)[7] <- "anpp"
 # add in other information
 bio_dat$project_name <- "NutNet"
 bio_dat$data_type <- "biomass"
+bio_dat$site_code[bio_dat$site_code == "bayr.de"] <- "Bt"
+bio_dat$site_code[bio_dat$site_code == "cdcr.us"] <- "CDR"
 
 write.csv(bio_dat, "Data/CleanedData/Sites/ANPP csv/NutNet_anpp.csv", row.names = FALSE)
 

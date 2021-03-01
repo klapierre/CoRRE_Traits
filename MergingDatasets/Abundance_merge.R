@@ -634,7 +634,7 @@ combine<-rbind(bffert2, bgp, biocon, bowman2, ccd2, climarid, clip2, clonal2, cu
                gcme, gcme2, graze, h_precip, herbdiv, herbwood2, imagine2, interaction2, irg2, kgfert2, lind2, lovegrass, 
                lucero, mat22, megarich2, mnt2, mwatfer, nash, nde, nfert2, nitadd, nitphos, nitrogen, nsfc4, nut, nutnet,
                oface2, pennings2, phace, pme, pplots, pq2, ramps, rhps, rmapc2, s_precip, sask, sev_edge, snfert3, snow, 
-               study1192, study2782, t72, ter, tface, tide2, tmece, ton, uk2, wapaclip2, warmnut2, water, watering2, 
+               study1192, study2782, t72, ter, tface, tide2, tmece, ton, uk2, wapaclip2, warmnut2, warmnit, water, watering2, 
                wenndex3, wet2, yu)
 
 combine <- combine %>% mutate(genus_species = trimws(genus_species, 'both')) %>%
