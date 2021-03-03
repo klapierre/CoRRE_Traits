@@ -3041,14 +3041,31 @@ df1 <- df %>% mutate(trt_type = ifelse(trt_type %in% c("N*P"), "mult_nutrient",
                                                                                                              ifelse(trt_type %in% c("temp*mow_clip", "temp*fungicide"), "temp*non_resource", 
                                                                                                                     ifelse(trt_type %in% c("C*stone", "*herb_removal", "K*herb_removal", "K*herb_removal*herbicide", "K*herb_removal*lime", "K*herb_removal*lime*herbicide", "K*herbicide", "K*lime*herbicide","Mg*herb_removal", "Mg*herb_removal*herbicide", "Mg*herb_removal*lime", "Mg*herb_removal*lime*herbicide", "Mg*herbicide", "Mg*lime","Mg*lime*herbicide"), "other_nutrient*non_resource(s)", 
                                                                                                                            trt_type))))))))))))))
+df2 <- temp_df %>% mutate(trt_type = ifelse(trt_type %in% c("N*P"), "mult_nutrient",
+                                       ifelse(trt_type %in% c("mow_clip", "herb_removal", "plant_mani", "lime", "burn", "seed","fungicide", "disturbance", "herbicide", "stone","till"), "other_non_resource", 
+                                              ifelse(trt_type=="N*irr*CO2", "3 resources", 
+                                                     ifelse(trt_type == "N*P", "mult_nutrient", 
+                                                            ifelse(trt_type %in% c("irr*herb_removal", "irr*mow_clip", "irr*plant_mani", "irr*plant_mani*herb_removal"), "irr*non_resource", 
+                                                                   ifelse(trt_type %in% c("mult_nutrient*herb_removal", "mult_nutrient*mow_clip", "mult_nutrient*plant_mani", "N*P*burn", "N*P*mow_clip", "N*P*seed", "mult_nutient*fungicide", "mult_nutrient*herb_removal_lime*herbicide", "mult_nutrient*herb_removal*lime", "mult_nutrient*herb_removal*lime", "mult_nutrient*herb_removal*mow_clip", "mult_nutrient*herbicide", "mult_nutrient*lime", "mult_nutrient*lime*herbicide", "mult_nutrient*plant_mani*herb_removal", "N*P*burn*graze", "N*P*burn*mow_clip", "mult_nutrient*herb_removal*herbicide", "mult_nutrient*fungicide"), "mult_nutrient*non_resource",
+                                                                          ifelse(trt_type %in% c("N*irr*temp", "N*P*temp", "drought*CO2*temp", "irr*CO2*temp", "mult_nutrient*temp", "N*CO2*temp", "N*irr*CO2*temp"), "mult_resources*temp", 
+                                                                                 ifelse(trt_type %in% c("N*till", "N*temp*fungicide", "N*stone", "N*seed*mow_clip", "N*plant_mani*disturbance", "N*lime*herbicide", "N*lime", "H*herbicide", "N*herb_removal*lime*herbicide", "N*herb_removal*lime", "N*herb_removal)herbicide", "N*herb_removal", "N*fungicide", "N*disturbance", "N*burn*graze", "N*burn*mow_clip", "N*seed", "N*burn", "N*mow_clip", "N*plant_mani", "N*herbicide", "N*herb_removal*herbicide"), "N*other_non_resource(s)", 
+                                                                                        ifelse(trt_type %in% c("P*burn", "P*seed", "P*burn*graze", "P*burn*mow_clip", "P*herb_removal", "P*herb_removal*herbicide", "P*herb_removal*lime", "P*herb_removal*lime*herbicide", "P*herbicide", "P*lime", "P*lime*herbicide", "P*mow_clip"), "P*other_non_resource(s)",
+                                                                                               ifelse(trt_type %in% c("plant_mani*herb_removal", "burn*mow_clip", "burn*graze", "herb_removal*herbicide","herb_removal*lime", "herb_removal*lime*herbicide", "herb_removal*mow_clip", "lime*herbicide", "seed*mow_clip", "plant_mani*disturbance"), "mult_non_resource", 
+                                                                                                      ifelse(trt_type %in% c("K", "C", "Ca addition", "Mg", "protein"), "other_nutrient", 
+                                                                                                             ifelse(trt_type %in% c("temp*mow_clip", "temp*fungicide"), "temp*non_resource", 
+                                                                                                                    ifelse(trt_type %in% c("C*stone", "*herb_removal", "K*herb_removal", "K*herb_removal*herbicide", "K*herb_removal*lime", "K*herb_removal*lime*herbicide", "K*herbicide", "K*lime*herbicide","Mg*herb_removal", "Mg*herb_removal*herbicide", "Mg*herb_removal*lime", "Mg*herb_removal*lime*herbicide", "Mg*herbicide", "Mg*lime","Mg*lime*herbicide"), "other_nutrient*non_resource(s)", 
+                                                                                                                           trt_type))))))))))))))
+
 
 
 temp <- df1 %>% count(trt_type, site_code)
 temp1<- temp[,c(1,2)] %>% count(trt_type)
 names(temp1)<- c("treatment_type", "Number_of_locations")
-trt_sum2 <- as.data.frame(table(df1$trt_type))
-names(trt_sum2) <- c("treatment_type", "Number_of_sites")
+trt_sum2 <- as.data.frame(table(df2$trt_type))
+names(trt_sum2) <- c("treatment_type", "Number_of_experiments")
 trt_sum3 <- merge(trt_sum2, temp1)
-trt_sum3 <- trt_sum3[trt_sum3$treatment_type != "control",]
-write.csv(trt_sum, "~/Dropbox/CoRRE_database/Data/CompiledData/treatment_type_summary_broad_groups.csv")
+#trt_sum3 <- trt_sum3[trt_sum3$treatment_type != "control",]
+write.csv(trt_sum3, "~/Dropbox/CoRRE_database/Data/CompiledData/treatment_type_summary_broad_groups.csv")
+
+
 

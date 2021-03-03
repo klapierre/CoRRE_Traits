@@ -17,7 +17,7 @@ for (i in 1:length(newdf)){
   df<- df[colSums(!is.na(df)) > 0]
   df <- df[rowSums(is.na(df)) != ncol(df),]
   df$calendar_year <- i + 2012
-  df$treatment_year <- 1
+  df$treatment_year <- i
   df$site_code <- "YMN"
   df$project_name <- "NitAdd"
   df$data_type <- "biomass"

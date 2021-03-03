@@ -131,7 +131,7 @@ rmapc2<-merge(rmapc, rmapc_names, by="species_code", all=T)%>%
   select(-species_code)
 
 biocon<-read.csv("CDR_BioCON.csv")%>%
-  mutate(community_type=0, version = 1.0) %>% filter(abundance!=0)
+  mutate(community_type=0, version = ifelse(calendar_year<=2013, 1.0,2.0)) %>% filter(abundance!=0)
 
 e001<-read.csv("CDR_e001.csv")%>%
   mutate(block=0, version=ifelse(calendar_year<=2013, 1.0,2.0))%>%
