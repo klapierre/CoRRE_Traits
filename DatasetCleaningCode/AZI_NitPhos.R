@@ -67,6 +67,7 @@ ANPP <- aggregate(ANPP$mass, by = list(calendar_year = ANPP$year, trt = ANPP$trt
                                        repeat. = ANPP$repeat., treatment_year = ANPP$treatment_year),
                   FUN = sum)
 names(ANPP)[5] <- "anpp"
+ANPP$anpp <- ANPP$anpp*4 #reported in g/0.25m2 originally
 ANPP$data_type <- "biomass"
 ANPP$site_code <- "AZI"
 ANPP$project_name <- "NitPhos"

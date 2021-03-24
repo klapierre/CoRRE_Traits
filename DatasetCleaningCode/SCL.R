@@ -1,23 +1,19 @@
-setwd("~/Dropbox/converge_diverge/datasets/ORIGINAL_DATASETS/SCL_Pedro_Datasets")
+setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database")
 
 library(dplyr)
 library(tidyr)
 
-ter<-read.csv("SCL_TER_raw.csv")%>%
+ter<-read.csv("Data/OriginalData/Sites/SCL_Pedro_datasets/SCL_TER_raw.csv")%>%
   select(-Forb.seedling)%>%
   gather(genus_species, abundance, Achyrocline.satureioides:Viola.arvensis)
 
-treatment_year<-ter%>%
-  select(calendar_year)%>%
-  unique()%>%
-  mutate(treatment_year=seq(1,4, by=1))
+ter$treatment_year <- ter$calendar_year - 2003
 
-ter2<-merge(treatment_year, ter, by="calendar_year")%>%
-  mutate(site_code="SCL", project_name="TER")
+ter2<-ter %>% mutate(site_code="SCL", project_name="TER")
 
-write.csv(ter2, "SCL_TER.csv")
+write.csv(ter2, "Data/CleanedData/Sites/Species csv/SCL_TER.csv")
 
-luc<-read.csv("SCL_Lucero_raw.csv")%>%
+luc<-read.csv("Data/OriginalData/Sites/SCL_Pedro_datasets/SCL_Lucero_raw.csv")%>%
   select(-Unknown.seedling)%>%
   gather(genus_species, abundance, Achyrocline.satureioides:Viola.arvensis)
 
@@ -29,4 +25,4 @@ treatment_year<-luc%>%
 luc2<-merge(treatment_year, luc, by="calendar_year")%>%
   mutate(site_code="SCL", project_name="Lucero")
 
-write.csv(luc2, "SCL_Lucero.csv")
+write.csv(luc2, "Data/CleanedData/Sites/Species csv/SCL_Lucero.csv")

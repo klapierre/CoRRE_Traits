@@ -57,5 +57,6 @@ bio_dat <- aggregate(bio_dat$abundance,by = list(calendar_year = bio_dat$calenda
                                     site_code = bio_dat$site_code, project_name = bio_dat$project_name, 
                                     plot_id = bio_dat$plot_id, treatment = bio_dat$treatment), FUN = sum)
 names(bio_dat)[9] <- "anpp"
+bio_dat$anpp <- bio_dat$anpp *8
 
 write.csv(bio_dat, "Data/CleanedData/Sites/ANPP csv/Sil_NASH_anpp.csv", row.names = FALSE)

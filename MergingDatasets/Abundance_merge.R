@@ -354,6 +354,11 @@ rhps<-read.csv("KNZ_RHPs.csv")%>%
   mutate(community_type=0, version=ifelse(calendar_year<=2015, 1.0,2.0)) %>%
   filter(abundance!=0)
 
+gfp <- read.csv("KNZ_KNP_GFP.csv")%>%
+  mutate(block = 0, version = 1.0)%>%
+  filter(abundance!=0)
+  
+
 e2 <- read.csv("KUFS_E2.csv") %>%
   mutate(community_type = 0, version = 2.0) %>%
   filter(abundance !=0)
@@ -418,6 +423,7 @@ gb2<-merge(gb, gb_names, by="species_code", all=T)%>%
 herbdiv<-read.csv("NIN_herbdiv.csv")%>%
   mutate(community_type=0, version=ifelse(calendar_year<=2015, 1.0,2.0))%>%
   filter(abundance!=0)
+herbdiv <- herbdiv[which(duplicated(herbdiv) == FALSE),]
 
 ccd<-read.delim("NTG_CCD.txt")%>%
   select(-id, -nutrients, -light, -carbon, -water, -other_manipulation, -num_manipulations, -experiment_year, -clip,-precip, -temp,   -plot_mani, -species_num)%>%
@@ -496,11 +502,11 @@ nut <- read.csv("Rengen_Nut.csv")%>% #species '...41', what is this? ask PIs
   mutate(genus_species=ifelse(genus_species=='Picea abies seedling', 'Picea abies', as.character(genus_species)))
 
 interaction<-read.delim("RIO_interaction.txt")%>%
-  select(-n, -precip, -precip_vari, -plot_mani, -data_type)%>%
+  select(-n, -precip, -precip_vari, -plot_mani)%>%
   gather(species_code, abundance, sp1:sp10)%>%
   mutate(block=0, version = 1.0)
 interaction_names<-read.delim("RIO_interaction_specieslist.txt")
-interaction2<-merge(tide, tide_names, by="species_code", all=T)%>%
+interaction2<-merge(interaction, interaction_names, by="species_code", all=T)%>%
   filter(abundance!=0)%>%
   select(-species_code)
 
@@ -619,7 +625,7 @@ lovegrass <- read.csv("TRA_Lovegrass.csv") %>%
 
 edge <- read.csv("USA_EDGE.csv") %>% ## Added new data 2020
   mutate(data_type = "cover", version = 1.0)%>%
-  filter(abundance !=0)
+  filter(abundance !=0, site_code != "SEV")
 
 shet <- read.csv("WAG_SHet.csv") %>%
   mutate(version = 2.0, community_type = 0)
@@ -630,8 +636,8 @@ nitadd <- read.csv("YMN_NitAdd.csv") %>%
 
 #merge all datasets
 combine<-rbind(bffert2, bgp, biocon, bowman2, ccd2, climarid, clip2, clonal2, culardoch2, cxn, d_precip, e001, e0023,
-               e2, e6, edge, eelplot, events2, exp12, face2, fert1, fert2, fireplots2, gane2, gap2, gb2, gce2, 
-               gcme, gcme2, graze, h_precip, herbdiv, herbwood2, imagine2, interaction2, irg2, kgfert2, lind2, lovegrass, 
+               e2, e6, edge, eelplot, events2, exp12, face2, fert1, fert2, fireplots2, gane2, gap2, gb2, gce2, gcme, 
+               gcme2, gfp, graze, h_precip, herbdiv, herbwood2, imagine2, interaction2, irg2, kgfert2, lind2, lovegrass, 
                lucero, mat22, megarich2, mnt2, mwatfer, nash, nde, nfert2, nitadd, nitphos, nitrogen, nsfc4, nut, nutnet,
                oface2, pennings2, phace, pme, pplots, pq2, ramps, rhps, rmapc2, s_precip, sask, sev_edge, snfert3, snow, 
                study1192, study2782, t72, ter, tface, tide2, tmece, ton, uk2, wapaclip2, warmnut2, warmnit, water, watering2, 
@@ -657,7 +663,7 @@ write.csv(species_list, "~/Dropbox/CoRRE_database/Data/CompiledData/Species_list
 
 ###Getting Relative Cover
 totcov<-combine%>%
-  tbl_df()%>%
+  tibble::as_tibble()%>%
   group_by(site_code, project_name, community_type, calendar_year, treatment_year, treatment, block, plot_id, data_type)%>%
   summarise(totcov=sum(abundance))
 
@@ -671,6 +677,6 @@ write.csv(relcov, "~/Dropbox/CoRRE_database/Data/CompiledData/RelativeCover.csv"
 ##### Relative cover and raw abundance for sCoRRE
 
 sCoRRERaw <- combine[-which(combine$project_name %in% c("BioCON", "EELplot", "NASH") & combine$data_type == "cover"),]
-write.csv(sCoRRERaw, "~/Dropbox/sDiv_sCoRRE_shared/CoRRE data/CoRRE data/community composition/CoRRE_RawAbundance_Feb2021.csv", row.names = FALSE)  
+write.csv(sCoRRERaw, "~/Dropbox/sDiv_sCoRRE_shared/CoRRE data/CoRRE data/community composition/CoRRE_RawAbundanceMar2021.csv", row.names = FALSE)  
 sCoRRERel <- relcov[-which(relcov$project_name %in% c("BioCON", "EELplot", "NASH") & relcov$data_type == "cover"),]
-write.csv(sCoRRERel, "~/Dropbox/sDiv_sCoRRE_shared/CoRRE data/CoRRE data/community composition/CoRRE_RelativeAbundance_Feb2021.csv", row.names = FALSE)  
+write.csv(sCoRRERel, "~/Dropbox/sDiv_sCoRRE_shared/CoRRE data/CoRRE data/community composition/CoRRE_RelativeAbundanceMar2021.csv", row.names = FALSE)  

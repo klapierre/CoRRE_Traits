@@ -35,6 +35,9 @@ names(df)[c(3:5)] <- c("genus_species", "calendar_year", "abundance")
 # get rid of block 1 because was destroyed in 2013
 df <- df[which(df$block != 1),]
 df <- df[which(df$abundance >0),]
+### some duplicated rows, get rid of these
+df <- df[which(duplicated(df) == FALSE),]
+
 write.csv(df, "Data/CleanedData/Sites/Species csv/SIU_TON.csv", row.names = FALSE)
 
 

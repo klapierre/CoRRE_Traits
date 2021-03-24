@@ -200,9 +200,8 @@ clonal<-read.delim("ASGA_Clonal.txt")%>%
   unique()
 
 exp1<-read.delim("ASGA_Exp1.txt")%>%
-  select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
-  mutate(community_type=0, 
-         nutrients=1, light=0, carbon=0, water=0, other_manipulation=1,
+  select(site_code, project_name, calendar_year, treatment_year, treatment, community_type)%>%
+  mutate(nutrients=1, light=0, carbon=0, water=0, other_manipulation=1,
          n=ifelse(treatment=='2_0_CO'|treatment=='1_0_CO'|treatment=='2_1_CO'|treatment=='1_1_CO', 0, 20.1),
          p=0, 
          k=0, 
@@ -897,12 +896,12 @@ hprecip <- read.csv("HAYS_Precip.csv") %>%
          plant_mani=0,  
          plant_trt=0,
          pulse=0)%>%
-  mutate(plot_mani=ifelse(treatment == "Control", 0, 1))%>%
+  mutate(plot_mani=ifelse(treatment == "control", 0, 1))%>%
   mutate(resource_mani=1)%>%
   mutate(max_trt=1)%>%
   mutate(public=0)%>%
   mutate(factorial=0)%>%
-  mutate(trt_type=ifelse(treatment=="Control", "control", ifelse(treatment == "reduction", "drought", "irr"))) %>%
+  mutate(trt_type=ifelse(treatment=="control", "control", ifelse(treatment == "reduction", "drought", "irr"))) %>%
   unique()
 
 phace <- read.csv("HPGRS_PHACE.csv")%>%
@@ -1939,7 +1938,7 @@ lucero<-read.csv("SCL_Lucero.csv")%>%
   mutate(max_trt=1)%>%
   mutate(public=0)%>%
   mutate(factorial=0)%>%
-  mutate(trt_type=ifelse(treatment=='N1', 'control', 'N'))%>%
+  mutate(trt_type=ifelse(treatment=='N0', 'control', 'N'))%>%
   unique()
 
 ter<-read.csv("SCL_TER.csv")%>%
@@ -3066,6 +3065,4 @@ names(trt_sum2) <- c("treatment_type", "Number_of_experiments")
 trt_sum3 <- merge(trt_sum2, temp1)
 #trt_sum3 <- trt_sum3[trt_sum3$treatment_type != "control",]
 write.csv(trt_sum3, "~/Dropbox/CoRRE_database/Data/CompiledData/treatment_type_summary_broad_groups.csv")
-
-
 

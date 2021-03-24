@@ -12,6 +12,9 @@ df$project_name <- "e001"
 names(df)[c(1:6)] <- c("calendar_year", "community_type", "plot_id", "treatment", "genus_species", "abundance")
 df <- df[,c(1,4,3,2,8,7,9,10,5,6)]
 
+# several duplicated rows mostly from 2014, get rid of these
+df <- df[which(duplicated(df) == FALSE),]
+
 write.csv(df, "Data/CleanedData/Sites/Species csv/CDR_e001.csv", row.names = FALSE)
 
 anpp <- aggregate(df$abundance, by = list(calendar_year = df$calendar_year, treatment = df$treatment, 
@@ -20,6 +23,7 @@ anpp <- aggregate(df$abundance, by = list(calendar_year = df$calendar_year, trea
                                           site_code = df$site_code, project_name = df$project_name), 
                   FUN = sum)
 names(anpp)[9] <- "anpp"
+write.csv(anpp, "Data/CleanedData/Sites/Species csv/CDR_e001_anpp.csv", row.names = FALSE)
 
 # setwd("~/Dropbox/converge_diverge/datasets/ORIGINAL_DATASETS/CDR e001")
 # 
@@ -53,4 +57,4 @@ names(anpp)[9] <- "anpp"
 #   group_by(calendar_year, treatment_year, community_type, plot_id, treatment, site_code, project_name)%>%
 #   summarize(anpp=sum(abundance))
 # 
-# write.csv(anpp, "CDR_e001_anpp.csv")
+# 
