@@ -23,7 +23,7 @@ anpp <- aggregate(df$abundance, by = list(calendar_year = df$calendar_year, trea
                                           site_code = df$site_code, project_name = df$project_name), 
                   FUN = sum)
 names(anpp)[9] <- "anpp"
-write.csv(anpp, "Data/CleanedData/Sites/Species csv/CDR_e001_anpp.csv", row.names = FALSE)
+write.csv(anpp, "Data/CleanedData/Sites/ANPP csv/CDR_e001_anpp.csv", row.names = FALSE)
 
 # setwd("~/Dropbox/converge_diverge/datasets/ORIGINAL_DATASETS/CDR e001")
 # 
