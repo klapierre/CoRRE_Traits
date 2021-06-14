@@ -233,6 +233,9 @@ warmnut2<-merge(warmnut, warmnut_names, by="species_code", all=T)%>%
   filter(abundance!=0)%>%
   select(-species_code)
 
+gfert <- read.csv("Glen_Fert.csv") %>%
+  mutate(community_type = 0, version = 2.0)
+
 face<-read.delim("GVN_FACE.txt")%>%
   select(-id, -nutrients, -light, -carbon, -water, -other_manipulation, -num_manipulations, -experiment_year, -c,  -plot_mani, -species_num, -plot_id1)%>%
   gather(species_code, abundance, sp1:sp232)%>%
@@ -637,7 +640,7 @@ nitadd <- read.csv("YMN_NitAdd.csv") %>%
 #merge all datasets
 combine<-rbind(bffert2, bgp, biocon, bowman2, ccd2, climarid, clip2, clonal2, culardoch2, cxn, d_precip, e001, e0023,
                e2, e6, edge, eelplot, events2, exp12, face2, fert1, fert2, fireplots2, gane2, gap2, gb2, gce2, gcme, 
-               gcme2, gfp, graze, h_precip, herbdiv, herbwood2, imagine2, interaction2, irg2, kgfert2, lind2, lovegrass, 
+               gcme2, gfert, gfp, graze, h_precip, herbdiv, herbwood2, imagine2, interaction2, irg2, kgfert2, lind2, lovegrass, 
                lucero, mat22, megarich2, mnt2, mwatfer, nash, nde, nfert2, nitadd, nitphos, nitrogen, nsfc4, nut, nutnet,
                oface2, pennings2, phace, pme, pplots, pq2, ramps, rhps, rmapc2, s_precip, sask, sev_edge, snfert3, snow, 
                study1192, study2782, t72, ter, tface, tide2, tmece, ton, uk2, wapaclip2, warmnut2, warmnit, water, watering2, 
