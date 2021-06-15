@@ -26,6 +26,10 @@ lind<-read.delim("BAY_LIND_anpp.txt")%>%
 events<-read.delim("Bt_EVENT2_anpp.txt")%>%
   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp, block)%>%
   mutate(community_type=0)
+btdrought <- read.csv("Bt_DroughtNet_anpp.csv", row.names = 1) %>%
+  mutate(community_type = 0, block = 0)
+btnpkd <- read.csv("Bt_NPKDNet.csv") %>%
+  mutate(community_type = 0, block = 0)
 rmapc<-read.delim("CAU_RMAPC_anpp.txt")%>%
   select(site_code, project_name, community_type, treatment_year, calendar_year, treatment, plot_id, anpp) %>%
   mutate(block = 0)
@@ -158,7 +162,7 @@ nitadd <- read.csv("YMN_NitAdd_anpp.csv")%>%
   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp)%>%
   mutate(community_type = 0, block = 0)
 
-anpp <- rbind(bgp, biocon, bowman, clonal, cxn, e001, e002, events, exp1, fireplots, gb, gfp, imagine, imgers, irg, kgfert, 
+anpp <- rbind(bgp, biocon, bowman, btdrought, btnpkd, clonal, cxn, e001, e002, events, exp1, fireplots, gb, gfp, imagine, imgers, irg, kgfert, 
               lind, megarich, mnr,NDE, nfert, nit, nitadd, nitrogen, nsfc, nsfc2, oface, pme, pplots, ramps, rhps, rio, rmapc, 
               snfert, snow, t7, tide, tmece, ton, uk, wapaclip, water, watering, wenndex, wet)
 
