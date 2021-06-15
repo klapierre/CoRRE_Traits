@@ -102,6 +102,12 @@ events2<-merge(events, events_names, by="species_code", all=T)%>%
   filter(abundance!=0)%>%
   select(-species_code)
 
+btdrought <- read.csv("Bt_DroughtNet.csv") %>%
+  mutate(community_type = 0, block = 0, version = 2.0)
+
+btnpkd <- read.csv("Bt_NPKDNet.csv") %>%
+  mutate(community_type = 0, block = 0, version = 2.0)
+
 pq<-read.delim("BUX_PQ.txt")%>%
   select(-id, -nutrients, -light, -carbon, -water, -other_manipulation, -num_manipulations, -true_num_manipulations, -experiment_year, -clip, -precip, -temp, -true_plot_mani, -plot_id1, -plot_mani,   -species_num)%>%
   gather(species_code, abundance, sp1:sp66)%>%
@@ -638,7 +644,7 @@ nitadd <- read.csv("YMN_NitAdd.csv") %>%
   filter(abundance != 0)
 
 #merge all datasets
-combine<-rbind(bffert2, bgp, biocon, bowman2, ccd2, climarid, clip2, clonal2, culardoch2, cxn, d_precip, e001, e0023,
+combine<-rbind(bffert2, bgp, biocon, bowman2, btdrought, btnpkd, ccd2, climarid, clip2, clonal2, culardoch2, cxn, d_precip, e001, e0023,
                e2, e6, edge, eelplot, events2, exp12, face2, fert1, fert2, fireplots2, gane2, gap2, gb2, gce2, gcme, 
                gcme2, gfert, gfp, graze, h_precip, herbdiv, herbwood2, imagine2, interaction2, irg2, kgfert2, lind2, lovegrass, 
                lucero, mat22, megarich2, mnt2, mwatfer, nash, nde, nfert2, nitadd, nitphos, nitrogen, nsfc4, nut, nutnet,
