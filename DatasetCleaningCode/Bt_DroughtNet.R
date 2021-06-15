@@ -38,7 +38,7 @@ dat$treatment[dat$treatment == "NR"] <- "control"
 dat <- dat[,-c(1,2,5,6)]
 dat$site_code <- "Bt"
 dat$project_name <- "DroughtNet"
-dat$cover_type <- "cover"
+dat$data_type <- "cover"
 names(dat)[c(1,2)] <- c("genus_species", "abundance")
 
 controlplots <- dat[dat$treatment == "control",]
@@ -85,4 +85,6 @@ dat$treatment_year[dat$treatment_year == -1] <- 0 # collected pre-treatment data
 dat$site_code <- "Bt"
 dat$project_name <- "DroughtNet"
 
+cntplots <- dat[which(dat$treatment == "control"),]
+write.csv(cntplots,"Data/OriginalData/2020 update/Data/Bt/biomass_cntrol.csv", row.names = FALSE)
 write.csv(dat, "Data/CleanedData/Sites/ANPP csv/Bt_DroughtNet_anpp.csv")
