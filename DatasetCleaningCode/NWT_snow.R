@@ -27,6 +27,7 @@ df1$data_type <- "biomass"
 
 df1 <- df1[df1$spp == "live", c(3,7,6,5,16,15,1,14,12)]
 names(df1)[c(1:4,7,9)] <- c("calendar_year", "treatment", "plot_id", "block", "site_code", "anpp")
-
+df1$anpp <- as.numeric(df1$anpp)
+# plot 18 in 2013 originally "lost" so will be na now
 write.csv(df1, "Data/CleanedData/Sites/ANPP csv/NWT_snow_anpp.csv", row.names = FALSE)           
            

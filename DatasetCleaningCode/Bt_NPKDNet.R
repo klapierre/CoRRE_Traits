@@ -14,6 +14,7 @@ dat <- read_excel(path = "Data/OriginalData/2020 update/Data/Bt/Bt_NPKDNet_cover
 control <- read.csv("Data/OriginalData/2020 update/Data/Bt/clean_control_data.csv", row.names = 1)
 control <- control[-which(control$calendar_year < 2018),]
 control$treatment_year <- control$calendar_year -2017
+control$project_name <- "NPKDNet"
 
 plot_id <- data.frame(plot = unique(dat$plot))
 plot_id$plot_id <- seq(11,20)
@@ -47,6 +48,7 @@ dat1 <- read_excel(path = "Data/OriginalData/2020 update/Data/Bt/Bt_NPKDNet_cove
 control <- read.csv("Data/OriginalData/2020 update/Data/Bt/biomass_cntrol.csv")
 control <- control[-which(control$calendar_year < 2018),]
 control$treatment_year <- control$calendar_year - 2017
+control$project_name <- "NPKDNet"
 
 dat$calendar_year <- as.numeric(format(dat$date, format = "%Y"))
 dat <- merge(dat, plot_id)

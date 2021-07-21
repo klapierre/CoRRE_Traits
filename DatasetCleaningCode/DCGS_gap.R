@@ -17,7 +17,7 @@ df[is.na(df)] <- 0
 df <- df[df$Block %in% c(4,7),]
 df <- df[df$match_col != "ExpUnID",]
 
-df <- aggregate(df$abundance, by = list(calendar_year = df$year, treatment = df$trtmt, plot_id = df$plot,
+df <- aggregate(df$abundance, by = list(calendar_year = df$year, treatment = df$trtmt, plot = df$plot,
                                           block = df$Block, genus_species = df$genus_species, 
                                         match_col = df$match_col), FUN = mean)
 for (i in 1:nrow(df)){
@@ -27,13 +27,17 @@ for (i in 1:nrow(df)){
 }
 
 names(df)[7] <- "abundance"
+df$plotmerge <- paste(df$treatment, df$plot, sep = "::")
+plot_id <- data.frame(plotmerge = unique(df$plotmerge))
+plot_id$plot_id <- seq(1:nrow(plot_id))
+df <- merge(df, plot_id)
+df <- df[,-c(1,4)]
 
 df$site_code <- "DCGS"
 df$project_name <- "gap"
 df$treatment_year <- df$calendar_year - 1994
 df$data_type <- "cover"
-
-df <- df[,c(1:4,8,11,9,10,5,7)]
+df <- df[,-5]
 
 write.csv(df, "Data/CleanedData/Sites/Species csv/dcgs_gap.csv", row.names = FALSE)
 

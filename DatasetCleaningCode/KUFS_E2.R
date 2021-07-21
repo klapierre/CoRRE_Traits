@@ -45,6 +45,7 @@ for (i in 1:nrow(df)){
   }
 }
 
+
 # Add other experiment details
 df$site_code <- "KUFS"
 df$project_name <- "E2"
@@ -72,12 +73,6 @@ df1 <- read.csv(file1, header= TRUE)
 # put data in long format
 df1 <- gather(df1, genus_species, abundance, 10:length(df1))
 df1 <- df1[df1$abundance>0,]
-
-#add in project details
-df1$site_code <- "KUFS"
-df1$project_name <- "E2"
-df1$data_type <- "biomass"
-df1$treatment_year <- df1$Year - 2000
 
 # Create Combined treatment column
 df1$treatment <- paste(df1$Fert, df1$Seed, df1$Hay, sep = "_")
@@ -109,8 +104,14 @@ for (i in 1:nrow(df1)){
   }
 }
 
+#add in project details
+df1$site_code <- "KUFS"
+df1$project_name <- "E2"
+df1$data_type <- "biomass"
+df1$treatment_year <- df1$Year - 2000
+
 #order and get rid of columns
-df1 <- df1[,c(2,4,5,10,11:16)]
+df1 <- df1[,c(2,4,6,10,11:16)]
 #rename
 names(df1)[c(1,2,3)] <- c("calendar_year", "block", "plot_id")
 

@@ -55,7 +55,7 @@ nsfc2<-read.csv("DL_NSFC_anpp20132016.csv")%>%
   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp, block)%>%
   mutate(community_type=0)
 phace <- read.csv("HPGRS_PHACE_anpp.csv")%>%
-  select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, block) %>%
+  select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, block, anpp) %>%
   mutate(community_type = 0)
 NDE <- read.csv("IMGERS_NDE_anpp.csv") %>%
   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp, block)%>%
@@ -162,10 +162,13 @@ nitadd <- read.csv("YMN_NitAdd_anpp.csv")%>%
   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp)%>%
   mutate(community_type = 0, block = 0)
 
-anpp <- rbind(bgp, biocon, bowman, btdrought, btnpkd, clonal, cxn, e001, e002, events, exp1, fireplots, gb, gfp, imagine, imgers, irg, kgfert, 
-              lind, megarich, mnr,NDE, nfert, nit, nitadd, nitrogen, nsfc, nsfc2, oface, pme, pplots, ramps, rhps, rio, rmapc, 
+anpp <- rbind(bgp, biocon, bowman, btdrought, btnpkd, clonal, cxn, e001, e002, e2, e6, eel, 
+              events, exp1, fireplots, gb, gfp, imagine, imgers, irg, kgfert, 
+              lind, megarich, mnr, nash, NDE, nfert, nit, nitadd, nitrogen, nsfc, 
+              nsfc2, nutnet, oface, phace, pme, pplots, ramps, rhps, rio, rmapc, shet,
               snfert, snow, t7, tide, tmece, ton, uk, wapaclip, water, watering, wenndex, wet)
 
 write.csv(anpp, '~/Dropbox/CoRRE_database/Data/CompiledData/ANPP2020.csv')
 
 ## NA values in MNR watfer and KNZ GFP
+

@@ -314,6 +314,35 @@ lind<-read.delim("BAY_LIND.txt")%>%
   mutate(trt_type=ifelse(treatment=='ref_rich16', 'control', ifelse(treatment %in% c('ref_rich1','ref_rich2','ref_rich4','ref_rich8'), 'plant_mani', 'irr*plant_mani')))%>%
   unique()
 
+
+bt_drought <- read.csv("Bt_DroughtNet.csv") %>%
+  select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
+  mutate(community_type=0, 
+         nutrients=0, light=0, carbon=0, water=1, other_manipulation=0, 
+         n=0, 
+         p=0, 
+         k=0, 
+         CO2=0, 
+         precip= ifelse(treatment == "drought", -40,0), 
+         temp=0, 
+         mow_clip=0, 
+         burn=0, 
+         herb_removal=0,
+         management=0,
+         other_trt=0,
+         trt_details=0,
+         successional=0, 
+         plant_mani=0, 
+         plant_trt=0,
+         pulse=0)%>%
+  mutate(plot_mani=ifelse(treatment=='drought', 1,0))%>%
+  mutate(resource_mani=1)%>%
+  mutate(max_trt=1)%>%
+  mutate(public=0)%>%
+  mutate(factorial=0)%>%
+  mutate(trt_type=ifelse(treatment=='control', 'control', 'drought'))%>%
+  unique()
+
 events<-read.delim("Bt_EVENT2.txt")%>%
   select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
   mutate(community_type=0, 
@@ -340,6 +369,34 @@ events<-read.delim("Bt_EVENT2.txt")%>%
   mutate(public=0)%>%
   mutate(factorial=0)%>%
   mutate(trt_type=ifelse(treatment=='CA-N1', 'control', 'precip_vari'))%>%
+  unique()
+
+npkd<-read.csv("Bt_NPKDNet.csv")%>%
+  select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
+  mutate(community_type=0, 
+         nutrients=1, light=0, carbon=0, water=1, other_manipulation=0,
+         n=ifelse(treatment == "control", 0, 1), ## Need to fix
+         p=ifelse(treatment == "control", 0, 1), 
+         k=ifelse(treatment == "control", 0, 1), 
+         CO2=0, 
+         precip=ifelse(treatment == "drought*fert", -40, 0), 
+         temp=0,
+         mow_clip=0, 
+         burn=0, 
+         herb_removal=0,
+         management=0,
+         other_trt=0, 
+         trt_details=0,
+         successional=0, 
+         plant_mani=0,  
+         plant_trt=0,
+         pulse=0)%>%
+  mutate(plot_mani=ifelse(treatment=='control', 0, ifelse(treatment == "fert",1,0)))%>%
+  mutate(resource_mani= 1)%>%
+  mutate(max_trt=1)%>%
+  mutate(public=0)%>%
+  mutate(factorial=0)%>%
+  mutate(trt_type=ifelse(treatment=='control', 'control', ifelse(treatment == 'fert', "mult_nutrient", "mult_nutrient*drought")))%>%
   unique()
 
 pq<-read.delim("BUX_PQ.txt")%>%
@@ -736,6 +793,7 @@ nsfc<-read.delim("DL_NSFC.txt")%>%
   mutate(factorial=1)%>%
   mutate(trt_type=ifelse(treatment=='N', 'N', ifelse(treatment=='W', 'irr', ifelse(treatment=='WN', 'N*irr', 'control'))))%>%
   unique()
+
 nsfc2<-read.csv("DL_NSFC20132016.csv")%>%
   select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
   mutate(community_type=0, 
@@ -2999,15 +3057,15 @@ nitadd<-read.csv("YMN_NitAdd.csv")%>%
   unique()
 
 ###merge all datasets
-combine<-rbind(bffert, bgp, biocon, bowman, ccd, clip, clima, clonal, culardoch, cxn, e001, e002, 
+combine<-rbind(bffert, bgp, biocon, bowman, bt_drought, ccd, clima, clip, clonal, culardoch, cxn, e001, e002, 
                e2, e6, edge, eelplot, events, exp1, face, fert1, fert2, fireplots, gane, gap2, gb, 
-               gce, gcme, gcme2, gfp, grazeprecip, herbdiv, herbwood, hprecip, imagine, interaction, 
+               gce, gcme, gcme2, gfert, gfp, grazeprecip, herbdiv, herbwood, hprecip, imagine, interaction, 
                irg, kgfert, lind, lovegrass, lucero, mat2, megarich, mnt, mwatfer, nash, nde, nfert, 
-               nitadd, nitphos,  nitrogen,nsfc, nsfc2, nut, nutnet, oface, pennings, phace, pme, precip, 
+               nitadd, nitphos,  nitrogen,npkd, nsfc, nsfc2, nut, nutnet, oface, pennings, phace, pme, precip, 
                pplots, pq, ramps, rhps, rmapc, sedge, snfert, snow, sprecip, study119, study278, t7, 
                ter, tface,tide,tmece,ton, uk, wapaclip, warmnit, warmnut, water, watering, wenndex, wet, yu)
 
-write.csv(combine, "~/Dropbox/CoRRE_database/Data/CompiledData/ExperimentInfo.csv")
+write.csv(combine, "~/Dropbox/CoRRE_database/Data/CompiledData/ExperimentInfo.csv", row.names = FALSE)
 
 
 temp_df <- unique(combine[,c(1,2,6,33)])

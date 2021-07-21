@@ -17,7 +17,7 @@ df$anpp <- rowSums(df[,-c(1,2)])
 df$site_code <- "DL"
 df$project_name <- "NSFC"
 df$data_type <- "ANPP"
-df$treatment_year <- df$Y - 2005
+df$treatment_year <- df$Y - 2004
 
 # making a unique plot number for each treatment-plot combination
 trt_plot <- as.data.frame(unique(df$species))

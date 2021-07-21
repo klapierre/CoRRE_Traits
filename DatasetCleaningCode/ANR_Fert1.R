@@ -27,8 +27,10 @@ dat <- gather(dat, key = "sp_code", value = "abundance", 4:length(dat))
 dat <- merge(dat, sp, all.x = TRUE)
 # getting rid of 3 columns which summed cover by class
 dat <- dat[-which(dat$sp_code == "bryophyt" | dat$sp_code == "lichens" | dat$sp_code == "vascular"),]
-#NB. "Cornicul" sp_code does not have an associated genus_species. Need to email PIs to see what this is. 
-# it is a lichen so may take it out anyway
+#NB. "Cornicul" sp_code does not have an associated genus_species. Emailed PI to see what this is. 
+# Coding as unknown
+
+dat$genus_species[dat$sp_code == "Cornicul"] <- "Unknown"
 
 dat$sp_code <- NULL
 dat$site_code <- "ANR"
@@ -41,7 +43,7 @@ for(i in 1:nrow(dat)){
     dat$Treatment[i] == "ACTIVATED CARBON"|
     dat$Treatment[i] == "REDUCTION"|
     dat$Treatment[i] == "PROTEIN")
-    dat$treatment_year[i] <- dat$Year -1990
+    dat$treatment_year[i] <- dat$Year[i]-1990
 }
 
 dat$data_type <- "cover"

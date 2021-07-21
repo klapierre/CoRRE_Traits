@@ -35,7 +35,7 @@ dat$abundance[which(is.na(dat$abundance))] <- 0
 # activity period is Spring (between February and May) but there is a second growth period 
 # in autumn (Sept-Nov), probably lower in activity and growth than spring but still significant
 dat <- aggregate(dat$abundance, by = list(calendar_year = dat$calendar_year, treatment = dat$treatment, 
-                                           plot_id = dat$plot_id, genus_species = dat$genus_species),
+                                           plot_no = dat$plot_id, genus_species = dat$genus_species),
                   FUN = max)
 # Get rid of 2016 because only data from December
 dat <- dat[-which(dat$calendar_year == 2016),]
@@ -50,6 +50,13 @@ names(dat)[5] <- "abundance"
 
 ## "RR " coming up as a unique treatment - fixing that
 dat$treatment[dat$treatment =="RR "] <- "RR"
+
+#get unique plot_ids for experiment
+dat$plotmatch <- paste(dat$treatment, dat$plot_no, sep="-")
+plot_ids <- data.frame(plotmatch = unique(dat$plotmatch))
+plot_ids$plot_id <- seq(1:nrow(plot_ids))
+dat <- merge(dat, plot_ids)
+dat <- dat[,-c(1,4)]
 
 write.csv(dat, "Data/CleanedData/Sites/Species csv/SORBAS_CLIMARID.csv", row.names = FALSE)
 

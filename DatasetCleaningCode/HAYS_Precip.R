@@ -20,10 +20,18 @@ dat <- gather(dat, key = "sp_code", value = "abundance", 6:length(dat))
 
 # species composition should be sum of 10 replicated
 dat <- aggregate(dat$abundance, by = list(calendar_year = dat$YEAR, treatment = dat$TREAT, 
-                                          plot_id = dat$PLOT, sp_code = dat$sp_code, 
+                                          plot_no = dat$PLOT, sp_code = dat$sp_code, 
                                           block = dat$Block),FUN = sum)
 
 names(dat)[6] <- "abundance"
+
+dat$plotmatch <- paste(dat$treatment, dat$plot_no, sep = "::")
+
+plot_ids <- data.frame(plotmatch = unique(dat$plotmatch))
+plot_ids$plot_id <- seq(1,nrow(plot_ids))
+dat <- merge(dat, plot_ids)
+
+dat <- dat[,-c(1,4)]
 
 #code in treatments
 
@@ -33,6 +41,9 @@ dat$treatment[dat$treatment ==3] <- "add"
 
 # get rid of 0s
 dat <- dat[which(dat$abundance > 0),]
+
+
+
 
 # Add in other columns
 dat$site_code <- "HAYS"

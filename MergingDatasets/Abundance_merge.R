@@ -427,6 +427,7 @@ gb<-read.delim("NGBER_gb.txt")%>%
 gb_names<-read.delim("NGBER_gb_specieslist.txt")
 gb2<-merge(gb, gb_names, by="species_code", all=T)%>%
   filter(abundance!=0)%>%
+  filter(treatment !="AMBIENT") %>%
   select(-species_code)
 
 herbdiv<-read.csv("NIN_herbdiv.csv")%>%
@@ -680,7 +681,7 @@ relcov<-merge(totcov, combine, by=c("site_code", "project_name", "community_type
   mutate(relcov=abundance/totcov)%>%
   select(-abundance, -totcov)
 
-write.csv(relcov, "~/Dropbox/CoRRE_database/Data/CompiledData/RelativeCover.csv")
+write.csv(relcov, "~/Dropbox/CoRRE_database/Data/CompiledData/RelativeCover.csv", row.names = FALSE)
 
 
 ##### Relative cover and raw abundance for sCoRRE
