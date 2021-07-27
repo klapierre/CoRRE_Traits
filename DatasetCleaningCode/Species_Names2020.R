@@ -12,7 +12,7 @@
 ## intermediate stages are saved to run the rest of the code
 
 # Set working directory
-setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database/")
+setwd("~/Dropbox/CoRRE_database/")
 
 # load libraries
 library(Taxonstand)

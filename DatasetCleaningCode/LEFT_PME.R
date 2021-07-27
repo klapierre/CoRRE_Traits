@@ -1,6 +1,6 @@
-setwd("~/Dropbox/converge_diverge/datasets/FINAL_SEPT2014/clean datasets - please do not touch/To ADD NOV2015/LEFT_PME")
+setwd("~/Dropbox/CoRRE_database")
 
-data<-read.csv("Lefthand_precip_experiment_data2.csv")
+data<-read.csv("Data/OriginalData/Sites/LEFT_PME/Lefthand_precip_experiment_data2.csv")
 
 anpp<-data%>%
   mutate(anpp=aboveground_biomass, site_code="LEFT", project_name="PME")%>%
@@ -14,7 +14,7 @@ treatment_year<-anpp%>%
 
 anpp2<-merge(anpp, treatment_year, by="calendar_year")
 
-write.csv(anpp2, "LEFT_PME_anpp.csv")
+write.csv(anpp2, "Data/CleanedData/Sites/ANPP csv/LEFT_PME_anpp.csv")
 
 
 species<-data%>%
@@ -27,5 +27,5 @@ species<-data%>%
 
 species2<-merge(species, treatment_year, by="calendar_year")
 
-write.csv(species2, "LEFT_NME.csv")
+write.csv(species2, "Data/CleanedData/Sites/Species csv/LEFT_NME.csv")
   

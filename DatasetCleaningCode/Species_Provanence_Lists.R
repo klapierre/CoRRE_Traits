@@ -9,7 +9,7 @@
 library(tidyverse)
 
 # set working directory 
-setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database/")
+setwd("~/Dropbox/CoRRE_database/")
 
 # read in merged file with of species abunances
 corre <- read.csv("Data/CompiledData/RawAbundance.csv")

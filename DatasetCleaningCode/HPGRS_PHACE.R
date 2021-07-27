@@ -2,14 +2,14 @@
 #### HPGSRS_PHACE #####
 #####################
 
-setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database")
+setwd("~/Dropbox/CoRRE_database")
 
 # library
 library(readxl)
 library(tidyr)
 
 # data
-dat <- read_excel("Data/OriginalData/2020 update/Data/HPGRS_PHACE_data.xlsx")
+dat <- read_excel("Data/OriginalData/Sites/HPGRS_PHACE_data.xlsx")
 
 dat$treatment_year <- dat$YEAR - 2005
 # How to add in warming treatment year?

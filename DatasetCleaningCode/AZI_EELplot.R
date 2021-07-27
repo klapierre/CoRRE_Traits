@@ -2,14 +2,14 @@
 ### AZI_EELplot ####
 ####################
 
-setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database")
+setwd("~/Dropbox/CoRRE_database")
 
 # library
 library(readxl)
 library(tidyr)
 
 # data
-dat <- read_excel("Data/OriginalData/2020 update/Data/AZI_EELplot_data.xls")
+dat <- read_excel("Data/OriginalData/Sites/AZI_EELplot_data.xls")
 dat <- dat[,-6]
 dat$treatment_year <- dat$Year - 2015
 dat$site_code <- "AZI"

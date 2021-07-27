@@ -1,15 +1,15 @@
 #######################
 ## SORBAS_CLIMARID ###
 ######################
-setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database")
+setwd("~/Dropbox/CoRRE_database")
 
 ## libraries ##
 library(tidyr)
 
 # read in data
 
-dat <- read.csv("Data/OriginalData/2020 update/Data/SORBAS_CLIMARID_data.csv")
-sp <- read.csv("Data/OriginalData/2020 update/Data/SORBAS_CLIMARID_sp.csv")
+dat <- read.csv("Data/OriginalData/Sites/SORBAS_CLIMARID_data.csv")
+sp <- read.csv("Data/OriginalData/Sites/SORBAS_CLIMARID_sp.csv")
 
 
 colnames(dat)[c(1:3)] <- c("treatment", "plot_id", "sp_code")

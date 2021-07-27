@@ -4,7 +4,7 @@
 
 # New site with 2020 update!
 
-setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database")
+setwd("~/Dropbox/CoRRE_database")
 
 ###############
 #### ANPP ####

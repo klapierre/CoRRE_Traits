@@ -1,7 +1,7 @@
 ###################
 #### CDR_e001 ####
 ##################
-setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database")
+setwd("~/Dropbox/CoRRE_database")
 file <- "https://pasta.lternet.edu/package/data/eml/knb-lter-cdr/14/8/057e39850bd748d364df8a5ef60bb08d"
 df <- read.delim(file, header = TRUE)
 df <- df[,c(2,3,4,5,9,10)]

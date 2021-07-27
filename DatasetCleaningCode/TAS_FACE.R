@@ -1,4 +1,4 @@
-setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database/Data/")
+setwd("~/Dropbox/CoRRE_database/Data/")
 
 library(dplyr)
 library(tidyr)
@@ -16,7 +16,7 @@ spdata<-merge(spcount, treatment_year, by="calendar_year")%>%
          project_name="FACE",
          data_type = "count")
 
-write.csv(spdata, "CleanedData/Sites/TAS_FACE.csv")
+write.csv(spdata, "CleanedData/Sites/Species csv/TAS_FACE.csv")
 
 # Cover data - do not use
 #Load in data

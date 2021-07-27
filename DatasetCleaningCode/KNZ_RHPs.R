@@ -4,7 +4,7 @@
 library(tidyr)
 library(plyr)
 library(stringr)
-setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database")
+setwd("~/Dropbox/CoRRE_database")
 
 file <- "https://portal.lternet.edu/nis/dataviewer?packageid=knb-lter-knz.103.2&entityid=366e428fea83641acf1926ef18adc72e"
 df <- read.csv(file, header = TRUE)

@@ -2,14 +2,14 @@
 ## NutNet Batch ####
 ####################
 
-setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database")
+setwd("~/Dropbox/CoRRE_database")
 
 # libraries
 library(Hmisc)
 
 ## data
-dat <- read.csv("Data/OriginalData/2020 update/Data/NutNet/nutnet_cover_01272021.csv", row.names = 1)
-bio_dat <- read.csv("Data/OriginalData/2020 update/Data/NutNet/nutnet_anpp_012752021.csv", row.names = 1)
+dat <- read.csv("Data/OriginalData/Sites/NutNet/nutnet_cover_01272021.csv", row.names = 1)
+bio_dat <- read.csv("Data/OriginalData/Sites/NutNet/nutnet_anpp_012752021.csv", row.names = 1)
 # sites included in this dataset:
 # "cdcr.us", "cbgb.us", "lake.us", "lancaster.uk", "chilcas.ar" , "potrok.ar", 
 # "shps.us","sier.us", "temple.us", "veluwe.nl",  "yarra.au", "bayr.de"

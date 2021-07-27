@@ -1,13 +1,13 @@
 ##################
 ## Sil_NASH ####
 ###############
-setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database")
+setwd("~/Dropbox/CoRRE_database")
 
 ## libraries ##
 library(tidyr)
 
 # load data
-dat <- read.delim("Data/OriginalData/2020 update/Data/Sil_NASH_data.txt")
+dat <- read.delim("Data/OriginalData/Sites/Sil_NASH_data.txt")
 # N.B. collected both biomass and cover data, depended on year
 
 # wide to long format

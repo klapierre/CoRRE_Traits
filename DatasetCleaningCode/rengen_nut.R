@@ -2,14 +2,14 @@
 ## Rengen_Nut ####
 ##################
 
-setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database")
+setwd("~/Dropbox/CoRRE_database")
 
 
 #libraries
 library(tidyr)
 library(readxl)
 
-dat <- read_excel(path = "Data/OriginalData/2020 update/Data/Rengen_Nut_data.xlsx")
+dat <- read_excel(path = "Data/OriginalData/Sites/Rengen_Nut_data.xlsx")
 # one column with no species name - ask Meghan to email provider
 
 dat <- gather(dat, key = genus_species, value = abundance, 4:length(dat)) #wide to long format

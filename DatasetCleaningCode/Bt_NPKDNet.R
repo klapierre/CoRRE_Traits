@@ -3,15 +3,15 @@
 ##################
 
 
-setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database")
+setwd("~/Dropbox/CoRRE_database")
 
 # library
 library(readxl)
 library(tidyr)
 
-dat <- read_excel(path = "Data/OriginalData/2020 update/Data/Bt/Bt_NPKDNet_cover_biomass2018-2020.xlsx", sheet = "cover18-20")
+dat <- read_excel(path = "Data/OriginalData/Sites/Bt/Bt_NPKDNet_cover_biomass2018-2020.xlsx", sheet = "cover18-20")
 # control plots are the same as those in DroughtNet data - importing them too
-control <- read.csv("Data/OriginalData/2020 update/Data/Bt/clean_control_data.csv", row.names = 1)
+control <- read.csv("Data/OriginalData/Sites/Bt/clean_control_data.csv", row.names = 1)
 control <- control[-which(control$calendar_year < 2018),]
 control$treatment_year <- control$calendar_year -2017
 control$project_name <- "NPKDNet"
@@ -42,8 +42,8 @@ write.csv(test, "Data/CleanedData/Sites/Species csv/Bt_NPKDNet.csv", row.names =
 ####### biomass
 
 
-dat <- read_excel(path = "Data/OriginalData/2020 update/Data/Bt/Bt_NPKDNet_cover_biomass2018-2020.xlsx", sheet = "biomass18-19")
-dat1 <- read_excel(path = "Data/OriginalData/2020 update/Data/Bt/Bt_NPKDNet_cover_biomass2018-2020.xlsx", sheet = "biomassFG20")
+dat <- read_excel(path = "Data/OriginalData/Sites/Bt/Bt_NPKDNet_cover_biomass2018-2020.xlsx", sheet = "biomass18-19")
+dat1 <- read_excel(path = "Data/OriginalData/Sites/Bt/Bt_NPKDNet_cover_biomass2018-2020.xlsx", sheet = "biomassFG20")
 # control plots are the same as those in DroughtNet data - importing them too
 control <- read.csv("Data/OriginalData/2020 update/Data/Bt/biomass_cntrol.csv")
 control <- control[-which(control$calendar_year < 2018),]

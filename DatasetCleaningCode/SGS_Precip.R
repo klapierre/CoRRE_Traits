@@ -2,15 +2,15 @@
 #### SGS_PRECIP ####
 ###################
 
-setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database")
+setwd("~/Dropbox/CoRRE_database")
 
 # library
 library(readxl)
 library(tidyr)
 
 # read in data
-dat <- read_excel("Data/OriginalData/2020 update/Data/SGS/SGS_Precip.xlsx")
-sp.list <- read_excel("Data/OriginalData/2020 update/Data/SGS/plant_list-SGS.xls")
+dat <- read_excel("Data/OriginalData/Sites/SGS/SGS_Precip.xlsx")
+sp.list <- read_excel("Data/OriginalData/OriginalData/Sites/SGS/plant_list-SGS.xls")
 
 dat <- dat[,-53]
 # Long to wide format

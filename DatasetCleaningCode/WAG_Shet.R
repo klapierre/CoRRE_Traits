@@ -2,15 +2,15 @@
 ### WAG_Shet #####
 #################
 
-setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database")
+setwd("~l/Dropbox/CoRRE_database")
 
 
 # library
 library(tidyr)
 
 # data
-dat <- read.csv("Data/OriginalData/2020 update/Data/WAG_Shet.csv")
-sp <- read.csv("Data/OriginalData/2020 update/Data/WAG_Shet_sp.csv")
+dat <- read.csv("Data/OriginalData/Sites/WAG_Shet/WAG_SHet.csv")
+sp <- read.csv("Data/OriginalData/Sites/WAG_Shet/WAG_Shet_sp.csv")
 
 # need to sum over the 4 measurements per plot to get biomass / 40cm2
 

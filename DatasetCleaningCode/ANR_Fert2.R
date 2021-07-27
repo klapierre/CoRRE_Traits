@@ -2,14 +2,14 @@
 ## ANR FERT2 ####
 #################
 
-setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database")
+setwd("~/Dropbox/CoRRE_database")
 
 # library
 library(readxl)
 library(tidyr)
 
 # data
-dat <- read_excel("Data/OriginalData/2020 update/Data/ANR_Fert2_data.xlsx")
+dat <- read_excel("Data/OriginalData/Sites/ANR_Fert2_data.xlsx")
 
 # plot number imported as numeric, want to make it an integer so rounding to nearest whole number
 

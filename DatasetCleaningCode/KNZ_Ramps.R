@@ -1,14 +1,14 @@
-setwd("~/Dropbox/converge_diverge/datasets/ORIGINAL_DATASETS/KNZ_Ramps/ramps_updated")
+setwd("~/Dropbox/CoRRE_database")
 
 library(dplyr)
 library(tidyr)
 
-splist<-read.csv("konza_spplist.csv")%>%
+splist<-read.csv("Data/OriginalData/Sites/KNZ_RAMPS/ramps_updated/konza_spplist.csv")%>%
   mutate(genus_species=paste(genus, spp.1, sep="_"))%>%
   select(spnum2, genus_species)
 
 
-sp1<-read.csv("RaMPs_03_13_SpComp_w0s_v3.csv")%>%
+sp1<-read.csv("Data/OriginalData/Sites/KNZ_RAMPS/ramps_updated/RaMPs_03_13_SpComp_w0s_v3.csv")%>%
   gather(spnum2, abundance, spp2:spp410)%>%
   filter(precip!="control", type!=0)%>%#this drop half the plots to account for spatial array
   mutate(treatment=paste(precip, heat, sep="_"), 
@@ -32,9 +32,9 @@ treatment_year<-sp2%>%
 sp3<-merge(treatment_year, sp2, by="calendar_year")%>%
   mutate(site_code="KNZ", project_name="RaMPs")
 
-write.csv(sp3, "KNZ_RaMPs.csv")
+write.csv(sp3, "Data/CleanedData/Sites/Species csv/KNZ_RaMPs.csv")
 
-anpp<-read.csv("Ramps_ANPP_forRegs.csv")%>%
+anpp<-read.csv("Data/OriginalData/Sites/KNZ_RAMPS/ramps_updated/Ramps_ANPP_forRegs.csv")%>%
   mutate(treatment=paste(trt, subtrt, sep="_"))%>%
   select(calendar_year, block, ramp, treatment, total)
 
@@ -47,4 +47,4 @@ anpp3<-merge(anpp2, treatment_year, by="calendar_year")%>%
   select(-ramp)%>%
   mutate(site_code="KNZ", project_name="RaMPs")
 
-write.csv(anpp3, "KNZ_RaMPs_anpp.csv")
+write.csv(anpp3, "Data/CleanedData/Sites/ANPP csv/KNZ_RaMPs_anpp.csv")

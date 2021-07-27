@@ -1,9 +1,9 @@
-setwd("~/Dropbox/converge_diverge/datasets/ORIGINAL_DATASETS/seabloom/exp1")
+setwd("~/Dropbox/CoRRE_database")
 
 library(dplyr)
 library(tidyr)
 
-dat<-read.csv("invade-exp-data-output-full-plant-biomass_CLEAN.csv")
+dat<-read.csv("Data/OriginalData/Sites/SR seabloom/exp1/invade-exp-data-output-full-plant-biomass_CLEAN.csv")
 #nitrogen experiment
 
 nit<-dat%>%
@@ -27,14 +27,14 @@ treatment_year<-nit%>%
 nit2<-merge(treatment_year, nit, by="calendar_year")%>%
   filter(genus_species!="LITTER")
 
-write.csv(nit2, "SR_Nitrogen.csv")
+write.csv(nit2, "Data/CleanedData/Sites/Species csv/SR_Nitrogen.csv")
 
 nit_anpp<-nit2%>%
   tbl_df()%>%
   group_by(site_code, project_name, block, plot_id, community_type, treatment, calendar_year, treatment_year)%>%
   summarize(anpp=sum(abundance))
   
-write.csv(nit_anpp,"SR_Nitrogen_anpp.csv")
+write.csv(nit_anpp,"Data/CleanedData/Sites/ANPP csv/SR_Nitrogen_anpp.csv")
 ###water experiment
 wat<-dat%>%
   filter(exp=="WATER")%>% #have to drop this b/c not a resource manip
@@ -57,11 +57,11 @@ treatment_year<-wat%>%
 wat2<-merge(treatment_year, wat, by="calendar_year")%>%
   filter(genus_species!="LITTER")
 
-write.csv(wat2, "SR_Water.csv")
+write.csv(wat2, "Data/CleanedData/Sites/Species csv/SR_Water.csv")
 
 wat_anpp<-wat2%>%
   tbl_df()%>%
   group_by(site_code, project_name, block, plot_id, community_type, treatment, calendar_year, treatment_year)%>%
   summarize(anpp=sum(abundance))
 
-write.csv(wat_anpp,"SR_Water_anpp.csv")
+write.csv(wat_anpp,"Data/CleanedData/Sites/ANPP csv/SR_Water_anpp.csv")

@@ -2,15 +2,15 @@
 ## ANR FERT1 ####
 #################
 
-setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database")
+setwd("~/Dropbox/CoRRE_database")
 
 # library
 library(readxl)
 library(tidyr)
 
 # data
-dat <- read_excel("Data/OriginalData/2020 update/Data/ANR_Fert1_data_formatted.xls")
-sp <- read_excel("Data/OriginalData/2020 update/Data/ANR_Fert1_species.xlsx")
+dat <- read_excel("Data/OriginalData/Sites/ANR_Fert1/ANR_Fert1_data_formatted.xls")
+sp <- read_excel("Data/OriginalData/Sites/ANR_Fert1/ANR_Fert1_species.xlsx")
 names(sp) <- c("sp_code", "genus_species")
 
 

@@ -3,7 +3,7 @@
 ################
 library(tidyr)
 
-setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database")
+setwd("~/Dropbox/CoRRE_database")
 ### biomass data from 2013-2016
 df <- read.csv("Data/OriginalData/Sites/DL_NSFC/DL species biomass-3-16.csv")
 

@@ -1,9 +1,14 @@
-setwd("~/Dropbox/converge_diverge/datasets/ORIGINAL_DATASETS/SFREC_HallettDissertation")
+###############################################################
+## I do not know where these files listed in this code are. ##
+##############################################################
+
+
+setwd("~/Dropbox/CoRRE_database")
 
 library(tidyr)
 library(dplyr)
 
-data<-read.csv("data.csv")
+data<-read.csv("Data/OriginalData/Sites/SFREC_GrazePrecip/data.csv")
 
 species<-read.csv("speciescode.csv")
 

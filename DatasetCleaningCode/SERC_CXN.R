@@ -1,6 +1,6 @@
-setwd("~/Dropbox/converge_diverge/datasets/ORIGINAL_DATASETS/SERC_CXN")
+setwd("~/Dropbox/CoRRE_database")
 
-dat<-read.csv("4-CO2xN Total Shoot Biomass 2005-2014 (1).csv")
+dat<-read.csv("Data/OriginalData/Sites/SERC_CXN/4-CO2xN Total Shoot Biomass 2005-2014 (1).csv")
 
 anpp<-dat%>%
   mutate(anpp=SCbiomass_m2+SPbiomass_m2+DIbiomass_m2)%>%
@@ -31,8 +31,8 @@ treatment_year<-anpp%>%
   mutate(treatment_year=seq(1,10, by=1))
 
 anpp3<-merge(anpp2, treatment_year, by="calendar_year")
-write.csv(anpp3, "SERC_CXN_anpp.csv")
+write.csv(anpp3, "Data/CleanedData/Sites/ANPP csv/SERC_CXN_anpp.csv")
 
 
 species3<-merge(species2, treatment_year, by="calendar_year")
-write.csv(species3, "SERC_CXN.csv")
+write.csv(species3, "Data/CleanedData/Sites/Species csv/SERC_CXN.csv")

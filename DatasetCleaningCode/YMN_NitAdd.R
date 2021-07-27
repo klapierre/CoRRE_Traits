@@ -4,7 +4,7 @@
 
 # NO = plots 1-6; N5 = plots 7-12; N10 = plots 13-18; 
 # N20 = plots 19-24; N40 = plots 25-30; N80 = plots 31-36
-setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database")
+setwd("~/Dropbox/CoRRE_database")
 library(readxl) # Reading in as excel files. can update later to be csv files
 library(tidyr)
 # get all file names
@@ -90,6 +90,6 @@ write.csv(df2, "Data/CleanedData/Sites/Species csv/YMN_NitAdd.csv", row.names = 
 #   select(site_code, project_name, treatment, calendar_year, treatment_year, plot_id, anpp)%>%
 #   unique()
 
-write.csv(anppdata, "YMN_NitAdd_anpp.csv")
+#write.csv(anppdata, "YMN_NitAdd_anpp.csv")
 
 

@@ -2,7 +2,7 @@
 ## HAYS_PRECIP ####
 ###################
 
-setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database")
+setwd("~/Dropbox/CoRRE_database")
 
 # library
 library(readxl)
@@ -10,8 +10,8 @@ library(tidyr)
 
 # read in data
 
-dat <- read_excel("Data/OriginalData/2020 update/Data/HAYS/HAYS_Precip.xlsx")
-sp.list <- read_excel("Data/OriginalData/2020 update/Data/HAYS/HAYS_splist.xlsx",col_names = FALSE)
+dat <- read_excel("Data/OriginalData/Sites/HAYS/HAYS_Precip.xlsx")
+sp.list <- read_excel("Data/OriginalData/Sites/HAYS/HAYS_splist.xlsx",col_names = FALSE)
 
 # get rid of last 9 columns of data - unknown sp and summaries by functinal group
 dat <- dat[,c(1:64)]

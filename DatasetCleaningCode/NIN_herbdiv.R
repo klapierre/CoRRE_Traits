@@ -1,7 +1,7 @@
 ######################
 #### NIN_herbdiv ####
 ####################
-setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database")
+setwd("~/Dropbox/CoRRE_database")
 
 df <- read.csv("Data/OriginalData/Sites/NIN_HerbDiv/HerbDiv_2019_Cover_Tx_Trait_toKaitlin.csv")
 

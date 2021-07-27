@@ -2,10 +2,10 @@
 ## SIU_TON ####
 ###############
 
-setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database")
+setwd("~/Dropbox/CoRRE_database")
 
 #### Cover ####
-df <- read.csv("Data/OriginalData/2020 update/Data/SIU_TON/TON_Div.csv")
+df <- read.csv("Data/OriginalData/Sites/SIU_TON/TON_Div.csv")
 
 # Convert from cover classes to cover
 # Using only cover measured from cov.1 (cover under 1 m off the ground)
@@ -43,7 +43,7 @@ write.csv(df, "Data/CleanedData/Sites/Species csv/SIU_TON.csv", row.names = FALS
 
 #### Biomass ####
 
-df1 <- read.csv("Data/OriginalData/2020 update/Data/SIU_TON/TON_Biomass.csv")
+df1 <- read.csv("Data/OriginalData/Sites/SIU_TON/TON_Biomass.csv")
 
 df1$treatment <- paste(df1$trt.fert, df1$trt.mow, sep = "") # make treatment column
 names(df1)[5] <- "block" #change PL column to block so can merge over plts df from cover data

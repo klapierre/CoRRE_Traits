@@ -1,7 +1,7 @@
 ##################
 #### KNZ_BGP ####
 ################
-setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database")
+setwd("~/Dropbox/CoRRE_database")
 
 # biomass data
 file <- "https://portal.edirepository.org/nis/dataviewer?packageid=knb-lter-knz.57.10&entityid=eaf1b05d4c7578a1fe1efc5173b80953"

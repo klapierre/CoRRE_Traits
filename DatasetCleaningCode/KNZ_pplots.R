@@ -1,7 +1,7 @@
 ######################
 ##### KNZ_pplots ####
 #####################
-setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database")
+setwd("~/Dropbox/CoRRE_database")
 
 #Pull data from LTER site
 file <- "https://pasta.lternet.edu/package/data/eml/knb-lter-knz/127/2/904b175920ac68a39f68969138b82475"

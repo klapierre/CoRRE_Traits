@@ -3,7 +3,7 @@
 ################
 library(stringr)
 
-setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database")
+setwd("~/Dropbox/CoRRE_database")
 # Pull data from LTER site
 # biomass data
 file <- "https://portal.lternet.edu/nis/dataviewer?packageid=knb-lter-cdr.302.9&entityid=7dfa36f6d8adbc6a669d9501beaa30bf"

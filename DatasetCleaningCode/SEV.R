@@ -4,7 +4,7 @@
 
 # Data sent as one large datafile, so will have all SEV experiments cleaned in the same R script
 # all data are percent cover
-setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database")
+setwd("~/Dropbox/CoRRE_database")
 
 sev.dat <- read.csv("Data/OriginalData/Sites/SEV/npp_quadcover_for_corre.csv")
 sev.sp <- read.csv("Data/OriginalData/Sites/SEV/SEV_species names.csv")

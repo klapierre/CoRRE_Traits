@@ -2,14 +2,14 @@
 ## Glen_Fert ####
 ################
 
-setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database")
+setwd("~/Dropbox/CoRRE_database")
 
 # library
 library(readxl)
 library(tidyr)
 
-dat <- read_excel("Data/OriginalData/2020 update/Data/Glen_Fert_data1.xlsx")
-enviro <- read_excel("Data/OriginalData/2020 update/Data/Glen_Fert_data2.xlsx")
+dat <- read_excel("Data/OriginalData/Sites/Glen_Fert/Glen_Fert_data1.xlsx")
+enviro <- read_excel("Data/OriginalData/Sites/Glen_Fert/Glen_Fert_data2.xlsx")
 
 # remove first row because just species abbreviations
 

@@ -1,7 +1,7 @@
 #####################
 ### AZI_NitPhos ####
 ###################
-setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database")
+setwd("~/Dropbox/CoRRE_database")
 
 dat <- read.csv("Data/OriginalData/Sites/AZI_NitPhos/Azi_quadrat.csv")
 

@@ -1,9 +1,9 @@
-setwd("~/Dropbox/converge_diverge/datasets/ORIGINAL_DATASETS/TRA_Lovegrass")
+setwd("~/Dropbox/CoRRE_database")
 
 library(dplyr)
 library(tidyr)
 
-dat<-read.csv("TRA_Lovegrass_raw.csv")
+dat<-read.csv("Data/OriginalData/Sites/TRA_Lovegrass/TRA_Lovegrass_raw.csv")
 
 dat2<-dat%>%
   select(-baresoil, -branchg, -Dates, -grazing, -Grazing_1, -control, -nitrogen)%>%
@@ -25,5 +25,5 @@ dat3<-merge(dat2, treatment_year, by="calendar_year")%>%
   mutate(site_code="TRA", project_name="Lovegrass")%>%
   filter(abundance!=0)
 
-write.csv(dat3, "TRA_Lovegrass.csv")
+write.csv(dat3, "Data/CleanedData/Sites/Species csv/TRA_Lovegrass.csv")
 

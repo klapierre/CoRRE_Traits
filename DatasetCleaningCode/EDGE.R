@@ -1,16 +1,17 @@
-setwd('C://Users/megha/Dropbox/converge_diverge/datasets/ORIGINAL_DATASETS/Edge')
+setwd("~/Dropbox/CoRRE_database")
+
 
 library(tidyverse)
 
-dat<-read.csv("USA_EDGE.csv")
-sev<-read.csv('sev_fixed.csv')
+dat<-read.csv("Data/OriginalData/Sites/Edge/USA_EDGE.csv")
+sev<-read.csv('Data/OriginalData/Sites/Edge/sev_fixed.csv')
 
 splist<-dat%>%
   select(species)%>%
   unique()
 
-write.csv(splist, "USA_species.csv", row.names=F)
-clean<-read.csv('USA_species_filled.csv')
+write.csv(splist, "Data/OriginalData/Sites/Edge/USA_species.csv", row.names=F)
+clean<-read.csv('Data/OriginalData/Sites/Edge/USA_species_filled.csv')
 
 dat2<-dat%>%
   left_join(clean)%>%
@@ -68,4 +69,4 @@ test<-cleaned2%>%
   select(site_code, treatment_year, calendar_year)%>%
   unique()
 
-write.csv(cleaned2, "USA_EDGE_clean.csv", row.names = F)
+write.csv(cleaned2, "CleanedData/Sites/USA_EDGE.csv", row.names = F)

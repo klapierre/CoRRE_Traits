@@ -2,7 +2,7 @@
 ## Bt_DroughtNet #####
 #####################
 
-setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database")
+setwd("~/Dropbox/CoRRE_database")
 
 # library
 library(readxl)
@@ -10,8 +10,8 @@ library(tidyr)
 library(stringr)
 
 ####### Cover ########
-temp = list.files(path = "./Data/OriginalData/2020 update/Data/Bt/Bt_DroughtNet/")
-myfiles = lapply(temp, function(x) read_excel(path = paste("Data/OriginalData/2020 update/Data/Bt/Bt_DroughtNet",x, sep = "/"), sheet = "cover"))
+temp = list.files(path = "./Data/OriginalData/Sites/Bt/Bt_DroughtNet/")
+myfiles = lapply(temp, function(x) read_excel(path = paste("Data/OriginalData/Sites/Bt/Bt_DroughtNet",x, sep = "/"), sheet = "cover"))
 
 #first four years have note_date and plot_replication - do not need this information for data cleaning
 for(i in 1:4){
@@ -42,12 +42,12 @@ dat$data_type <- "cover"
 names(dat)[c(1,2)] <- c("genus_species", "abundance")
 
 controlplots <- dat[dat$treatment == "control",]
-write.csv(controlplots,"Data/OriginalData/2020 update/Data/Bt/clean_control_data.csv")
+write.csv(controlplots,"Data/OriginalData/Sites/Bt/clean_control_data.csv")
 write.csv(dat, "Data/CleanedData/Sites/Species csv/Bt_DroughtNet.csv", row.names = FALSE)
 
 ####### Biomass ########
-temp1 = list.files(path = "./Data/OriginalData/2020 update/Data/Bt/Bt_DroughtNet/")
-myfiles1 = lapply(temp, function(x) read_excel(path = paste("Data/OriginalData/2020 update/Data/Bt/Bt_DroughtNet",x, sep = "/"), sheet = "biomass"))
+temp1 = list.files(path = "./Data/OriginalData/Sites/Bt/Bt_DroughtNet/")
+myfiles1 = lapply(temp, function(x) read_excel(path = paste("Data/OriginalData/Sites/Bt/Bt_DroughtNet",x, sep = "/"), sheet = "biomass"))
 
 #first four years have note_date and plot_replication - do not need this information for data cleaning
 for(i in 1:4){
@@ -86,5 +86,5 @@ dat$site_code <- "Bt"
 dat$project_name <- "DroughtNet"
 
 cntplots <- dat[which(dat$treatment == "control"),]
-write.csv(cntplots,"Data/OriginalData/2020 update/Data/Bt/biomass_cntrol.csv", row.names = FALSE)
+write.csv(cntplots,"Data/OriginalData/Sites/Bt/biomass_cntrol.csv", row.names = FALSE)
 write.csv(dat, "Data/CleanedData/Sites/ANPP csv/Bt_DroughtNet_anpp.csv")

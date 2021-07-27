@@ -1,7 +1,7 @@
 ##################
 #### KNZ_IRG ####
 ################
-setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database")
+setwd("~/Dropbox/CoRRE_database")
 
 file <- "https://pasta.lternet.edu/package/data/eml/knb-lter-knz/72/13/2798ee2d63b042202cdb97fa25fe3a30"
 df <- read.csv(file, header = TRUE)

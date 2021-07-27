@@ -1,7 +1,7 @@
 ###################
 #### NWT_snow ####
 #################
-setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database")
+setwd("~/Dropbox/CoRRE_database")
 
 file <- "https://pasta.lternet.edu/package/data/eml/knb-lter-nwt/13/1/4eb00e2fd65329c4463732974907061f"
 

@@ -2,18 +2,18 @@
 ## DCIMC_GCME ####
 ##################
 
-setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database")
+setwd("~/Dropbox/CoRRE_database")
 
 # library
 library(readxl)
 library(tidyr)
 
-temp = list.files(path = "./Data/OriginalData/2020 update/Data/DCIMC_GCME")
+temp = list.files(path = "./Data/OriginalData/Sites/DCIMC_GCME")
 temp = temp[c(1:16)]
-myfiles = lapply(paste("./Data/OriginalData/2020 update/Data/DCIMC_GCME",temp, sep ="/"), read_excel)
+myfiles = lapply(paste("./Data/OriginalData/Sites/DCIMC_GCME",temp, sep ="/"), read_excel)
 
 #pull out sp data from community data
-sp <- read.csv("./Data/OriginalData/2020 update/Data/DCIMC_GCME/DCIMC_GCME_sp.csv")
+sp <- read.csv("./Data/OriginalData/Sites/DCIMC_GCME/DCIMC_GCME_sp.csv")
 
 for (i in 1:length(myfiles)){
   colnames(myfiles[[i]]) <- myfiles[[i]][1,] # make first row column names

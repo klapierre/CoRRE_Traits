@@ -2,7 +2,7 @@
 ## DCIMC_GCME2 ####
 ##################
 
-setwd("/Users/kaitlinkimmel/Dropbox/CoRRE_database")
+setwd("~/Dropbox/CoRRE_database")
 
 # library
 library(readxl)
@@ -10,10 +10,10 @@ library(tidyr)
 
 #Load in data
 # Get names from all of the tabs in excel sheet
-tab_names <- excel_sheets(path = "Data/OriginalData/2020 update/Data/DCIMC_GCME2.xlsx")
+tab_names <- excel_sheets(path = "Data/OriginalData/Sites/DCIMC_GCME2.xlsx")
 # import all tabs so that each is a separate element in a list
-myfiles <- lapply(tab_names, function(x) read_excel(path = "Data/OriginalData/2020 update/Data/DCIMC_GCME2.xlsx", sheet = x))
-sp <- read.csv("./Data/OriginalData/2020 update/Data/DCIMC_GCME/DCIMC_GCME_sp.csv")
+myfiles <- lapply(tab_names, function(x) read_excel(path = "Data/OriginalData/Sites/DCIMC_GCME2.xlsx", sheet = x))
+sp <- read.csv("./Data/OriginalData/Sites/DCIMC_GCME/DCIMC_GCME_sp.csv")
 
 for (i in 1:length(myfiles)){
   colnames(myfiles[[i]]) <- myfiles[[i]][1,]
