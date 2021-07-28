@@ -30,8 +30,13 @@ plot_id <- data.frame("trt_temp" = unique(dat$trt_temp))
 plot_id$plot_id <- seq(1:nrow(plot_id))
 dat <- merge(dat, plot_id, by = "trt_temp")
 
+dat <- dat[which(dat$herbicide == "control"),]
+dat <- dat[which(dat$insecticide == "insects"),]
+dat <- dat[which(dat$molluscicide == "molluscs"),]
+dat <- dat[which(dat$nutrient %in% c("min.mg", "no.nutr", "plus.n", "plus.p", "plus.k")),]
+
 # make treatment column
-dat$treatment <- paste(dat$insecticide, dat$molluscicide, dat$fencing, dat$lime, dat$herbicide, dat$nutrient, sep = ".")
+dat$treatment <- paste(dat$fencing, dat$lime, dat$nutrient, sep = ".")
 dat$trt_temp <- NULL
 dat[,c(4:9)] <- NULL
 
@@ -39,10 +44,10 @@ dat[,c(4:9)] <- NULL
 
 names(dat)[c(1,2,3)] <- c("calendar_year", "data_type", "block")
 
-repcount <- as.data.frame(table(dat$treatment[dat$calendar_year== 1997]))
-exclude <- as.character(repcount[which(repcount$Freq <3),1])
-
-dat<- dat[-which(dat$treatment %in% exclude),]
+# repcount <- as.data.frame(table(dat$treatment[dat$calendar_year== 1997]))
+# exclude <- as.character(repcount[which(repcount$Freq <3),1])
+# 
+# dat<- dat[-which(dat$treatment %in% exclude),]
 
 # save abundance data
 write.csv(dat, "Data/CleanedData/Sites/Species csv/Sil_NASH.csv", row.names = FALSE)
