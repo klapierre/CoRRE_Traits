@@ -3,10 +3,9 @@
 ################
 library(stringr)
 
-setwd("~/Dropbox/CoRRE_database")
 # Pull data from LTER site
 # biomass data
-file <- "https://portal.lternet.edu/nis/dataviewer?packageid=knb-lter-cdr.302.9&entityid=7dfa36f6d8adbc6a669d9501beaa30bf"
+file <- "https://portal.edirepository.org/nis/dataviewer?packageid=knb-lter-cdr.302.12&entityid=7dfa36f6d8adbc6a669d9501beaa30bf"
 df <- read.delim(file, header=TRUE)
 
 # cover data
@@ -66,9 +65,9 @@ df2$genus_species <- gsub("amorpha canescens", "Amorpha canescens", df2$genus_sp
 df2$genus_species <- gsub("bromus inermis", "Bromus inermis", df2$genus_species)
 df2$genus_species <- gsub("poa compressa", "Poa compressa", df2$genus_species)
 
-df2 <- df2[df2$genus_species %in% planted,]
+biocon.species <- df2[df2$genus_species %in% planted,]
 
-write.csv(df2, "Data/CleanedData/Sites/Species csv/CDR_BioCON.csv", row.names = FALSE)
+#write.csv(df2, "Data/CleanedData/Sites/Species csv/CDR_BioCON.csv", row.names = FALSE)
 
 ### ANPP data ###
 
@@ -81,7 +80,7 @@ ANPP$project_name <- "BioCON"
 ANPP$data_type <- "biomass"
 ANPP$treatment_year <- ANPP$calendar_year -1997
 
-ANPP <- ANPP[,c(1:4,8,6,7,5,9)]
+biocon.ANPP <- ANPP[,c(1:4,8,6,7,5,9)]
 
-write.csv(ANPP, "Data/CleanedData/Sites/ANPP csv/CDR_BioCON_anpp.csv", row.names = FALSE)
+#write.csv(ANPP, "Data/CleanedData/Sites/ANPP csv/CDR_BioCON_anpp.csv", row.names = FALSE)
                   

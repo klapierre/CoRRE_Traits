@@ -1,7 +1,7 @@
 #################
 #### KUFS_E6 ####
 ################
-setwd("~/Dropbox/CoRRE_database")
+#setwd("~/Dropbox/CoRRE_database")
 
 library(tidyr)
 
@@ -69,10 +69,10 @@ for (i in 1:nrow(df)){
   }
 }
 
-df <- df[,-c(5:7)]
-names(df)[c(1:4)] <- c("calendar_year", "plot_id", "block", "community_type")
-df$treatment_year <- df$calendar_year - 2001
-write.csv(df, "Data/CleanedData/Sites/Species csv/KUFS_E6.csv", row.names = FALSE)
+E6.species <- df[,-c(5:7)]
+names(E6.species)[c(1:4)] <- c("calendar_year", "plot_id", "block", "community_type")
+E6.species$treatment_year <- E6.species$calendar_year - 2001
+#write.csv(df, "Data/CleanedData/Sites/Species csv/KUFS_E6.csv", row.names = FALSE)
 
 ## ANPP data
 file1 <- "https://foster.ku.edu/sites/foster.ku.edu/files/files/E1%20Plant%20Biomass%206%2016.csv"
@@ -136,10 +136,10 @@ for (i in 1:nrow(df1)){
 }
 
 df1$treatment_year <- df1$Year - 2001
-df1 <- df1[,c(2,16,4,5,6,15,17,13,14,11)]
-names(df1)[c(1,3:5,10)] <- c("calendar_year", "plot_id", "block", "community_type", "anpp")
+E6.anpp <- df1[,c(2,16,4,5,6,15,17,13,14,11)]
+names(E6.anpp)[c(1,3:5,10)] <- c("calendar_year", "plot_id", "block", "community_type", "anpp")
 
-write.csv(df1, "Data/CleanedData/Sites/ANPP csv/KUFS_E6_anpp.csv")
+#write.csv(df1, "Data/CleanedData/Sites/ANPP csv/KUFS_E6_anpp.csv")
   
   
   

@@ -1,7 +1,7 @@
 ##################
 #### KNZ_BGP ####
 ################
-setwd("~/Dropbox/CoRRE_database")
+#setwd("~/Dropbox/CoRRE_database")
 
 # biomass data
 file <- "https://portal.edirepository.org/nis/dataviewer?packageid=knb-lter-knz.57.10&entityid=eaf1b05d4c7578a1fe1efc5173b80953"
@@ -36,9 +36,9 @@ df$treatment_year <- df$calendar_year - 1985
 names(df)[4] <- "anpp"
 df$anpp <- df$anpp*10 # mulitply by 10 to get g/m2, currently g/0.1 m2
 
-df <- df[,c(1,3,2,7,8,5,6,4)]
+bgp.anpp <- df[,c(1,3,2,7,8,5,6,4)]
 
-write.csv(df, "Data/CleanedData/Sites/ANPP csv/KNZ_BGP_anpp.csv", row.names = FALSE)
+#write.csv(df, "Data/CleanedData/Sites/ANPP csv/KNZ_BGP_anpp.csv", row.names = FALSE)
 
 
 file1 <- "https://pasta.lternet.edu/package/data/eml/knb-lter-knz/17/11/410e032a0651ce990c8c497be62c68f7"
@@ -77,7 +77,7 @@ df1$data_type <- "cover"
 df2 <- merge(df1, trtdf, by = "plot_id", all.x = TRUE)
 df2$treatment <- paste(df2$burned, df2$mowed, df2$nutrient, sep = "_")
 
-df1 <- df2[,c(1,4:8,17,18,22)]
+bgp.species <- df2[,c(1,4:8,17,18,22)]
 
-write.csv(df1, "Data/CleanedData/Sites/Species csv/KNZ_BGP.csv", row.names = FALSE)
+#write.csv(df1, "Data/CleanedData/Sites/Species csv/KNZ_BGP.csv", row.names = FALSE)
 

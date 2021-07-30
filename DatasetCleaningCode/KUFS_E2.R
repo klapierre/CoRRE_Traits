@@ -4,7 +4,7 @@
 
 # New site with 2020 update!
 
-setwd("~/Dropbox/CoRRE_database")
+#setwd("~/Dropbox/CoRRE_database")
 
 ###############
 #### ANPP ####
@@ -53,11 +53,11 @@ df$data_type <- "biomass"
 df$treatment_year <- df$Year - 2000
 
 # order columns and get rid of unnecessary ones
-df <- df[,c(2,12,5,4,15,16,13,14,10)]
+E2.anpp <- df[,c(2,12,5,4,15,16,13,14,10)]
 # rename
-names(df)[c(1,3,4,9)] <- c("calendar_year", "plot_id", "block", "anpp")
+names(E2.anpp)[c(1,3,4,9)] <- c("calendar_year", "plot_id", "block", "anpp")
 # save
-write.csv(df, "Data/CleanedData/Sites/ANPP csv/KUFS_E2_anpp.csv", row.names = FALSE)
+#write.csv(df, "Data/CleanedData/Sites/ANPP csv/KUFS_E2_anpp.csv", row.names = FALSE)
 
 ##############################
 #### Species composition ####
@@ -111,9 +111,9 @@ df1$data_type <- "biomass"
 df1$treatment_year <- df1$Year - 2000
 
 #order and get rid of columns
-df1 <- df1[,c(2,4,6,10,11:16)]
+E2.species <- df1[,c(2,4,6,10,11:16)]
 #rename
-names(df1)[c(1,2,3)] <- c("calendar_year", "block", "plot_id")
+names(E2.species)[c(1,2,3)] <- c("calendar_year", "block", "plot_id")
 
 #save
-write.csv(df1, "Data/CleanedData/Sites/Species csv/KUFS_E2.csv", row.names = FALSE)
+#write.csv(df1, "Data/CleanedData/Sites/Species csv/KUFS_E2.csv", row.names = FALSE)

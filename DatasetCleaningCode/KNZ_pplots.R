@@ -1,7 +1,7 @@
 ######################
 ##### KNZ_pplots ####
 #####################
-setwd("~/Dropbox/CoRRE_database")
+#setwd("~/Dropbox/CoRRE_database")
 
 #Pull data from LTER site
 file <- "https://pasta.lternet.edu/package/data/eml/knb-lter-knz/127/2/904b175920ac68a39f68969138b82475"
@@ -14,10 +14,10 @@ df$project_name <- "pplots"
 df$treatment_year <- df$RecYear - 2002
 df$data_type  <- "cover"
 
-df <- df[,c(3,5,4,13,12,10,11,9,6)]
+pplots.species <- df[,c(3,5,4,13,12,10,11,9,6)]
 names(df)[c(1,2,3,9)] <- c("calendar_year", "treatment", "plot_id", "abundance")
 
-write.csv(df, "Data/CleanedData/Sites/Species csv/KNZ_pplots.csv", row.names = FALSE)
+#write.csv(df, "Data/CleanedData/Sites/Species csv/KNZ_pplots.csv", row.names = FALSE)
 
 
 
@@ -30,10 +30,10 @@ df1$project_name <- "pplots"
 df1$treatment_year <- df1$RecYear - 2002
 df1$data_type <- "biomass"
 
-df1 <- df1[,c(3,5,4,10,9,7,8,6)]
-names(df1)[c(1,2,3,8)] <- c("calendar_year", "treatment", "plot_id", "anpp")
+pplots.anpp <- df1[,c(3,5,4,10,9,7,8,6)]
+names(pplots.anpp)[c(1,2,3,8)] <- c("calendar_year", "treatment", "plot_id", "anpp")
 
-write.csv(df1, "Data/CleanedData/Sites/ANPP csv/KNZ_pplots_anpp.csv")
+#write.csv(df1, "Data/CleanedData/Sites/ANPP csv/KNZ_pplots_anpp.csv")
 
 
 # 

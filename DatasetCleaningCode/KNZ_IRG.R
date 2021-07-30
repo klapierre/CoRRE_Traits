@@ -1,7 +1,7 @@
 ##################
 #### KNZ_IRG ####
 ################
-setwd("~/Dropbox/CoRRE_database")
+#setwd("~/Dropbox/CoRRE_database")
 
 file <- "https://pasta.lternet.edu/package/data/eml/knb-lter-knz/72/13/2798ee2d63b042202cdb97fa25fe3a30"
 df <- read.csv(file, header = TRUE)
@@ -27,8 +27,8 @@ df$site_code <- "KNZ"
 df$project_name <- "IRG"
 df$data_type <- "cover"
 df$treatment_year <- df$calendar_year - 1990
-df <- df[,c(1,2,4,3,9,10,7,8,6,5)]
-write.csv(df, "Data/CleanedData/Sites/Species csv/KNZ_IRG.csv", row.names = FALSE)
+irg.species <- df[,c(1,2,4,3,9,10,7,8,6,5)]
+#write.csv(df, "Data/CleanedData/Sites/Species csv/KNZ_IRG.csv", row.names = FALSE)
 
 file1 <- "https://pasta.lternet.edu/package/data/eml/knb-lter-knz/72/13/d7d500227665f76533332ebade88deeb"
 df1 <- read.csv(file1, header = TRUE)

@@ -4,7 +4,7 @@
 library(tidyr)
 library(plyr)
 library(stringr)
-setwd("~/Dropbox/CoRRE_database")
+#setwd("~/Dropbox/CoRRE_database")
 
 file <- "https://portal.lternet.edu/nis/dataviewer?packageid=knb-lter-knz.103.2&entityid=366e428fea83641acf1926ef18adc72e"
 df <- read.csv(file, header = TRUE)
@@ -43,15 +43,15 @@ df2[is.na(df2)] <- 0
 df2 <- gather(df2, key = "genus_species_code", value = "abundance", 4:87)
 df2 <- merge(df2, species)
 df2$data_type <- "cover"
-df2 <- df2[-1]
+rhps.species <- df2[-1]
 
-write.csv(df2, "Data/CleanedData/Sites/Species csv/KNZ_RHPs.csv", row.names = FALSE)
+#write.csv(df2, "Data/CleanedData/Sites/Species csv/KNZ_RHPs.csv", row.names = FALSE)
 
 # ANPP data
 df3 <- df1[-which(is.na(df1$ANPP)),c(2:6,94:97)] 
 df3$data_type <- "biomass"
 
-df3 <- df3[,c(1,2,9,4,10,6,7,8,5)]
-names(df3)[9] <- "anpp"
+rhps.anpp <- df3[,c(1,2,9,4,10,6,7,8,5)]
+names(rhps.anpp)[9] <- "anpp"
 
 write.csv(df3, "Data/CleanedData/Sites/ANPP csv/KNZ_RHPs_anpp.csv", row.names = FALSE)
