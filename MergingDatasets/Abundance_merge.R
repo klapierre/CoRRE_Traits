@@ -258,7 +258,7 @@ h_precip <- read.csv("HAYS_Precip.csv")%>%
   mutate(version = 2.0, community_type = 0) %>%
   filter(genus_species!="Cacti")
 
-phace <- read.csv("HPGRS_PHACE.csv")%>%
+phace <- read.csv("CHY_PHACE.csv")%>%
   mutate(version = 2.0, community_type = 0)
 
 nde <- read.csv("IMGERS_NDE.csv") %>% 

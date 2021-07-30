@@ -962,13 +962,13 @@ hprecip <- read.csv("HAYS_Precip.csv") %>%
   mutate(trt_type=ifelse(treatment=="control", "control", ifelse(treatment == "reduction", "drought", "irr"))) %>%
   unique()
 
-phace <- read.csv("HPGRS_PHACE.csv")%>%
+phace <- read.csv("CHY_PHACE.csv")%>%
   select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
   mutate(community_type=0, 
          nutrients=0, light=0, carbon=1, water=0, other_manipulation=1,
          n=0, 
          p=0, 
-         k=0,
+         k=0, 
          CO2= ifelse(treatment %in% c("Ct", "CT"), 600,0),
          precip=0, 
          temp=ifelse(treatment %in% c("cT", "CT"), 2, 0), # 1.5 in the day 3 at night, took average of these
