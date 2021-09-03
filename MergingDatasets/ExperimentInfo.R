@@ -1,4 +1,4 @@
-setwd("~/Dropbox/CoRRE_database/Data/CleanedData/Sites/Species csv")
+setwd("C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CleanedData\\Sites\\Species csv")
 
 library(tidyverse)
 
@@ -506,7 +506,7 @@ biocon<-read.csv("CDR_BioCON.csv")%>%
   mutate(max_trt=1)%>%
   mutate(public=1)%>%
   mutate(factorial=1)%>%
-  mutate(trt_type=ifelse(treatment=='Namb_Cenrich', 'CO2', ifelse(treatment=='Camb_Nenrich', 'N', ifelse(treatment=='Cenrich_Nenrich', 'N*CO2', 'control'))))%>%
+  mutate(trt_type=ifelse(treatment=='Cenrich_Namb', 'CO2', ifelse(treatment=='Camb_Nenrich', 'N', ifelse(treatment=='Cenrich_Nenrich', 'N*CO2', 'control'))))%>%
   unique()
 
 e001<-read.csv("CDR_e001.csv")%>%
@@ -903,7 +903,7 @@ face<-read.delim("GVN_FACE.txt")%>%
   mutate(max_trt=1)%>%
   mutate(public=0)%>%
   mutate(factorial=0)%>%
-  mutate(trt_type=ifelse(treatment=='A', 'CO2', 'control'))%>%
+  mutate(trt_type=ifelse(treatment=='E', 'CO2', 'control'))%>%
   unique()
 
 warmnit <- read.csv("Hayoka_WarmNit.csv")%>%
@@ -2209,7 +2209,7 @@ nash <- read.csv("Sil_NASH.csv")%>%
          burn=0, 
          herb_removal=ifelse(grepl("fenced", treatment, fixed = T),1,0),
          management=0,
-         other_trt=ifelse(grepl("limed", treatment, fixed = T),"limed", 0), 
+         other_trt=ifelse(grepl("unlimed", treatment, fixed = T), 0, "limed"), 
          trt_details=0,
          successional=0, 
          plant_mani=0,  
@@ -2219,7 +2219,7 @@ nash <- read.csv("Sil_NASH.csv")%>%
                           ifelse(treatment %in% c("fenced.limed.no.nutr", "fenced.unlimed.plus.k", "fenced.unlimed.plus.n", "fenced.unlimed.plus.p",
                                                   "rabbits.limed.plus.k", "rabbits.limed.plus.n", "rabbits.limed.plus.p"), 2,
                                  ifelse(treatment %in% c("fenced.unlimed.no.nutr", "rabbits.limed.no.nutr", "rabbits.unlimed.plus.k", "rabbits.unlimed.plus.p", "rabbits.unlimed.plus.n"), 1,
-                                        ifelse(treatment %in% c("fenced.unlimed.min.mg", "rabbits.limed.min.mg"), 4, 3)))))%>%
+                                        ifelse(treatment %in% c("fenced.unlimed.min.mg", "rabbits.limed.min.mg"), 4, ifelse(treatment == "rabbits.unlimed.no.nutr", 0, 3))))))%>%
   mutate(resource_mani=ifelse(grepl("no.nutr", treatment, fixed = T),0,1))%>%
   mutate(max_trt=1)%>%
   mutate(public=0)%>%
@@ -2244,7 +2244,7 @@ nash <- read.csv("Sil_NASH.csv")%>%
                                                                                                                                            ifelse(treatment == "rabbits.unlimed.plus.k", "K", 
                                                                                                                                                   ifelse(treatment == "rabbits.unlimed.plus.n", "N", "P"))))))))))))))))))))%>%
   unique()
-                                                                                                                                                                                                                                                                                                             unique()
+                                                                                                                                                                                            
 
 ton <- read.csv("SIU_TON.csv")%>%
   select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
@@ -2570,14 +2570,14 @@ combine<-rbind(bffert, bgp, biocon, bowman, bt_drought, ccd, clima, clip, clonal
                pplots, pq, ramps, rhps, rmapc, sedge, snfert, snow, sprecip, study119, study278, t7, 
                ter, tface,tide,tmece,ton, uk, wapaclip, warmnit, warmnut, water, watering, wenndex, wet, yu)
 
-write.csv(combine, "~/Dropbox/CoRRE_database/Data/CompiledData/ExperimentInfo.csv", row.names = FALSE)
+# write.csv(combine, "C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CompiledData\\ExperimentInfo.csv", row.names = FALSE)
 
 
 temp_df <- unique(combine[,c(1,2,6,33)])
 trt_sum <- as.data.frame(table(temp_df$trt_type))
 trt_sum <- trt_sum[order(trt_sum$Freq, decreasing = TRUE),]
 names(trt_sum) <- c("treatment_type", "Number_of_experiments")
-write.csv(trt_sum, "~/Dropbox/CoRRE_database/Data/CompiledData/treatment_type_summary.csv")
+# write.csv(trt_sum, "C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CompiledData\\treatment_type_summary.csv")
 
 # Creating a summary of treatment types by location - all treatment types
 df <- unique(combine[,c(1,2,29,33)])
@@ -2585,7 +2585,7 @@ temp <- df %>% count(trt_type, site_code)
 temp1<- temp[,c(1,2)] %>% count(trt_type)
 names(temp1) <- c("treatment_type","Number_of_locations")
 test <- merge(trt_sum, temp1)
-write.csv(test, "~/Dropbox/CoRRE_database/Data/CompiledData/treatment_type_summary_location.csv")
+# write.csv(test, "C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CompiledData\\treatment_type_summary_location.csv")
 
 # Larger grouping of treatment types
 # CO2, N, P, Drought, Irr, Var
@@ -2603,6 +2603,7 @@ df1 <- df %>% mutate(trt_type = ifelse(trt_type %in% c("N*P"), "mult_nutrient",
                                                                                                              ifelse(trt_type %in% c("temp*mow_clip", "temp*fungicide"), "temp*non_resource", 
                                                                                                                     ifelse(trt_type %in% c("C*stone", "*herb_removal", "K*herb_removal", "K*herb_removal*herbicide", "K*herb_removal*lime", "K*herb_removal*lime*herbicide", "K*herbicide", "K*lime*herbicide","Mg*herb_removal", "Mg*herb_removal*herbicide", "Mg*herb_removal*lime", "Mg*herb_removal*lime*herbicide", "Mg*herbicide", "Mg*lime","Mg*lime*herbicide"), "other_nutrient*non_resource(s)", 
                                                                                                                            trt_type))))))))))))))
+
 df2 <- temp_df %>% mutate(trt_type = ifelse(trt_type %in% c("N*P"), "mult_nutrient",
                                        ifelse(trt_type %in% c("mow_clip", "herb_removal", "plant_mani", "lime", "burn", "seed","fungicide", "disturbance", "herbicide", "stone","till"), "other_non_resource", 
                                               ifelse(trt_type=="N*irr*CO2", "3 resources", 
@@ -2627,5 +2628,5 @@ trt_sum2 <- as.data.frame(table(df2$trt_type))
 names(trt_sum2) <- c("treatment_type", "Number_of_experiments")
 trt_sum3 <- merge(trt_sum2, temp1)
 #trt_sum3 <- trt_sum3[trt_sum3$treatment_type != "control",]
-write.csv(trt_sum3, "~/Dropbox/CoRRE_database/Data/CompiledData/treatment_type_summary_broad_groups.csv")
+# write.csv(trt_sum3, "C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CompiledData\\treatment_type_summary_broad_groups.csv")
 
