@@ -3,6 +3,7 @@
 #################
 
 setwd("~/Dropbox/CoRRE_database")
+setwd('C:\\Users\\komatsuk\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database')
 
 # library
 library(readxl)
@@ -63,5 +64,19 @@ names(dat)[c(1,2,3)] <- c("calendar_year", "treatment", "plot_id")
 # get rid of sp with 0 abundance
 dat <- dat[which(dat$abundance > 0),]
 
+###split into fert1
+fert1 <- dat%>%
+  filter(treatment %in% c('control', 'full_nut', 'NH4NO3', 'NH4PO4', 'KNO3', 'micronut'))
+  
 #save
-write.csv(dat, "Data/CleanedData/Sites/Species csv/ANR_Fert1.csv", row.names = FALSE)
+write.csv(fert1, "Data/CleanedData/Sites/Species csv/ANR_Fert1.csv", row.names = FALSE)
+
+
+#split into fert2
+fert3 <- dat%>%
+  filter(!(treatment %in% c('full_nut', 'NH4NO3', 'NH4PO4', 'KNO3', 'micronut')))%>%
+  mutate(treatment_year=ifelse(treatment=='control', treatment_year-1, treatment_year))%>%
+  filter(calendar_year>1990)
+  
+#save
+write.csv(fert3, "Data/CleanedData/Sites/Species csv/ANR_Fert3.csv", row.names = FALSE)

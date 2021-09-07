@@ -27,9 +27,9 @@ watering2<-merge(watering, watering_names, by="species_code", all=T)%>%
 
 fert1 <- read.csv("ANR_Fert1.csv") %>% 
   mutate(version = 2.0, community_type = 0, block = 0)
-  
-fert2 <- read.csv("ANR_Fert2.csv") %>%
-  mutate(version = 2.0, community_type = 0) #has "Other lichens" and "Pioneer mosses (unspecified), which make up a large part of the community
+
+fert3 <- read.csv("ANR_Fert3.csv") %>% 
+  mutate(version = 2.0, community_type = 0, block = 0)
 
 mat2<-read.delim("ARC_mat2.txt")%>%
   select(-id, -nutrients, -light, -carbon, -water, -other_manipulation, -num_manipulations, -experiment_year, -n, -p, -plot_mani, -species_num)%>%

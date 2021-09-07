@@ -2,6 +2,9 @@
 ## Updating Site Lat-Long ###
 ############################
 
+###to do: fix DL and DCIMC, both have double entries in final output
+
+
 setwd("C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\")
 
 library(raster)

@@ -1,4 +1,5 @@
-setwd("C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CleanedData\\Sites\\Species csv")
+setwd("C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CleanedData\\Sites\\Species csv") #kim's laptop
+setwd('C:\\Users\\komatsuk\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CleanedData\\Sites\\Species csv') #kim's desktop
 
 library(tidyverse)
 
@@ -54,9 +55,9 @@ watering<-read.delim("ANG_watering.txt")%>%
 fert1<-read.csv("ANR_Fert1.csv")%>%
   select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
   mutate(community_type=0, 
-         nutrients=1, light=0, carbon=0, water=0, other_manipulation=1,
+         nutrients=1, light=0, carbon=0, water=0, other_manipulation=0,
          n= ifelse(treatment %in% c('KNO3','NH4PO4', 'NH4NO3', 'full_nut'), 5, 0), 
-         p= ifelse(treatment == 'full_nut', 1, 0), 
+         p= ifelse(treatment == 'full_nut', 1, ifelse(treatment=='NH4PO4', 3.7, 0)), 
          k= ifelse(treatment == 'full_nut', 2.8,0), 
          CO2=0,
          precip=0, 
@@ -65,33 +66,27 @@ fert1<-read.csv("ANR_Fert1.csv")%>%
          burn=0, 
          herb_removal=0,
          management=0,
-         other_trt=ifelse(treatment=='ACTIVATED CARBON', 'activated carbon addition', ifelse(treatment=='GLUCOS', 'glucose addition',
-                   ifelse(treatment=='PROTEIN', 'BAS organic N addition', ifelse(treatment=='CACO3', 'lime addition',ifelse(treatment=='micronut', '0.25 g m2 of micronutrient solution added',0))))), 
+         other_trt=0, 
          trt_details=0,
          successional=0, 
-         plant_mani=ifelse(treatment == 'REDUCTION', 1, 0),
-         plant_trt= ifelse(treatment == 'REDUCTION', 1, 0),
-         pulse= ifelse(treatment == 'REDUCTION', 1, 0)) %>%
-  mutate(plot_mani=ifelse(treatment == 'control', 0, 1))%>%
-  mutate(resource_mani= ifelse(treatment == "REDUCTION", 0, 1))%>%
+         plant_mani=0,
+         plant_trt=0,
+         pulse=ifelse(treatment=='REDUCTION', 1, 0)) %>%
+  mutate(plot_mani=ifelse(treatment == 'control', 0, ifelse(treatment=='full_nut', 3, ifelse(treatment=='NH4PO4', 2, 1))))%>%
+  mutate(resource_mani= ifelse(treatment == "control", 0, 1))%>%
   mutate(max_trt=1)%>%
   mutate(public=0)%>%
   mutate(factorial=0)%>%
-  mutate(trt_type=ifelse(treatment == 'control', 'control', ifelse(treatment == 'REDUCTION', 'plant_mani', ifelse(treatment %in% c('micronut', 'full_nut'), 'mult_nutrient', ifelse(treatment == "ACTIVATED CARBON", 'C', ifelse(treatment == 'CACO3', 'lime', ifelse(treatment == 'PROTEIN', 'protein', 'N')))))))%>%
+  mutate(trt_type=ifelse(treatment == 'control', 'control', ifelse(treatment %in% c('micronut', 'full_nut'), 'mult_nutrient', ifelse(treatment=='NH4PO4', 'N*P', 'N'))))%>%
   unique()
 
-fert2<-read.csv("ANR_Fert2.csv")%>%
+fert3<-read.csv("ANR_Fert3.csv")%>% #note: fert2 was another treatment with species removals that we decided we didn't want
   select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
   mutate(community_type=0, 
          nutrients=1, light=0, carbon=0, water=0, other_manipulation=1,
-         n= ifelse(treatment %in% c("full_nut_Dflex_removal","full_nut_full_removal","full_nut_no_removal",
-                                    "NH4NO3_Dflex_removal", "NH4NO3_full_removal", "NH4NO3_no_removal",
-                                    "KNO3_Dflex_removal", "KNO3_full_removal", "KNO3_no_removal", 
-                                    "NH4PO4_Dflex_removal", "NH4PO4_full_removal", "NH4PO4_no_removal",
-                                    "full_nut_Eherm_removal", "NH4NO3_Eherm_removal", "KNO3_Eherm_removal",
-                                    "NH4PO4_Eherm_removal"), 5, 0), 
-         p= ifelse(treatment %in% c('full_nut_Dflex_removal', "full_nut_full_removal","full_nut_no_removal", "full_nut_Eherm_removal"), 1, 0), 
-         k= ifelse(treatment %in% c('full_nut_Dflex_removal', "full_nut_full_removal","full_nut_no_removal", "full_nut_Eherm_removal"), 2.8, 0), 
+         n= ifelse(treatment=='PROTEIN', 2, 0), 
+         p=0, 
+         k=0, 
          CO2=0,
          precip=0, 
          temp=0, 
@@ -99,21 +94,19 @@ fert2<-read.csv("ANR_Fert2.csv")%>%
          burn=0, 
          herb_removal=0,
          management=0,
-         other_trt= 0, 
-         trt_details=0, 
+         other_trt=ifelse(treatment=='ACTIVATED CARBON', 'activated carbon addition', ifelse(treatment=='GLUCOS', 'glucose addition', ifelse(treatment=='CACO3', 'lime addition',0))), 
+         trt_details=0,
          successional=0, 
-         plant_mani=ifelse(treatment %in% c('full_nut_no_removal', 'NH4NO3_no_removal', 'KNO3_no_removal', 'NH4PO4_no_removal', 'control_no_removal'), 0 , 1),
-         plant_trt= ifelse(treatment %in% c('full_nut_no_removal', 'NH4NO3_no_removal', 'KNO3_no_removal', 'NH4PO4_no_removal', 'control_no_removal'), 0 , 1),
-         pulse= ifelse(treatment %in% c('full_nut_full_removal', 'NH4NO3_full_removal', 'KNO3_full_removal', 'NH4PO4_full_removal', 'control_full_removal'), 1, 0)) %>%
-  mutate(plot_mani=ifelse(treatment == 'control_no_removal', 0,ifelse(treatment %in% c('control_Dflex_removal', 'control_Eherm_removal', 'control_full_removal'), 1, 2)))%>%
-  mutate(resource_mani=1)%>%
-  mutate(max_trt= ifelse(treatment %in% c("full_nut_full_removal", "NH4NO3_full_removal", "KNO3_full_removal", "NH4PO4_full_removal", 'control_full_removal','control_no_removal'),1,0))%>%
+         plant_mani=ifelse(treatment == 'REDUCTION', 1, 0),
+         plant_trt= ifelse(treatment == 'REDUCTION', 1, 0),
+         pulse=0) %>%
+  mutate(plot_mani=ifelse(treatment == 'control', 0, 1))%>%
+  mutate(resource_mani= ifelse(treatment %in% c("control", "REDUCTION"), 0, 1))%>%
+  mutate(max_trt=1)%>%
   mutate(public=0)%>%
   mutate(factorial=0)%>%
-  mutate(trt_type=ifelse(treatment == 'control_no_removal', 'control', ifelse(treatment %in% c("full_nut_Eherm_removal", 'full_nut_Dflex_removal', 'full_nut_full_removal'), 'mult_nutrient*plant_mani',
-                  ifelse(treatment %in% c("control_Eherm_removal", 'control_Dflex_removal', 'control_full_removal'), 'plant_mani', 'N*plant_mani'))))%>%
+  mutate(trt_type=ifelse(treatment == 'control', 'control', ifelse(treatment == 'REDUCTION', 'plant_mani', ifelse(treatment %in% c("ACTIVATED CARBON", "GLUCOS"), 'C', ifelse(treatment == 'CACO3', 'lime', 'N')))))%>%
   unique()
-
 
 mat2<-read.delim("ARC_mat2.txt")%>%
   select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
@@ -2563,7 +2556,7 @@ nitadd<-read.csv("YMN_NitAdd.csv")%>%
 
 ###merge all datasets
 combine<-rbind(bffert, bgp, biocon, bowman, bt_drought, ccd, clima, clip, clonal, culardoch, cxn, e001, e002, 
-               e2, e6, edge, eelplot, events, exp1, face, fert1, fert2, fireplots, gane, gap2, gb, 
+               e2, e6, edge, eelplot, events, exp1, face, fert1, fireplots, gane, gap2, gb, 
                gce, gcme, gcme2, gfert, gfp, grazeprecip, herbdiv, herbwood, hprecip, imagine, interaction, 
                irg, kgfert, lind, lovegrass, lucero, mat2, megarich, mnt, mwatfer, nash, nde, nfert, 
                nitadd, nitphos,  nitrogen,npkd, nsfc, nsfc2, nut, nutnet, oface, pennings, phace, pme, precip, 
