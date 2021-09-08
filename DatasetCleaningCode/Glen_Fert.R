@@ -3,6 +3,7 @@
 ################
 
 setwd("~/Dropbox/CoRRE_database")
+setwd('C:\\Users\\komatsuk\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database')
 
 # library
 library(readxl)
@@ -27,7 +28,7 @@ plot_id$plot_id <- seq(1:nrow(plot_id))
 dat <- merge(dat,plot_id)
 dat <- dat[,-c(1,2,6,9,10)]
 
-#two valleys = different blocks
+#two valleys = different community types
 names(dat)[c(3,4)] <- c("calendar_year", "block")
 
 dat$site_code <- "Glen"

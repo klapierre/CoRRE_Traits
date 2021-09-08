@@ -36,7 +36,7 @@ dat$genus_species[dat$sp_code == "Cornicul"] <- "Unknown"
 dat$sp_code <- NULL
 dat$site_code <- "ANR"
 dat$project_name <- "Fert1"
-dat$treatment_year <- dat$Year - 1989
+dat$treatment_year <- dat$Year - 1988
 # a subset of treatments started one year after nutrient addition treatments
 for(i in 1:nrow(dat)){
   if(dat$Treatment[i] == "GLUCOS"| 
@@ -44,7 +44,7 @@ for(i in 1:nrow(dat)){
     dat$Treatment[i] == "ACTIVATED CARBON"|
     dat$Treatment[i] == "REDUCTION"|
     dat$Treatment[i] == "PROTEIN")
-    dat$treatment_year[i] <- dat$Year[i]-1990
+    dat$treatment_year[i] <- dat$Year[i]-1989
 }
 
 dat$data_type <- "cover"

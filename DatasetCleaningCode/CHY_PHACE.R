@@ -3,6 +3,7 @@
 #####################
 
 setwd("~/Dropbox/CoRRE_database")
+setwd('C:\\Users\\komatsuk\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database')
 
 # library
 library(readxl)
@@ -20,9 +21,6 @@ dat$data_type <- "biomass"
 
 dat <- dat[-c(3,4,6,7,8,9)] # get rid of unnecessary columns
 names(dat)[c(1:5)] <- c("calendar_year", "plot_id", "block", "treatment", "anpp") #rename columms
-
-dat$treatment[which(dat$treatment == "cT" & dat$calendar_year < 2007)] <- "ct"
-dat$treatment[which(dat$treatment == "CT" & dat$calendar_year < 2007)] <- "Ct"
 
 bio_dat <- dat[,-c(6:59)] #pull out composite anpp data
 

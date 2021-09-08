@@ -2,6 +2,7 @@
 ## SORBAS_CLIMARID ###
 ######################
 setwd("~/Dropbox/CoRRE_database")
+setwd('C:\\Users\\komatsuk\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database')
 
 ## libraries ##
 library(tidyr)

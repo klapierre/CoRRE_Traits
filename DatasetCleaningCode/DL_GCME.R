@@ -1,8 +1,9 @@
 ###################
-## DCIMC_GCME ####
+## DL_GCME ####
 ##################
 
 setwd("~/Dropbox/CoRRE_database")
+setwd('C:\\Users\\komatsuk\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database')
 
 # library
 library(readxl)
@@ -13,7 +14,8 @@ temp = temp[c(1:16)]
 myfiles = lapply(paste("./Data/OriginalData/Sites/DCIMC_GCME",temp, sep ="/"), read_excel)
 
 #pull out sp data from community data
-sp <- read.csv("./Data/OriginalData/Sites/DCIMC_GCME/DCIMC_GCME_sp.csv")
+sp <- read.csv("./Data/OriginalData/Sites/DCIMC_GCME/DCIMC_GCME_sp.csv")%>%
+  rename(SP_ID=ï..SP_ID)
 
 for (i in 1:length(myfiles)){
   colnames(myfiles[[i]]) <- myfiles[[i]][1,] # make first row column names
@@ -48,12 +50,12 @@ dat$treatment <- substr(dat$treatment,1,nchar(dat$treatment)-1)
 dat<- dat[which(dat$abundance >0),]
 
 # add other project info
-dat$site_code <- "DCIMC"
+dat$site_code <- "DL"
 dat$project_name <- "GCME"
 dat$data_type <- "cover"
 
 # merge with species names
-dat <- merge(dat, sp)
-dat <- dat[,-c(1,11:13)]
+dat2 <- merge(dat, sp)
+dat2 <- dat2[,-c(1,11:13)]
 
-write.csv(dat, "Data/CleanedData/Sites/Species csv/DCMIC_GCME.csv", row.names = FALSE)
+write.csv(dat2, "Data/CleanedData/Sites/Species csv/DL_GCME.csv", row.names = FALSE)

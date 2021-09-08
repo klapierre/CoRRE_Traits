@@ -233,7 +233,7 @@ eelplot <- read.csv("AZI_EELplot.csv")%>%
          burn=0, 
          herb_removal=0,
          management=0,
-         other_trt= ifelse(treatment %in% c("F", "F+N", "F+W+N", "F+W"), 'fungicide', 0),
+         other_trt= ifelse(treatment %in% c("F", "F+N", "F+N+W", "F+W"), 'fungicide', 0),
          trt_details=0,
          successional=0, 
          plant_mani=0, 
@@ -670,7 +670,7 @@ gap2<-read.csv("DCGS_gap.csv")%>%
   mutate(trt_type=ifelse(treatment=='_000', 'control', 'light'))%>%
   unique()
 
-gcme<- read.csv("DCMIC_GCME.csv")%>%
+gcme<- read.csv("DL_GCME.csv")%>%
   select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
   mutate(community_type=0, 
          nutrients=1, light=0, carbon=0, water=0, other_manipulation=1, 
@@ -700,7 +700,7 @@ gcme<- read.csv("DCMIC_GCME.csv")%>%
                   ifelse(treatment == "NP", "N*P", "N*mow_clip"))))))))%>%
   unique()
 
-gcme2<- read.csv("DCMIC_GCME2.csv")%>%
+gcme2<- read.csv("DL_GCME2.csv")%>%
   select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
   mutate(community_type=0, 
          nutrients=1, light=0, carbon=0, water=1, other_manipulation=1, 
@@ -708,7 +708,7 @@ gcme2<- read.csv("DCMIC_GCME2.csv")%>%
          p=0,
          k=0, 
          CO2=0, 
-         precip=ifelse(treatment %in% c("MP", "MNP", "NP", "P"), 120, 0), 
+         precip=ifelse(treatment %in% c("MP", "MNP", "NP", "P"), 32, 0), #precip is 378 mm, plus 120 mm of trt leads to a 32% water addition
          temp=0, 
          mow_clip= ifelse(treatment %in% c("MP", "MNP", "M", "MN"), 1, 0), 
          burn=0, 
@@ -730,7 +730,7 @@ gcme2<- read.csv("DCMIC_GCME2.csv")%>%
                   ifelse(treatment == "NP", "N*irr", "N*mow_clip"))))))))%>%
   unique()
 
-precip<- read.csv("DCMIC_Precip.csv")%>%
+precip<- read.csv("DL_Precip.csv")%>%
   select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
   mutate(community_type=0, 
          nutrients=0, light=0, carbon=0, water=1, other_manipulation=0, 
@@ -868,7 +868,7 @@ gfert<- read.csv("Glen_Fert.csv")%>%
   mutate(max_trt=1)%>%
   mutate(public=0)%>%
   mutate(factorial=1)%>%
-  mutate(trt_type=ifelse(treatment == "C", "control", ifelse(treatment == "N", "N", ifelse(treatment == "P", "P", "NP"))))%>%
+  mutate(trt_type=ifelse(treatment == "C", "control", ifelse(treatment == "N", "N", ifelse(treatment == "P", "P", "N*P"))))%>%
   unique()
 
 face<-read.delim("GVN_FACE.txt")%>%
@@ -962,9 +962,9 @@ phace <- read.csv("CHY_PHACE.csv")%>%
          n=0, 
          p=0, 
          k=0, 
-         CO2= ifelse(treatment %in% c("Ct", "CT"), 600,0),
+         CO2= ifelse(treatment %in% c("Ct", "CT"), 220, 0),
          precip=0, 
-         temp=ifelse(treatment %in% c("cT", "CT"), 2, 0), # 1.5 in the day 3 at night, took average of these
+         temp=ifelse(treatment %in% c("cT", "CT"), 2.25, 0), # 1.5 in the day 3 at night, took average of these
          mow_clip=0, 
          burn=0, 
          herb_removal=0,
@@ -1176,7 +1176,7 @@ t7<-read.delim("KBS_T7.txt")%>%
   mutate(max_trt=1)%>%
   mutate(public=1)%>%
   mutate(factorial=1)%>%
-  mutate(trt_type=ifelse(treatment=='T0F0', 'control', ifelse(treatment=='T1F1', 'N*till', ifelse(treatment=='T0F1', 'N', 'till'))))%>%
+  mutate(trt_type=ifelse(treatment=='T0F0', 'control', ifelse(treatment=='T1F1', 'N*disturbance', ifelse(treatment=='T0F1', 'N', 'disturbance'))))%>%
   unique()
 
 bffert<-read.delim("KLU_BFFert.txt")%>%
@@ -1436,11 +1436,11 @@ e2 <- read.csv("KUFS_E2.csv")%>%
   mutate(factorial=1)%>%
   mutate(trt_type=ifelse(treatment=='N0S0H0', 'control',
                          ifelse(treatment =='N1S0H0', 'N', 
-                                ifelse(treatment == 'N0S1H0', 'seed',
+                                ifelse(treatment == 'N0S1H0', 'plant_mani',
                                        ifelse(treatment == 'N0S0H1', 'mow_clip', 
-                                              ifelse(treatment == 'N1S1H0', 'N*seed',
+                                              ifelse(treatment == 'N1S1H0', 'N*plant_mani',
                                                      ifelse(treatment == 'N1S0H1', 'N*mow_clip',
-                                                            ifelse(treatment == 'N0S1H1', 'seed*mow_clip', 'N*seed*mow_clip'))))))))%>%
+                                                            ifelse(treatment == 'N0S1H1', 'plant_mani*mow_clip', 'N*plant_mani*mow_clip'))))))))%>%
   unique()
 
   
@@ -1475,9 +1475,9 @@ e6<-read.csv("KUFS_E6.csv")%>%
   mutate(trt_type=ifelse(treatment=='N0P0S0', 'control', ifelse(treatment=='N0P8S0', 'P', 
                                                                 ifelse(treatment %in% c('N16P0S0','N8P0S0','N4P0S0'), 'N', 
                                                                        ifelse(treatment %in% c('N4P8S0', 'N8P8S0', 'N16P8S0'),'N*P',
-                                                                              ifelse(treatment =='N0P0S1', 'seed',
-                                                                                     ifelse(treatment %in% c('N4P0S1', 'N8P0S1', 'N16P0S1'), 'N*seed',
-                                                                                            ifelse(treatment == 'N0P8S1', 'P*seed', "N*P*seed"))))))))%>%
+                                                                              ifelse(treatment =='N0P0S1', 'plant_mani',
+                                                                                     ifelse(treatment %in% c('N4P0S1', 'N8P0S1', 'N16P0S1'), 'N*plant_mani',
+                                                                                            ifelse(treatment == 'N0P8S1', 'P*plant_mani', "N*P*plant_mani"))))))))%>%
   unique()
 
 clip<-read.delim("LATNJA_CLIP.txt")%>%
@@ -1933,7 +1933,7 @@ nut <- read.csv("Rengen_Nut.csv") %>%
   mutate(max_trt=ifelse(treatment == "Ca", 0, 1))%>%
   mutate(public=0)%>%
   mutate(factorial=0)%>%
-  mutate(trt_type=ifelse(treatment== "Control", "control", ifelse(treatment == "Ca","Ca addition", "mult_nutrient")))%>%
+  mutate(trt_type=ifelse(treatment== "Control", "control", ifelse(treatment == "Ca","lime", "mult_nutrient")))%>%
   unique()
 
 interaction<-read.delim("RIO_interaction.txt")%>%
@@ -2157,7 +2157,7 @@ grazeprecip<-read.csv("SFREC_GrazePrecip.csv")%>%
   mutate(trt_type=ifelse(treatment=='C', 'control', ifelse(treatment=='W', 'irr', 'drought')))%>%
   unique()
 
-sprecip <- read.csv("SGS_Precip.csv") %>%
+sirg <- read.csv("SGS_Irg.csv") %>%
   select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
   mutate(community_type=0, 
          nutrients=0, light=0, carbon=0, water=1, other_manipulation=0,
@@ -2165,7 +2165,7 @@ sprecip <- read.csv("SGS_Precip.csv") %>%
          p=0, 
          k=0, 
          CO2=0, 
-         precip=ifelse(treatment == "reduction", -60, ifelse(treatment == "add", 50,0)), 
+         precip=ifelse(treatment == "add", 50,0), 
          temp=0,
          mow_clip=0, 
          burn=0, 
@@ -2182,62 +2182,98 @@ sprecip <- read.csv("SGS_Precip.csv") %>%
   mutate(max_trt=1)%>%
   mutate(public=1)%>%
   mutate(factorial=0)%>%
-  mutate(trt_type=ifelse(treatment=="control", "control", ifelse(treatment == "add", "irr", "drought")))%>%
+  mutate(trt_type=ifelse(treatment=="control", "control", "irr"))%>%
   unique()
 
-nash <- read.csv("Sil_NASH.csv")%>% 
+sdrought <- read.csv("SGS_Drought.csv") %>%
   select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
   mutate(community_type=0, 
-         nutrients=1, light=0, carbon=0, water=0, other_manipulation=1,
-         n=ifelse(grepl("plus.n", treatment, fixed = T),10,
-                  ifelse(grepl("min.mg", treatment, fixed = T),10, 0)),
-         p=ifelse(grepl("plus.p", treatment, fixed = T),3.5,
-                  ifelse(grepl("min.mg", treatment, fixed = T),3.5,0)), 
-         k=ifelse(grepl("plus.k", treatment, fixed = T),22.5,
-                  ifelse(grepl("min.mg", treatment, fixed = T),22.5,0)), 
+         nutrients=0, light=0, carbon=0, water=1, other_manipulation=0,
+         n=0,
+         p=0, 
+         k=0, 
          CO2=0, 
-         precip=0, 
+         precip=ifelse(treatment == "reduction", -60, 0), 
          temp=0,
          mow_clip=0, 
          burn=0, 
-         herb_removal=ifelse(grepl("fenced", treatment, fixed = T),1,0),
+         herb_removal=0,
          management=0,
-         other_trt=ifelse(grepl("unlimed", treatment, fixed = T), 0, "limed"), 
+         other_trt=0, 
          trt_details=0,
          successional=0, 
          plant_mani=0,  
          plant_trt=0,
-         pulse= 0) %>%
-  mutate(plot_mani=ifelse(treatment == "fenced.limed.min.mg", 5,
-                          ifelse(treatment %in% c("fenced.limed.no.nutr", "fenced.unlimed.plus.k", "fenced.unlimed.plus.n", "fenced.unlimed.plus.p",
-                                                  "rabbits.limed.plus.k", "rabbits.limed.plus.n", "rabbits.limed.plus.p"), 2,
-                                 ifelse(treatment %in% c("fenced.unlimed.no.nutr", "rabbits.limed.no.nutr", "rabbits.unlimed.plus.k", "rabbits.unlimed.plus.p", "rabbits.unlimed.plus.n"), 1,
-                                        ifelse(treatment %in% c("fenced.unlimed.min.mg", "rabbits.limed.min.mg"), 4, ifelse(treatment == "rabbits.unlimed.no.nutr", 0, 3))))))%>%
-  mutate(resource_mani=ifelse(grepl("no.nutr", treatment, fixed = T),0,1))%>%
+         pulse=0)%>%
+  mutate(plot_mani=ifelse(treatment=="control", 0, 1))%>%
+  mutate(resource_mani=1)%>%
   mutate(max_trt=1)%>%
-  mutate(public=0)%>%
+  mutate(public=1)%>%
   mutate(factorial=0)%>%
-  mutate(trt_type = ifelse(treatment == "fenced.limed.min.mg", "mult_nutrient*herb_removal*lime", 
-                           ifelse(treatment == "fenced.limed.no.nutr", "herb_removal*lime",
-                                  ifelse(treatment == "fenced.limed.plus.k", "K*herb_removal*lime",
-                                         ifelse(treatment == "fenced.limed.plus.n", "N*herb_removal*lime",
-                                                ifelse(treatment == "fenced.limed.plus.p", "P*herb_removal*lime",
-                                                       ifelse(treatment == "fenced.unlimed.min.mg", "mult_nutrient*herb_removal", 
-                                                              ifelse(treatment == "fenced.unlimed.plus.p", "P*herb_removal",
-                                                                     ifelse(treatment == "fenced.unlimed.plus.k", "K*herb_removal",
-                                                                            ifelse(treatment == "fenced.unlimed.plus.n", "N*herb_removal", 
-                                                                                   ifelse(treatment == "fenced.unlimed.no.nutr", "herb_removal", 
-                                                                                          ifelse(treatment == "rabbits.limed.min.mg", "mult_nutrient*lime", 
-                                                                                                 ifelse(treatment == "rabbits.limed.no.nutr","lime", 
-                                                                                                        ifelse(treatment == "rabbits.limed.plus.k", "K*lime", 
-                                                                                                               ifelse(treatment == "rabbits.limed.plus.n", "N*lime", 
-                                                                                                                      ifelse(treatment == "rabbits.limed.plus.p", "P*lime", 
-                                                                                                                             ifelse(treatment =="rabbits.unlimed.min.mg", "mult_nutrient", 
-                                                                                                                                    ifelse(treatment == "rabbits.unlimed.no.nutr", "control", 
-                                                                                                                                           ifelse(treatment == "rabbits.unlimed.plus.k", "K", 
-                                                                                                                                                  ifelse(treatment == "rabbits.unlimed.plus.n", "N", "P"))))))))))))))))))))%>%
+  mutate(trt_type=ifelse(treatment=="control", "control", "drought"))%>%
   unique()
-                                                                                                                                                                                            
+
+# nash <- read.csv("Sil_NASH.csv")%>% 
+#   select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
+#   mutate(community_type=0, 
+#          nutrients=1, light=0, carbon=0, water=0, other_manipulation=1,
+#          n=ifelse(grepl("plus.n", treatment, fixed = T),10,
+#                   ifelse(grepl("min.mg", treatment, fixed = T),10, 0)),
+#          p=ifelse(grepl("plus.p", treatment, fixed = T),3.5,
+#                   ifelse(grepl("min.mg", treatment, fixed = T),3.5,0)), 
+#          k=ifelse(grepl("plus.k", treatment, fixed = T),22.5,
+#                   ifelse(grepl("min.mg", treatment, fixed = T),22.5,0)), 
+#          CO2=0, 
+#          precip=0, 
+#          temp=0,
+#          mow_clip=0, 
+#          burn=0, 
+#          herb_removal=ifelse(grepl("fenced", treatment, fixed = T),1,0),
+#          management=0,
+#          other_trt=ifelse(grepl("unlimed", treatment, fixed = T), 0, "limed"), 
+#          trt_details=0,
+#          successional=0, 
+#          plant_mani=0,  
+#          plant_trt=0,
+#          pulse= 0) %>%
+#   mutate(plot_mani=ifelse(treatment == "fenced.limed.min.mg", 5,
+#                           ifelse(treatment %in% c("fenced.limed.no.nutr", "fenced.unlimed.plus.k", "fenced.unlimed.plus.n", "fenced.unlimed.plus.p",
+#                                                   "rabbits.limed.plus.k", "rabbits.limed.plus.n", "rabbits.limed.plus.p"), 2,
+#                                  ifelse(treatment %in% c("fenced.unlimed.no.nutr", "rabbits.limed.no.nutr", "rabbits.unlimed.plus.k", "rabbits.unlimed.plus.p", "rabbits.unlimed.plus.n"), 1,
+#                                         ifelse(treatment %in% c("fenced.unlimed.min.mg", "rabbits.limed.min.mg"), 4, ifelse(treatment == "rabbits.unlimed.no.nutr", 0, 3))))))%>%
+#   mutate(resource_mani=ifelse(grepl("no.nutr", treatment, fixed = T),0,1))%>%
+#   mutate(max_trt=1)%>%
+#   mutate(public=0)%>%
+#   mutate(factorial=0)%>%
+#   mutate(trt_type = ifelse(treatment == "fenced.limed.min.mg", "mult_nutrient*herb_removal*lime", 
+#                            ifelse(treatment == "fenced.limed.no.nutr", "herb_removal*lime",
+#                                   ifelse(treatment == "fenced.limed.plus.k", "K*herb_removal*lime",
+#                                          ifelse(treatment == "fenced.limed.plus.n", "N*herb_removal*lime",
+#                                                 ifelse(treatment == "fenced.limed.plus.p", "P*herb_removal*lime",
+#                                                        ifelse(treatment == "fenced.unlimed.min.mg", "mult_nutrient*herb_removal", 
+#                                                               ifelse(treatment == "fenced.unlimed.plus.p", "P*herb_removal",
+#                                                                      ifelse(treatment == "fenced.unlimed.plus.k", "K*herb_removal",
+#                                                                             ifelse(treatment == "fenced.unlimed.plus.n", "N*herb_removal", 
+#                                                                                    ifelse(treatment == "fenced.unlimed.no.nutr", "herb_removal", 
+#                                                                                           ifelse(treatment == "rabbits.limed.min.mg", "mult_nutrient*lime", 
+#                                                                                                  ifelse(treatment == "rabbits.limed.no.nutr","lime", 
+#                                                                                                         ifelse(treatment == "rabbits.limed.plus.k", "K*lime", 
+#                                                                                                                ifelse(treatment == "rabbits.limed.plus.n", "N*lime", 
+#                                                                                                                       ifelse(treatment == "rabbits.limed.plus.p", "P*lime", 
+#                                                                                                                              ifelse(treatment =="rabbits.unlimed.min.mg", "mult_nutrient", 
+#                                                                                                                                     ifelse(treatment == "rabbits.unlimed.no.nutr", "control", 
+#                                                                                                                                            ifelse(treatment == "rabbits.unlimed.plus.k", "K", 
+#                                                                                                                                                   ifelse(treatment == "rabbits.unlimed.plus.n", "N", "P"))))))))))))))))))))%>%
+#   unique()
+#                                                                                                                                                                                             
+# nashreps <- read.csv("Sil_NASH.csv")%>%
+#   mutate(block_plot=paste(block, plot_id, sep='::'))%>%
+#   select(site_code, project_name, block_plot, treatment)%>%
+#   unique()%>%
+#   group_by(site_code, project_name, treatment)%>%
+#   summarise(reps=length(block_plot))%>%
+#   ungroup()
+
 
 ton <- read.csv("SIU_TON.csv")%>%
   select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
@@ -2266,7 +2302,7 @@ ton <- read.csv("SIU_TON.csv")%>%
          plant_mani=0,  
          plant_trt=0,
          pulse=0)%>%
-  mutate(plot_mani=ifelse(treatment %in% c('1C', 'AC', 'CS', 'CB'), 1, ifelse(treatment == "CC", 0, 2)))%>%
+  mutate(plot_mani=ifelse(treatment %in% c('AB', 'AS'), 4, ifelse(treatment %in% c('AC'), 3, ifelse(treatment == "CC", 0, 1))))%>%
   mutate(resource_mani=ifelse(treatment %in% c("CS", "CB"), 0, 1))%>%
   mutate(max_trt= ifelse(treatment %in% c('CC', 'AC', 'AS', 'CB', '1B', 'AB'), 1, 0))%>%
   mutate(public=0)%>%
@@ -2304,33 +2340,33 @@ uk<-read.delim("SKY_UK.txt")%>%
   mutate(trt_type=ifelse(treatment=='C', 'control', ifelse(treatment=='H', 'temp', ifelse(treatment=='P', 'irr', 'irr*temp'))))%>%
   unique()
 
-clima <- read.csv("SORBAS_CLIMARID.csv") %>%
-  select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
-  mutate(community_type = 0,
-         nutrients=0, light=0, carbon=0, water=1, other_manipulation=1,
-         n=0,
-         p=0, 
-         k=0, 
-         CO2=0, 
-         precip=ifelse(treatment %in% c("RR", "W+RR"), -30, 0), 
-         temp=ifelse(treatment %in% c("W", "W+RR"), 3, 0),
-         mow_clip=0, 
-         burn=0, 
-         herb_removal=0,
-         management=0,
-         other_trt=0, 
-         trt_details=0,
-         successional=1, 
-         plant_mani=0,  
-         plant_trt=0,
-         pulse=0)%>%
-  mutate(plot_mani=ifelse(treatment=="C", 0, ifelse(treatment=='W+RR',2,1)))%>%
-  mutate(resource_mani= ifelse(treatment == "W", 0,1))%>%
-  mutate(max_trt=1)%>%
-  mutate(public=0)%>%
-  mutate(factorial=1)%>%
-  mutate(trt_type=ifelse(treatment=="C", "control", ifelse(treatment == "RR", "drought", ifelse(treatment == "W", "temp", "drought*temp"))))%>%
-  unique()
+# clima <- read.csv("SORBAS_CLIMARID.csv") %>%
+#   select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
+#   mutate(community_type = 0,
+#          nutrients=0, light=0, carbon=0, water=1, other_manipulation=1,
+#          n=0,
+#          p=0, 
+#          k=0, 
+#          CO2=0, 
+#          precip=ifelse(treatment %in% c("RR", "W+RR"), -30, 0), 
+#          temp=ifelse(treatment %in% c("W", "W+RR"), 3, 0),
+#          mow_clip=0, 
+#          burn=0, 
+#          herb_removal=0,
+#          management=0,
+#          other_trt=0, 
+#          trt_details=0,
+#          successional=1, 
+#          plant_mani=0,  
+#          plant_trt=0,
+#          pulse=0)%>%
+#   mutate(plot_mani=ifelse(treatment=="C", 0, ifelse(treatment=='W+RR',2,1)))%>%
+#   mutate(resource_mani= ifelse(treatment == "W", 0,1))%>%
+#   mutate(max_trt=1)%>%
+#   mutate(public=0)%>%
+#   mutate(factorial=1)%>%
+#   mutate(trt_type=ifelse(treatment=="C", "control", ifelse(treatment == "RR", "drought", ifelse(treatment == "W", "temp", "drought*temp"))))%>%
+#   unique()
   
   
 nitrogen<-read.csv("SR_Nitrogen.csv")%>%
@@ -2554,16 +2590,17 @@ nitadd<-read.csv("YMN_NitAdd.csv")%>%
   mutate(trt_type=ifelse(treatment=='N0', 'control', 'N'))%>%
   unique()
 
+
 ###merge all datasets
-combine<-rbind(bffert, bgp, biocon, bowman, bt_drought, ccd, clima, clip, clonal, culardoch, cxn, e001, e002, 
+combine<-rbind(bffert, bgp, biocon, bowman, bt_drought, ccd, clip, clonal, culardoch, cxn, e001, e002, 
                e2, e6, edge, eelplot, events, exp1, face, fert1, fireplots, gane, gap2, gb, 
                gce, gcme, gcme2, gfert, gfp, grazeprecip, herbdiv, herbwood, hprecip, imagine, interaction, 
                irg, kgfert, lind, lovegrass, lucero, mat2, megarich, mnt, mwatfer, nash, nde, nfert, 
                nitadd, nitphos,  nitrogen,npkd, nsfc, nsfc2, nut, nutnet, oface, pennings, phace, pme, precip, 
-               pplots, pq, ramps, rhps, rmapc, sedge, snfert, snow, sprecip, study119, study278, t7, 
+               pplots, pq, ramps, rhps, rmapc, sedge, snfert, snow, sirg, sdrought, study119, study278, t7, 
                ter, tface,tide,tmece,ton, uk, wapaclip, warmnit, warmnut, water, watering, wenndex, wet, yu)
 
-# write.csv(combine, "C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CompiledData\\ExperimentInfo.csv", row.names = FALSE)
+# write.csv(combine, "C:\\Users\\komatsuk\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CompiledData\\ExperimentInfo.csv", row.names = FALSE)
 
 
 temp_df <- unique(combine[,c(1,2,6,33)])
@@ -2583,7 +2620,7 @@ test <- merge(trt_sum, temp1)
 # Larger grouping of treatment types
 # CO2, N, P, Drought, Irr, Var
 df1 <- df %>% mutate(trt_type = ifelse(trt_type %in% c("N*P"), "mult_nutrient",
-                                       ifelse(trt_type %in% c("mow_clip", "herb_removal", "plant_mani", "lime", "burn", "seed","fungicide", "disturbance", "herbicide", "stone","till"), "other_non_resource", 
+                                       ifelse(trt_type %in% c("mow_clip", "herb_removal", "plant_mani", "lime", "burn", "seed","fungicide", "disturbance", "herbicide", "stone"), "other_non_resource", 
                                               ifelse(trt_type=="N*irr*CO2", "3 resources", 
                                                      ifelse(trt_type == "N*P", "mult_nutrient", 
                                                             ifelse(trt_type %in% c("irr*herb_removal", "irr*mow_clip", "irr*plant_mani", "irr*plant_mani*herb_removal"), "irr*non_resource", 
@@ -2607,7 +2644,7 @@ df2 <- temp_df %>% mutate(trt_type = ifelse(trt_type %in% c("N*P"), "mult_nutrie
                                                                                  ifelse(trt_type %in% c("N*till", "N*temp*fungicide", "N*stone", "N*seed*mow_clip", "N*plant_mani*disturbance", "N*lime*herbicide", "N*lime", "H*herbicide", "N*herb_removal*lime*herbicide", "N*herb_removal*lime", "N*herb_removal)herbicide", "N*herb_removal", "N*fungicide", "N*disturbance", "N*burn*graze", "N*burn*mow_clip", "N*seed", "N*burn", "N*mow_clip", "N*plant_mani", "N*herbicide", "N*herb_removal*herbicide"), "N*other_non_resource(s)", 
                                                                                         ifelse(trt_type %in% c("P*burn", "P*seed", "P*burn*graze", "P*burn*mow_clip", "P*herb_removal", "P*herb_removal*herbicide", "P*herb_removal*lime", "P*herb_removal*lime*herbicide", "P*herbicide", "P*lime", "P*lime*herbicide", "P*mow_clip"), "P*other_non_resource(s)",
                                                                                                ifelse(trt_type %in% c("plant_mani*herb_removal", "burn*mow_clip", "burn*graze", "herb_removal*herbicide","herb_removal*lime", "herb_removal*lime*herbicide", "herb_removal*mow_clip", "lime*herbicide", "seed*mow_clip", "plant_mani*disturbance"), "mult_non_resource", 
-                                                                                                      ifelse(trt_type %in% c("K", "C", "Ca addition", "Mg", "protein"), "other_nutrient", 
+                                                                                                      ifelse(trt_type %in% c("K", "C", "Ca addition", "Mg"), "other_nutrient", 
                                                                                                              ifelse(trt_type %in% c("temp*mow_clip", "temp*fungicide"), "temp*non_resource", 
                                                                                                                     ifelse(trt_type %in% c("C*stone", "*herb_removal", "K*herb_removal", "K*herb_removal*herbicide", "K*herb_removal*lime", "K*herb_removal*lime*herbicide", "K*herbicide", "K*lime*herbicide","Mg*herb_removal", "Mg*herb_removal*herbicide", "Mg*herb_removal*lime", "Mg*herb_removal*lime*herbicide", "Mg*herbicide", "Mg*lime","Mg*lime*herbicide"), "other_nutrient*non_resource(s)", 
                                                                                                                            trt_type))))))))))))))

@@ -1,8 +1,9 @@
 ###################
-## DCIMC_GCME2 ####
+## DL_GCME2 ####
 ##################
 
 setwd("~/Dropbox/CoRRE_database")
+setwd('C:\\Users\\komatsuk\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database')
 
 # library
 library(readxl)
@@ -34,8 +35,8 @@ dat <- do.call("rbind", myfiles)
 dat<- dat[which(dat$abundance >0),]
 
 # add other project info
-dat$site_code <- "DCIMC"
+dat$site_code <- "DL"
 dat$project_name <- "Precip"
 dat$data_type <- "cover"
 
-write.csv(dat, "Data/CleanedData/Sites/Species csv/DCMIC_Precip.csv", row.names = FALSE)
+write.csv(dat, "Data/CleanedData/Sites/Species csv/DL_Precip.csv", row.names = FALSE)

@@ -3,6 +3,7 @@
 ###################
 
 setwd("~/Dropbox/CoRRE_database")
+setwd('C:\\Users\\komatsuk\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database')
 
 # library
 library(readxl)
@@ -10,7 +11,7 @@ library(tidyr)
 
 # read in data
 dat <- read_excel("Data/OriginalData/Sites/SGS/SGS_Precip.xlsx")
-sp.list <- read_excel("Data/OriginalData/OriginalData/Sites/SGS/plant_list-SGS.xls")
+sp.list <- read_excel("Data/OriginalData/Sites/SGS/plant_list-SGS.xls")
 
 dat <- dat[,-53]
 # Long to wide format
@@ -84,6 +85,21 @@ dat <- merge(dat, sp.match)
 
 dat <- dat[,-1]
 
-write.csv(dat, "Data/CleanedData/Sites/Species csv/SGS_Precip.csv", row.names = FALSE)
+
+#split into irrigation vs drought
+irg <- dat%>%
+  mutate(project_name='Irg')%>%
+  filter(treatment!='reduction', calendar_year>2008)%>%
+  mutate(treatment_year=calendar_year-2008)
+
+# write.csv(irg, "Data/CleanedData/Sites/Species csv/SGS_Irg.csv", row.names = FALSE)
+
+
+#split into irrigation vs drought
+drought <- dat%>%
+  mutate(project_name='Drought')%>%
+  filter(treatment!='add')
+
+# write.csv(drought, "Data/CleanedData/Sites/Species csv/SGS_Drought.csv", row.names = FALSE)
 
 

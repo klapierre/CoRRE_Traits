@@ -2,6 +2,7 @@
 ## Sil_NASH ####
 ###############
 setwd("~/Dropbox/CoRRE_database")
+setwd('C:\\Users\\komatsuk\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database')
 
 ## libraries ##
 library(tidyr)
@@ -50,7 +51,7 @@ names(dat)[c(1,2,3)] <- c("calendar_year", "data_type", "block")
 # dat<- dat[-which(dat$treatment %in% exclude),]
 
 # save abundance data
-write.csv(dat, "Data/CleanedData/Sites/Species csv/Sil_NASH.csv", row.names = FALSE)
+# write.csv(dat, "Data/CleanedData/Sites/Species csv/Sil_NASH.csv", row.names = FALSE)
 
 
 # pull out ANPP data
@@ -64,4 +65,4 @@ bio_dat <- aggregate(bio_dat$abundance,by = list(calendar_year = bio_dat$calenda
 names(bio_dat)[9] <- "anpp"
 bio_dat$anpp <- bio_dat$anpp *8
 
-write.csv(bio_dat, "Data/CleanedData/Sites/ANPP csv/Sil_NASH_anpp.csv", row.names = FALSE)
+# write.csv(bio_dat, "Data/CleanedData/Sites/ANPP csv/Sil_NASH_anpp.csv", row.names = FALSE)

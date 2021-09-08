@@ -1,8 +1,9 @@
 ###################
-## DCIMC_GCME2 ####
+## DL_GCME2 ####
 ##################
 
 setwd("~/Dropbox/CoRRE_database")
+setwd('C:\\Users\\komatsuk\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database')
 
 # library
 library(readxl)
@@ -13,7 +14,8 @@ library(tidyr)
 tab_names <- excel_sheets(path = "Data/OriginalData/Sites/DCIMC_GCME2.xlsx")
 # import all tabs so that each is a separate element in a list
 myfiles <- lapply(tab_names, function(x) read_excel(path = "Data/OriginalData/Sites/DCIMC_GCME2.xlsx", sheet = x))
-sp <- read.csv("./Data/OriginalData/Sites/DCIMC_GCME/DCIMC_GCME_sp.csv")
+sp <- read.csv("./Data/OriginalData/Sites/DCIMC_GCME/DCIMC_GCME_sp.csv")%>%
+  rename(SP_ID=ï..SP_ID)
 
 for (i in 1:length(myfiles)){
   colnames(myfiles[[i]]) <- myfiles[[i]][1,]
@@ -40,11 +42,11 @@ dat <- dat[,-c(1,2)]
 dat<- dat[which(dat$abundance >0),]
 
 # add other project info
-dat$site_code <- "DCIMC"
+dat$site_code <- "DL"
 dat$project_name <- "GCME2"
 dat$data_type <- "cover"
 
 dat <- merge(dat, sp)
 dat <- dat[,-1]
 
-write.csv(dat, "Data/CleanedData/Sites/Species csv/DCMIC_GCME2.csv", row.names = FALSE)
+write.csv(dat, "Data/CleanedData/Sites/Species csv/DL_GCME2.csv", row.names = FALSE)

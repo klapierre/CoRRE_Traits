@@ -573,12 +573,16 @@ wenndex3 <- read.csv("SEV_WENNDEx20.csv") %>%
 graze <- read.csv("SFREC_GrazePrecip.csv") %>%
   filter(abundance != 0) %>% mutate(version = 1.0)
 
-s_precip <- read.csv("SGS_Precip.csv")%>%
+s_irg <- read.csv("SGS_Irg.csv")%>%
   mutate(version = 2.0, community_type = 0, block = 0)%>%
   filter(!(genus_species %in% c('Unknown')))
 
-nash <- read.csv("Sil_NASH.csv") %>%
-  mutate(version = 2.0, community_type = 0)
+s_drought <- read.csv("SGS_Drought.csv")%>%
+  mutate(version = 2.0, community_type = 0, block = 0)%>%
+  filter(!(genus_species %in% c('Unknown')))
+
+# nash <- read.csv("Sil_NASH.csv") %>%
+#   mutate(version = 2.0, community_type = 0)
 
 ton <- read.csv("SIU_TON.csv") %>%
   mutate(community_type = 0, version = 2.0) %>%
@@ -599,8 +603,8 @@ uk2<-merge(uk, uk_names, by="species_code", all=T)%>%
   filter(abundance!=0)%>%
   select(-species_code)
 
-climarid <- read.csv("SORBAS_CLIMARID.csv") %>%
-  mutate(version = 2.0, community_type = 0, block = 0)
+# climarid <- read.csv("SORBAS_CLIMARID.csv") %>%
+#   mutate(version = 2.0, community_type = 0, block = 0)
 
 nitrogen <- read.csv("SR_Nitrogen.csv") %>%
   mutate(version = 1.0) %>%
@@ -637,19 +641,19 @@ edge <- read.csv("USA_EDGE.csv") %>% ## Added new data 2020
   mutate(data_type = "cover", version = 1.0)%>%
   filter(abundance !=0, site_code != "SEV")
 
-shet <- read.csv("WAG_SHet.csv") %>%
-  mutate(version = 2.0, community_type = 0)
+# shet <- read.csv("WAG_SHet.csv") %>%
+#   mutate(version = 2.0, community_type = 0)
 
 nitadd <- read.csv("YMN_NitAdd.csv") %>%
   mutate(community_type = 0, block = 0, version = 1.0) %>%
   filter(abundance != 0)
 
 #merge all datasets
-combine<-rbind(bffert2, bgp, biocon, bowman2, btdrought, btnpkd, ccd2, climarid, clip2, clonal2, culardoch2, cxn, d_precip, e001, e0023,
+combine<-rbind(bffert2, bgp, biocon, bowman2, btdrought, btnpkd, ccd2, clip2, clonal2, culardoch2, cxn, d_precip, e001, e0023,
                e2, e6, edge, eelplot, events2, exp12, face2, fert1, fert2, fireplots2, gane2, gap2, gb2, gce2, gcme, 
                gcme2, gfert, gfp, graze, h_precip, herbdiv, herbwood2, imagine2, interaction2, irg2, kgfert2, lind2, lovegrass, 
-               lucero, mat22, megarich2, mnt2, mwatfer, nash, nde, nfert2, nitadd, nitphos, nitrogen, nsfc4, nut, nutnet,
-               oface2, pennings2, phace, pme, pplots, pq2, ramps, rhps, rmapc2, s_precip, sask, sev_edge, snfert3, snow, 
+               lucero, mat22, megarich2, mnt2, mwatfer, nde, nfert2, nitadd, nitphos, nitrogen, nsfc4, nut, nutnet,
+               oface2, pennings2, phace, pme, pplots, pq2, ramps, rhps, rmapc2, s_Drought, s_Irg, sask, sev_edge, snfert3, snow, 
                study1192, study2782, t72, ter, tface, tide2, tmece, ton, uk2, wapaclip2, warmnut2, warmnit, water, watering2, 
                wenndex3, wet2, yu)
 
@@ -686,7 +690,6 @@ write.csv(relcov, "~/Dropbox/CoRRE_database/Data/CompiledData/RelativeCover.csv"
 
 ##### Relative cover and raw abundance for sCoRRE
 
-sCoRRERaw <- combine[-which(combine$project_name %in% c("BioCON", "EELplot", "NASH") & combine$data_type == "cover"),]
 write.csv(sCoRRERaw, "~/Dropbox/sDiv_sCoRRE_shared/CoRRE data/CoRRE data/community composition/CoRRE_RawAbundanceMar2021.csv", row.names = FALSE)  
-sCoRRERel <- relcov[-which(relcov$project_name %in% c("BioCON", "EELplot", "NASH") & relcov$data_type == "cover"),]
+sCoRRERel <- relcov[-which(relcov$project_name %in% c("BioCON", "EELplot") & relcov$data_type == "cover"),]
 write.csv(sCoRRERel, "~/Dropbox/sDiv_sCoRRE_shared/CoRRE data/CoRRE data/community composition/CoRRE_RelativeAbundanceMar2021.csv", row.names = FALSE)  

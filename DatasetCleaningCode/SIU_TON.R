@@ -3,6 +3,7 @@
 ###############
 
 setwd("~/Dropbox/CoRRE_database")
+setwd('C:\\Users\\komatsuk\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database')
 
 #### Cover ####
 df <- read.csv("Data/OriginalData/Sites/SIU_TON/TON_Div.csv")
@@ -37,8 +38,10 @@ df <- df[which(df$block != 1),]
 df <- df[which(df$abundance >0),]
 ### some duplicated rows, get rid of these
 df <- df[which(duplicated(df) == FALSE),]
+df2 <- df%>%
+  filter(!(treatment %in% c('1C', '1S', '1B')))
 
-write.csv(df, "Data/CleanedData/Sites/Species csv/SIU_TON.csv", row.names = FALSE)
+write.csv(df2, "Data/CleanedData/Sites/Species csv/SIU_TON.csv", row.names = FALSE)
 
 
 #### Biomass ####
@@ -67,4 +70,7 @@ df1$treatment_year <- df1$calendar_year - 1995
 df1$data_type <-"biomass"
 names(df1)[5] <- "anpp"
 
-write.csv(df1, "Data/CleanedData/Sites/ANPP csv/SIU_TON_anpp.csv", row.names = FALSE)
+df3 <- df1%>%
+  filter(!(treatment %in% c('1C', '1S', '1B')))
+
+write.csv(df3, "Data/CleanedData/Sites/ANPP csv/SIU_TON_anpp.csv", row.names = FALSE)

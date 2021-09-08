@@ -3,6 +3,7 @@
 ####################
 
 setwd("~/Dropbox/CoRRE_database")
+setwd('C:\\Users\\komatsuk\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database')
 
 # libraries
 library(Hmisc)
@@ -16,7 +17,7 @@ bio_dat <- read.csv("Data/OriginalData/Sites/NutNet/nutnet_anpp_012752021.csv", 
 
 
 # fix names & get rid of unnecessary columns
-dat <- dat[,-c(2,6,9,12:17)] #check with Kim on subplot column
+dat <- dat[,-c(2,6,9,12:17)]
 names(dat) <- c("calendar_year", "site_code", "block", "plot_id",  "treatment_year",
                 "treatment", "genus_species", "live", "abundance")
 
@@ -31,10 +32,10 @@ dat$genus_species <- capitalize(dat$genus_species)
 # add in other information
 dat$project_name <- "NutNet"
 dat$data_type <- "cover"
-dat$site_code[dat$site_code == "bayr.de"] <- "Bt"
-dat$site_code[dat$site_code == "cdcr.us"] <- "CDR"
+dat2 <- dat%>%
+  mutate(site_code=ifelse(site_code=='bayr.de', 'Bt', ifelse(site_code=='cdcr.us', 'CDR', as.character(site_code))))
 
-write.csv(dat, "Data/CleanedData/Sites/Species csv/NutNet.csv", row.names = FALSE)
+# write.csv(dat2, "Data/CleanedData/Sites/Species csv/NutNet.csv", row.names = FALSE)
 
 # get live biomass only
 bio_dat <- bio_dat[which(bio_dat$live ==1),]
@@ -47,9 +48,25 @@ names(bio_dat)[7] <- "anpp"
 # add in other information
 bio_dat$project_name <- "NutNet"
 bio_dat$data_type <- "biomass"
-bio_dat$site_code[bio_dat$site_code == "bayr.de"] <- "Bt"
-bio_dat$site_code[bio_dat$site_code == "cdcr.us"] <- "CDR"
+bio_dat2 <- bio_dat%>%
+  mutate(site_code=ifelse(site_code=='bayr.de', 'Bt', ifelse(site_code=='cdcr.us', 'CDR', as.character(site_code))))
 
-write.csv(bio_dat, "Data/CleanedData/Sites/ANPP csv/NutNet_anpp.csv", row.names = FALSE)
+# write.csv(bio_dat2, "Data/CleanedData/Sites/ANPP csv/NutNet_anpp.csv", row.names = FALSE)
 
 
+
+##get number of reps
+rep <- bio_dat2%>%
+  select(site_code, treatment, plot_id)%>%
+  unique()%>%
+  group_by(site_code, treatment)%>%
+  summarise(num_reps=length(plot_id))%>%
+  ungroup()
+
+##get number of reps
+rep2 <- dat2%>%
+  select(site_code, treatment, plot_id)%>%
+  unique()%>%
+  group_by(site_code, treatment)%>%
+  summarise(num_reps=length(plot_id))%>%
+  ungroup()

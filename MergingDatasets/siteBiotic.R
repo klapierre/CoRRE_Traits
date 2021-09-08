@@ -85,7 +85,7 @@ controlANPP<-merge(ANPP, expInfo, by=c("site_code","project_name","community_typ
   ungroup()
 
 
-noControlANPP <- read.csv("C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\datasets\\LongForm\\ANPP_noControls.csv")
+noControlANPP <- read.csv("C:\\Users\\komatsuk\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CleanedData\\ANPP_noControls.csv")
 
 allANPP <- rbind(noControlANPP, controlANPP)
 
