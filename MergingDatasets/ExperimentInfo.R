@@ -815,6 +815,33 @@ nsfc2<-read.csv("DL_NSFC20132016.csv")%>%
   mutate(trt_type=ifelse(treatment=='N10', 'N', ifelse(treatment=='WCK', 'irr', ifelse(treatment=='WN10', 'N*irr', 'control'))))%>%
   unique()
 
+Nmow<-read.csv("EGN_Nmow.csv")%>%
+  select(site_code, project_name, community_type, calendar_year, treatment_year, treatment)%>%
+  mutate(nutrients=1, light=0, carbon=0, water=1, other_manipulation=1,
+         n=ifelse(treatment %in% c('N', 'NM'), 5, 0),
+         p=0, 
+         k=0, 
+         CO2=0,
+         precip=0,
+         temp=0, 
+         mow_clip=ifelse(treatment %in% c('M', 'NM'), 1, 0), 
+         burn=0, 
+         herb_removal=0,
+         management=0,
+         other_trt=0, 
+         trt_details=0,
+         successional=0, 
+         plant_mani=0,  
+         plant_trt=0,
+         pulse=0)%>%
+  mutate(plot_mani=ifelse(treatment=='Control', 0, ifelse(treatment=='NM', 2, 1)))%>%
+  mutate(resource_mani=1)%>%
+  mutate(max_trt=1)%>%
+  mutate(public=0)%>%
+  mutate(factorial=1)%>%
+  mutate(trt_type=ifelse(treatment=='Control', 'control', ifelse(treatment=='N', 'N', ifelse(treatment=='M', 'mow_clip', 'N*mow_clip'))))%>%
+  unique()
+
 warmnut<-read.delim("Finse_WarmNut.txt")%>%
   select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
   mutate(community_type=0, 
@@ -2562,6 +2589,33 @@ sedge <- read.csv('SEV_EDGE20.csv')%>%
   mutate(trt_type=ifelse(treatment=='C', 'control', ifelse(treatment=='D', 'precip_vari', 'drought')))%>%
   unique()
 
+vcrnutnet <- read.csv('VCR_NutNet.csv')%>%
+  select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
+  mutate(community_type=0, nutrients=1, light=0, carbon=0, water=0, other_manipulation=0,
+         n=ifelse(treatment %in% c('N', 'NP'), 10, 0), 
+         p=ifelse(treatment %in% c('P', 'NP'), 10, 0), 
+         k=0, 
+         CO2=0, 
+         precip=0, 
+         temp=0,
+         mow_clip=0, 
+         burn=0, 
+         herb_removal=0,
+         management=0,
+         other_trt=0, 
+         trt_details=0,
+         successional=0, 
+         plant_mani=0, 
+         plant_trt=0,
+         pulse=0)%>%
+  mutate(plot_mani=ifelse(treatment=='C', 0, ifelse(treatment=='NP', 2, 1)))%>%
+  mutate(resource_mani=1)%>%
+  mutate(max_trt=1)%>%
+  mutate(public=0)%>%
+  mutate(factorial=1)%>%
+  mutate(trt_type=ifelse(treatment=='C', 'control', ifelse(treatment=='N', 'N', ifelse(treatment=='P', 'P', 'N*P'))))%>%
+  unique()
+
 nitadd<-read.csv("YMN_NitAdd.csv")%>%
   select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
   mutate(community_type=0,
@@ -2596,9 +2650,9 @@ combine<-rbind(bffert, bgp, biocon, bowman, bt_drought, ccd, clip, clonal, cular
                e2, e6, edge, eelplot, events, exp1, face, fert1, fireplots, gane, gap2, gb, 
                gce, gcme, gcme2, gfert, gfp, grazeprecip, herbdiv, herbwood, hprecip, imagine, interaction, 
                irg, kgfert, lind, lovegrass, lucero, mat2, megarich, mnt, mwatfer, nash, nde, nfert, 
-               nitadd, nitphos,  nitrogen,npkd, nsfc, nsfc2, nut, nutnet, oface, pennings, phace, pme, precip, 
+               nitadd, nitphos,  nitrogen,npkd, Nmow, nsfc, nsfc2, nut, nutnet, oface, pennings, phace, pme, precip, 
                pplots, pq, ramps, rhps, rmapc, sedge, snfert, snow, sirg, sdrought, study119, study278, t7, 
-               ter, tface,tide,tmece,ton, uk, wapaclip, warmnit, warmnut, water, watering, wenndex, wet, yu)
+               ter, tface,tide,tmece,ton, uk, vcrnutnet, wapaclip, warmnit, warmnut, water, watering, wenndex, wet, yu)
 
 # write.csv(combine, "C:\\Users\\komatsuk\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CompiledData\\ExperimentInfo.csv", row.names = FALSE)
 

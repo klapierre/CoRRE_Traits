@@ -230,6 +230,10 @@ nsfc3 <- read.csv("DL_NSFC20132016.csv") %>%
   mutate(community_type = 0, version = 2.0)
 nsfc4 <- rbind(nsfc2, nsfc3)
 
+Nmow<-read.csv("EGN_Nmow.csv")%>%
+  rename(abundance=cover)%>%
+  mutate(version = 2.0)
+
 warmnut<-read.delim("Finse_WarmNut.txt")%>%
   select(-id, -nutrients, -light, -carbon, -water, -other_manipulation, -num_manipulations, -experiment_year, -n, -p, -k, -temp,  -plot_mani, -species_num, -plot_id1)%>%
   gather(species_code, abundance, sp1:sp228)%>%
@@ -644,6 +648,13 @@ edge <- read.csv("USA_EDGE.csv") %>% ## Added new data 2020
 # shet <- read.csv("WAG_SHet.csv") %>%
 #   mutate(version = 2.0, community_type = 0)
 
+
+vcrnutnet <- read.csv('VCR_NutNet.csv')%>%
+  mutate(community_type = 0, version = 2.0, data_type='cover')%>%
+  rename(plot_id=plot, genus_species=taxa, abundance=cover)%>%
+  select(calendar_year, treatment, plot_id, data_type, treatment_year, site_code, project_name, community_type, genus_species, abundance, community_type, block, version)%>%
+  filter(abundance != 0, !(genus_species %in% c('Litter', 'Bare_ground')))
+
 nitadd <- read.csv("YMN_NitAdd.csv") %>%
   mutate(community_type = 0, block = 0, version = 1.0) %>%
   filter(abundance != 0)
@@ -652,10 +663,10 @@ nitadd <- read.csv("YMN_NitAdd.csv") %>%
 combine<-rbind(bffert2, bgp, biocon, bowman2, btdrought, btnpkd, ccd2, clip2, clonal2, culardoch2, cxn, d_precip, e001, e0023,
                e2, e6, edge, eelplot, events2, exp12, face2, fert1, fert2, fireplots2, gane2, gap2, gb2, gce2, gcme, 
                gcme2, gfert, gfp, graze, h_precip, herbdiv, herbwood2, imagine2, interaction2, irg2, kgfert2, lind2, lovegrass, 
-               lucero, mat22, megarich2, mnt2, mwatfer, nde, nfert2, nitadd, nitphos, nitrogen, nsfc4, nut, nutnet,
+               lucero, mat22, megarich2, mnt2, mwatfer, nde, nfert2, nitadd, nitphos, nitrogen, Nmow, nsfc4, nut, nutnet,
                oface2, pennings2, phace, pme, pplots, pq2, ramps, rhps, rmapc2, s_Drought, s_Irg, sask, sev_edge, snfert3, snow, 
                study1192, study2782, t72, ter, tface, tide2, tmece, ton, uk2, wapaclip2, warmnut2, warmnit, water, watering2, 
-               wenndex3, wet2, yu)
+               wenndex3, wet2, vcrnutnet, yu)
 
 combine <- combine %>% mutate(genus_species = trimws(genus_species, 'both')) %>%
   mutate(genus_species = gsub("\\s\\s"," ",genus_species, perl = TRUE)) %>%

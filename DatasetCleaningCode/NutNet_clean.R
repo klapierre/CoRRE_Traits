@@ -3,27 +3,27 @@
 ####################
 
 setwd("~/Dropbox/CoRRE_database")
-setwd('C:\\Users\\komatsuk\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database')
+setwd('C:\\Users\\komatsuk\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database') #kim's desktop
+setwd('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database') #kim's laptop
 
 # libraries
 library(Hmisc)
 
 ## data
-dat <- read.csv("Data/OriginalData/Sites/NutNet/nutnet_cover_01272021.csv", row.names = 1)
-bio_dat <- read.csv("Data/OriginalData/Sites/NutNet/nutnet_anpp_012752021.csv", row.names = 1)
+dat <- read.csv("Data/OriginalData/Sites/NutNet/nutnet_cover_11042021.csv", row.names = 1)
+bio_dat <- read.csv("Data/OriginalData/Sites/NutNet/nutnet_anpp_11042021.csv", row.names = 1)
 # sites included in this dataset:
 # "cdcr.us", "cbgb.us", "lake.us", "lancaster.uk", "chilcas.ar" , "potrok.ar", 
 # "shps.us","sier.us", "temple.us", "veluwe.nl",  "yarra.au", "bayr.de"
 
 
 # fix names & get rid of unnecessary columns
-dat <- dat[,-c(2,6,9,12:17)]
+dat <- dat%>%
+  rename(calendar_year=year, plot_id=plot, treatment_year=year_trt, treatment=trt, genus_species=Taxon, abundance=max_cover)%>%
+  filter(live==1)%>% # get live abundance
+  select(calendar_year, treatment_year, site_code, block, treatment, plot_id, genus_species, abundance)
 names(dat) <- c("calendar_year", "site_code", "block", "plot_id",  "treatment_year",
                 "treatment", "genus_species", "live", "abundance")
-
-# get live abundance
-dat <- dat[which(dat$live == 1),]
-dat <- dat[,-8]# get rid of "live" column
 
 # Species names to first letter capital only
 dat$genus_species <- tolower(dat$genus_species)

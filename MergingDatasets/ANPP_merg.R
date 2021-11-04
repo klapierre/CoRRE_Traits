@@ -1,4 +1,5 @@
 setwd("~/Dropbox/CoRRE_database/Data/CleanedData/Sites/ANPP csv")
+#setwd('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CleanedData\\Sites\\ANPP csv') #kim's laptop
 
 library(gtools)
 library(reshape2)
@@ -158,6 +159,14 @@ water <- read.csv("SR_Water_anpp.csv")%>%
 # shet <- read.csv("WAG_Shet_anpp.csv")%>%
 #   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp, block)%>%
 #   mutate(community_type=0)
+vcrnutnet<- read.csv('VCR_NutNet_anpp.csv')%>%
+  mutate(site_code='VCR', project_name='NutNet', community_type=0)%>%
+  filter(biomass!='NA')%>%
+  group_by(site_code, project_name, community_type, calendar_year, treatment_year, treatment, plot_id)%>%
+  summarise(anpp=sum(biomass))%>%
+  ungroup()%>%
+  select(site_code, project_name, community_type, treatment_year, calendar_year, treatment, plot_id, anpp)
+  
 nitadd <- read.csv("YMN_NitAdd_anpp.csv")%>%
   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp)%>%
   mutate(community_type = 0, block = 0)
