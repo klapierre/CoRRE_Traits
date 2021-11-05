@@ -1290,6 +1290,34 @@ bgp<-read.csv("KNZ_BGP.csv")%>%
   mutate(trt_type=ifelse(treatment=='b_m_b', 'N*P*burn*mow_clip', ifelse(treatment=='b_m_c', 'burn*mow_clip', ifelse(treatment=='b_m_n', 'N*burn*mow_clip', ifelse(treatment=='b_m_p', 'P*burn*mow_clip', ifelse(treatment=='b_u_b', 'N*P*burn', ifelse(treatment=='b_u_c', 'burn', ifelse(treatment=='b_u_n', 'N*burn', ifelse(treatment=='b_u_p', 'P*burn', ifelse(treatment=='u_m_b', 'N*P*mow_clip', ifelse(treatment=='u_m_c', 'mow_clip', ifelse(treatment=='u_m_n', 'N*mow_clip', ifelse(treatment=='u_m_p', 'P*mow_clip', ifelse(treatment=='u_u_b', 'N*P', ifelse(treatment=='u_u_c', 'control', ifelse(treatment=='u_u_n', 'N', 'P'))))))))))))))))%>%
   unique()
 
+change<-read.csv("KNZ_SGS_change.csv")%>%
+  select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
+  mutate(community_type=0, 
+         nutrients=1, light=0, carbon=0, water=0, other_manipulation=0,
+         n=treatment, 
+         p=0, 
+         k=0, 
+         CO2=0,
+         precip=0,
+         temp=0, 
+         mow_clip=0, 
+         burn=0, 
+         herb_removal=0,
+         management=0,
+         other_trt=0, 
+         trt_details=0,
+         successional=0, 
+         plant_mani=0, 
+         plant_trt=0,
+         pulse=0)%>%
+  mutate(plot_mani=ifelse(treatment==0, 0, 1))%>%
+  mutate(resource_mani=1)%>%
+  mutate(max_trt=ifelse(treatment %in% c(0, 30), 1, 0))%>%
+  mutate(public=1)%>%
+  mutate(factorial=0)%>%
+  mutate(trt_type=ifelse(treatment==0, 'control', 'N'))%>%
+  unique()
+
 irg<-read.delim("KNZ_IRG.txt")%>%
   select(site_code, project_name, community_type, calendar_year, treatment_year, treatment)%>%
   mutate(nutrients=0, light=0, carbon=0, water=1, other_manipulation=0,
@@ -1822,6 +1850,33 @@ nfert<-read.delim("NWT_246NFert.txt")%>%
   mutate(public=1)%>%
   mutate(factorial=0)%>%
   mutate(trt_type=ifelse(treatment=='x', 'control', 'N'))%>%
+  unique()
+
+atwe<-read.csv("NWT_ATWE.csv")%>%
+  select(site_code, project_name, community_type, calendar_year, treatment_year, treatment)%>%
+  mutate(nutrients=0, light=0, carbon=0, water=1, other_manipulation=1,
+         n=0, 
+         p=0, 
+         k=0, 
+         CO2=0,
+         precip=ifelse(treatment %in% c('w', 'hw'), 6, 0), 
+         temp=ifelse(treatment %in% c('h', 'hw'), 4.5, 0), 
+         mow_clip=0, 
+         burn=0, 
+         herb_removal=0,
+         management=0,
+         other_trt=0, 
+         trt_details=0,
+         successional=0, 
+         plant_mani=0,
+         plant_trt=0,
+         pulse=0)%>%
+  mutate(plot_mani=ifelse(treatment %in% c('w','h'), 1, ifelse(treatment=='hw', 2, 0)))%>%
+  mutate(resource_mani=1)%>%
+  mutate(max_trt=1)%>%
+  mutate(public=1)%>%
+  mutate(factorial=0)%>%
+  mutate(trt_type=ifelse(treatment=='w', 'irr',  ifelse(treatment=='h', 'temp', ifelse(treatment=='hw', 'irr*temp', 'control'))))%>%
   unique()
 
 bowman<-read.delim("NWT_bowman.txt")%>%
@@ -2646,15 +2701,15 @@ nitadd<-read.csv("YMN_NitAdd.csv")%>%
 
 
 ###merge all datasets
-combine<-rbind(bffert, bgp, biocon, bowman, bt_drought, ccd, clip, clonal, culardoch, cxn, e001, e002, 
+combine<-rbind(atwe, bffert, bgp, biocon, bowman, bt_drought, ccd, change, clip, clonal, culardoch, cxn, e001, e002, 
                e2, e6, edge, eelplot, events, exp1, face, fert1, fireplots, gane, gap2, gb, 
                gce, gcme, gcme2, gfert, gfp, grazeprecip, herbdiv, herbwood, hprecip, imagine, interaction, 
-               irg, kgfert, lind, lovegrass, lucero, mat2, megarich, mnt, mwatfer, nash, nde, nfert, 
+               irg, kgfert, lind, lovegrass, lucero, mat2, megarich, mnt, mwatfer, nde, nfert, 
                nitadd, nitphos,  nitrogen,npkd, Nmow, nsfc, nsfc2, nut, nutnet, oface, pennings, phace, pme, precip, 
                pplots, pq, ramps, rhps, rmapc, sedge, snfert, snow, sirg, sdrought, study119, study278, t7, 
                ter, tface,tide,tmece,ton, uk, vcrnutnet, wapaclip, warmnit, warmnut, water, watering, wenndex, wet, yu)
 
-# write.csv(combine, "C:\\Users\\komatsuk\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CompiledData\\ExperimentInfo.csv", row.names = FALSE)
+# write.csv(combine, "C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CompiledData\\ExperimentInfo.csv", row.names = FALSE)
 
 
 temp_df <- unique(combine[,c(1,2,6,33)])

@@ -3,6 +3,7 @@
 #####################
 
 setwd("~/Dropbox/CoRRE_database")
+setwd('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database')
 
 # library
 library(readxl)

@@ -1,6 +1,6 @@
 setwd("~/Dropbox/CoRRE_database/Data/CleanedData/Sites/Species csv")
 # Add your working directories here if this doesn't work for you
-#setwd('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CleanedData\\Sites\\Species csv') #kim's laptop
+setwd('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CleanedData\\Sites\\Species csv') #kim's laptop
 # MEGHAN
 library(gtools)
 library(reshape2)
@@ -76,7 +76,8 @@ exp12<-merge(exp1, exp1_names, by="species_code", all=T)%>%
   select(-species_code)
 
 eelplot <- read.csv("AZI_EELplot.csv")%>%
-  mutate(version = 2.0, community_type = 0)
+  mutate(version = 2.0, community_type = 0)%>%
+  rename(abundance=density)
 
 nitphos <- read.csv("AZI_NitPhos.csv") %>%
   mutate(community_type = 0, block = 0, version=ifelse(calendar_year<=2014, 1, 2)) %>%
@@ -232,7 +233,7 @@ nsfc4 <- rbind(nsfc2, nsfc3)
 
 Nmow<-read.csv("EGN_Nmow.csv")%>%
   rename(abundance=cover)%>%
-  mutate(version = 2.0)
+  mutate(version = 2.0, block=0)
 
 warmnut<-read.delim("Finse_WarmNut.txt")%>%
   select(-id, -nutrients, -light, -carbon, -water, -other_manipulation, -num_manipulations, -experiment_year, -n, -p, -k, -temp,  -plot_mani, -species_num, -plot_id1)%>%
@@ -345,6 +346,11 @@ kgfert2<-merge(kgfert, kgfert_names, by="species_code", all=T)%>%
 bgp<-read.csv("KNZ_BGP.csv")%>%
   mutate(community_type=0, block=0, version=ifelse(calendar_year<=2015, 1.0,2.0)) %>%
   filter(abundance !=0) %>% filter(genus_species != "NA NA")
+
+change<-read.csv("KNZ_SGS_change.csv")%>%
+  mutate(community_type=0, version=2.0, data_type='cover') %>%
+  select(-notes)%>%
+  filter(abundance !=0)
 
 irg<-read.delim("KNZ_IRG.txt")%>%
   select(-id, -nutrients, -light, -carbon, -water, -other_manipulation, -num_manipulations, -experiment_year, -precip,  -plot_mani, -species_num)%>%
@@ -476,6 +482,9 @@ nfert_names<-read.delim("NWT_246NFert_specieslist.txt")
 nfert2<-merge(nfert, nfert_names, by="species_code", all=T)%>%
   filter(abundance!=0) %>%
   select(-species_code)
+
+atwe<-read.csv("NWT_ATWE.csv")%>%
+  mutate(version=2.0, block=0, data_type='cover')
 
 bowman<-read.delim("NWT_bowman.txt")%>%
   select(-id, -nutrients, -light, -carbon, -water, -other_manipulation, -num_manipulations, -experiment_year, -n, -p,   -plot_mani, -species_num)%>%
@@ -660,13 +669,8 @@ nitadd <- read.csv("YMN_NitAdd.csv") %>%
   filter(abundance != 0)
 
 #merge all datasets
-combine<-rbind(bffert2, bgp, biocon, bowman2, btdrought, btnpkd, ccd2, clip2, clonal2, culardoch2, cxn, d_precip, e001, e0023,
-               e2, e6, edge, eelplot, events2, exp12, face2, fert1, fert2, fireplots2, gane2, gap2, gb2, gce2, gcme, 
-               gcme2, gfert, gfp, graze, h_precip, herbdiv, herbwood2, imagine2, interaction2, irg2, kgfert2, lind2, lovegrass, 
-               lucero, mat22, megarich2, mnt2, mwatfer, nde, nfert2, nitadd, nitphos, nitrogen, Nmow, nsfc4, nut, nutnet,
-               oface2, pennings2, phace, pme, pplots, pq2, ramps, rhps, rmapc2, s_Drought, s_Irg, sask, sev_edge, snfert3, snow, 
-               study1192, study2782, t72, ter, tface, tide2, tmece, ton, uk2, wapaclip2, warmnut2, warmnit, water, watering2, 
-               wenndex3, wet2, vcrnutnet, yu)
+combine<-rbind(atwe, bffert2, bgp, biocon, bowman2, btdrought, btnpkd, ccd2, change, clip2, clonal2, culardoch2, cxn, d_precip, e001, e0023, e2, e6, edge, eelplot, events2, exp12, face2, fert1, fert3, fireplots2, gane2, gap2, gb2, gce2, gcme, gcme2, gfert, gfp, graze, h_precip, herbdiv, herbwood2, imagine2, interaction2, irg2, kgfert2, lind2, lovegrass,  lucero, mat22, megarich2, mnt2, mwatfer, nde, nfert2, nitadd, nitphos, nitrogen, Nmow, nsfc4, nut, nutnet, oface2, pennings2, phace, pme, pplots, pq2, ramps, rhps, rmapc2, s_drought, s_irg, sask, sev_edge, snfert3, snow,  study1192, study2782, t72, ter, tface, tide2, tmece, ton, uk2, wapaclip2, warmnut2, warmnit, water, watering2,  wenndex3, wet2, vcrnutnet, yu)%>%
+  filter(abundance!='NA')
 
 combine <- combine %>% mutate(genus_species = trimws(genus_species, 'both')) %>%
   mutate(genus_species = gsub("\\s\\s"," ",genus_species, perl = TRUE)) %>%
@@ -677,30 +681,30 @@ combine <- combine %>% mutate(genus_species = trimws(genus_species, 'both')) %>%
 combine$genus_species <- str_trim(combine$genus_species, "right") # get rid of spaces after full species name
 combine$genus_species <- tolower(combine$genus_species)
 
-write.csv(combine, "~/Dropbox/CoRRE_database/Data/CompiledData/RawAbundance.csv")
+write.csv(combine, "C:/Users/lapie/Dropbox (Smithsonian)/working groups/CoRRE/CoRRE_database/Data/CompiledData/RawAbundance.csv")
 
 ###get species list
 species_list<-combine%>%
   select(genus_species)%>%
   unique()
 
-write.csv(species_list, "~/Dropbox/CoRRE_database/Data/CompiledData/Species_lists/SpeciesList.csv")
+write.csv(species_list, "C:/Users/lapie/Dropbox (Smithsonian)/working groups/CoRRE/CoRRE_database/Data/CompiledData/Species_lists/SpeciesList.csv", row.names=F)
 
 ###Getting Relative Cover
 totcov<-combine%>%
-  tibble::as_tibble()%>%
   group_by(site_code, project_name, community_type, calendar_year, treatment_year, treatment, block, plot_id, data_type)%>%
-  summarise(totcov=sum(abundance))
+  summarise(totcov=sum(abundance))%>%
+  ungroup()
 
 relcov<-merge(totcov, combine, by=c("site_code", "project_name", "community_type", "calendar_year", "treatment_year", "treatment", "block", "plot_id", "data_type"))%>%
   mutate(relcov=abundance/totcov)%>%
   select(-abundance, -totcov)
 
-write.csv(relcov, "~/Dropbox/CoRRE_database/Data/CompiledData/RelativeCover.csv", row.names = FALSE)
+write.csv(relcov, "C:/Users/lapie/Dropbox (Smithsonian)/working groups/CoRRE/CoRRE_database/Data/CompiledData/RelativeCover.csv", row.names = FALSE)
 
 
-##### Relative cover and raw abundance for sCoRRE
-
-write.csv(sCoRRERaw, "~/Dropbox/sDiv_sCoRRE_shared/CoRRE data/CoRRE data/community composition/CoRRE_RawAbundanceMar2021.csv", row.names = FALSE)  
-sCoRRERel <- relcov[-which(relcov$project_name %in% c("BioCON", "EELplot") & relcov$data_type == "cover"),]
-write.csv(sCoRRERel, "~/Dropbox/sDiv_sCoRRE_shared/CoRRE data/CoRRE data/community composition/CoRRE_RelativeAbundanceMar2021.csv", row.names = FALSE)  
+# ##### Relative cover and raw abundance for sCoRRE
+# 
+# write.csv(sCoRRERaw, "~/Dropbox/sDiv_sCoRRE_shared/CoRRE data/CoRRE data/community composition/CoRRE_RawAbundanceMar2021.csv", row.names = FALSE)  
+# sCoRRERel <- relcov[-which(relcov$project_name %in% c("BioCON", "EELplot") & relcov$data_type == "cover"),]
+# write.csv(sCoRRERel, "~/Dropbox/sDiv_sCoRRE_shared/CoRRE data/CoRRE data/community composition/CoRRE_RelativeAbundanceMar2021.csv", row.names = FALSE)  

@@ -1,5 +1,5 @@
 setwd("~/Dropbox/CoRRE_database/Data/CleanedData/Sites/ANPP csv")
-#setwd('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CleanedData\\Sites\\ANPP csv') #kim's laptop
+setwd('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CleanedData\\Sites\\ANPP csv') #kim's laptop
 
 library(gtools)
 library(reshape2)
@@ -76,6 +76,9 @@ kgfert<-read.delim("KLU_KGFert_anpp.txt")%>%
 bgp<-read.csv("KNZ_BGP_anpp.csv")%>%
   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp)%>%
   mutate(community_type=0, block = 0)
+change<-read.csv("KNZ_SGS_change_anpp.csv")%>%
+  select(site_code, project_name, treatment_year, calendar_year, treatment, block, plot_id, anpp)%>%
+  mutate(community_type=0)
 irg<-read.delim("KNZ_IRG_anpp.txt")%>%
   select(site_code, project_name, community_type, treatment_year, calendar_year, treatment, plot_id, anpp, block)
 pplots<-read.csv("KNZ_PPLOTS_anpp.csv")%>%
@@ -98,7 +101,9 @@ e6 <- read.csv("KUFS_E6_anpp.csv")%>%
 pme <- read.csv("LEFT_PME_anpp.csv")%>%
   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp, block) %>%
   mutate(community_type = 0)
-fireplots<-read.csv("MAERC_fireplots_anpp.csv")%>%
+fireplots<-read.csv("MAERC_fireplots_anpp.csv")
+names(fireplots)[1]<-'site_code'
+fireplots<- fireplots%>%
   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp, block)%>%
   mutate(community_type=0)
 mnr<-read.delim("MNR_watfer_anpp.txt")%>%
@@ -116,6 +121,9 @@ nutnet <- read.csv("NutNet_anpp.csv")%>%
 nfert<-read.delim("NWT_246NFert_anpp.txt")%>%
   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp, block)%>%
   mutate(community_type=0)
+atwe<-read.csv("NWT_ATWE_anpp.csv")%>%
+  select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp)%>%
+  mutate(community_type=0, block=0)
 bowman<-read.delim("NWT_bowman_anpp.txt")%>%
   select(site_code, project_name, community_type, treatment_year, calendar_year, treatment, plot_id, anpp) %>%
   mutate(block = 0)
@@ -171,13 +179,13 @@ nitadd <- read.csv("YMN_NitAdd_anpp.csv")%>%
   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp)%>%
   mutate(community_type = 0, block = 0)
 
-anpp <- rbind(bgp, biocon, bowman, btdrought, btnpkd, clonal, cxn, e001, e002, e2, e6, eel, 
+anpp <- rbind(atwe, bgp, biocon, bowman, btdrought, btnpkd, change, clonal, cxn, e001, e002, e2, e6, eel, 
               events, exp1, fireplots, gb, gfp, imagine, imgers, irg, kgfert, 
               lind, megarich, mnr, NDE, nfert, nit, nitadd, nitrogen, nsfc, 
               nsfc2, nutnet, oface, phace, pme, pplots, ramps, rhps, rio, rmapc, 
               snfert, snow, t7, tide, tmece, ton, uk, wapaclip, water, watering, wenndex, wet)
 
-write.csv(anpp, '~/Dropbox/CoRRE_database/Data/CompiledData/ANPP2020.csv')
+write.csv(anpp, 'C:/Users/lapie/Dropbox (Smithsonian)/working groups/CoRRE/CoRRE_database/Data/CompiledData/ANPP2020.csv')
 
 ## NA values in MNR watfer and KNZ GFP
 
