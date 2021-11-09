@@ -3,10 +3,7 @@ setwd("~/Dropbox/CoRRE_database/Data/CleanedData/Sites/Species csv")
 setwd('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CleanedData\\Sites\\Species csv') #kim's laptop
 # MEGHAN
 library(gtools)
-library(reshape2)
-library(tidyr)
-library(dplyr)
-library(stringr)
+library(tidyverse)
 
 #kim's notes 2/8/2021: 
 #Rengen_Nut has a species called '...41', ask PIs what this is
@@ -76,8 +73,7 @@ exp12<-merge(exp1, exp1_names, by="species_code", all=T)%>%
   select(-species_code)
 
 eelplot <- read.csv("AZI_EELplot.csv")%>%
-  mutate(version = 2.0, community_type = 0)%>%
-  rename(abundance=density)
+  mutate(version = 2.0, community_type = 0, data_type='density')
 
 nitphos <- read.csv("AZI_NitPhos.csv") %>%
   mutate(community_type = 0, block = 0, version=ifelse(calendar_year<=2014, 1, 2)) %>%
@@ -141,7 +137,7 @@ biocon<-read.csv("CDR_BioCON.csv")%>%
   mutate(community_type=0, version = ifelse(calendar_year<=2013, 1.0,2.0)) %>% filter(abundance!=0)
 
 e001<-read.csv("CDR_e001.csv")%>%
-  mutate(block=0, version=ifelse(calendar_year<=2013, 1.0,2.0))%>%
+  mutate(block=0, version=ifelse(calendar_year<=2013, 1.0,2.0), data_type='biomass')%>%
   filter(abundance!=0) %>%
   filter(genus_species!="Forb seedlings",
          genus_species!="Fungi ",
@@ -209,13 +205,13 @@ culardoch2<-merge(culardoch, culardoch_names, by="species_code", all=T)%>%
 gap2<-read.csv("DCGS_gap.csv")%>%
   mutate(community_type=0, version=ifelse(calendar_year<=2008, 1.0,2.0)) %>% filter(abundance!=0)
 
-gcme <- read.csv("DCMIC_GCME.csv")%>%
+gcme <- read.csv("DL_GCME.csv")%>%
   mutate(version = 2.0, block = 0, community_type = 0)
 
-gcme2 <- read.csv("DCMIC_GCME2.csv")%>%
+gcme2 <- read.csv("DL_GCME2.csv")%>%
   mutate(version = 2.0, block = 0, community_type = 0)
 
-d_precip <- read.csv("DCMIC_Precip.csv")%>%
+d_precip <- read.csv("DL_Precip.csv")%>%
   mutate(version = 2.0, block = 0, community_type = 0)
 
 nsfc<-read.delim("DL_NSFC.txt")%>%
@@ -259,9 +255,7 @@ face2<-merge(face, face_names, by="species_code", all=T)%>%
 warmnit <- read.csv("Hayoka_WarmNit.csv")%>%
   mutate(version = 2.0, community_type = 0, block = 0)
 
-h_precip <- read.csv("HAYS_Precip.csv")%>%
-  mutate(version = 2.0, community_type = 0) %>%
-  filter(genus_species!="Cacti")
+h_precip <- read.csv("HAYS_Precip.csv")
 
 phace <- read.csv("CHY_PHACE.csv")%>%
   mutate(version = 2.0, community_type = 0)
@@ -417,8 +411,7 @@ fireplots2<-merge(fireplots, fireplots_names, by="species_code", all=T)%>%
   select(-species_code)
 
 mwatfer<-read.csv("MNR_watfer.csv")%>%
-  mutate(genus_species=species_name, data_type = "cover", version = 1.0)%>%
-  select(-species_name, -species)%>%
+  mutate(data_type = "cover", version = 1.0)%>%
   filter(abundance!=0)
 
 wet<-read.delim("NANT_wet.txt")%>%
@@ -458,6 +451,10 @@ sask <- merge(ccd, ccd_names, by="species_code", all=T)%>%
   filter(site_code=='Saskatchewan'&plot_id!=32)%>% #drop plot 32 because it is missing data from 2 years
   filter(abundance!=0)%>%
   select(-species_code)
+
+Nprecip <- read.csv('Naiman_Nprecip.csv')%>%
+  mutate(block=0)%>%
+  select(-fertilization, -water, -Total.g.m2)
 
 nutnet <- read.csv("NutNet.csv")%>%
   mutate(version = 2.0, community_type = 0) %>% 
@@ -669,7 +666,7 @@ nitadd <- read.csv("YMN_NitAdd.csv") %>%
   filter(abundance != 0)
 
 #merge all datasets
-combine<-rbind(atwe, bffert2, bgp, biocon, bowman2, btdrought, btnpkd, ccd2, change, clip2, clonal2, culardoch2, cxn, d_precip, e001, e0023, e2, e6, edge, eelplot, events2, exp12, face2, fert1, fert3, fireplots2, gane2, gap2, gb2, gce2, gcme, gcme2, gfert, gfp, graze, h_precip, herbdiv, herbwood2, imagine2, interaction2, irg2, kgfert2, lind2, lovegrass,  lucero, mat22, megarich2, mnt2, mwatfer, nde, nfert2, nitadd, nitphos, nitrogen, Nmow, nsfc4, nut, nutnet, oface2, pennings2, phace, pme, pplots, pq2, ramps, rhps, rmapc2, s_drought, s_irg, sask, sev_edge, snfert3, snow,  study1192, study2782, t72, ter, tface, tide2, tmece, ton, uk2, wapaclip2, warmnut2, warmnit, water, watering2,  wenndex3, wet2, vcrnutnet, yu)%>%
+combine<-rbind(atwe, bffert2, bgp, biocon, bowman2, btdrought, btnpkd, ccd2, change, clip2, clonal2, culardoch2, cxn, d_precip, e001, e0023, e2, e6, edge, eelplot, events2, exp12, face2, fert1, fert3, fireplots2, gane2, gap2, gb2, gce2, gcme, gcme2, gfert, gfp, graze, h_precip, herbdiv, herbwood2, imagine2, interaction2, irg2, kgfert2, lind2, lovegrass,  lucero, mat22, megarich2, mnt2, mwatfer, nde, nfert2, nitadd, nitphos, nitrogen, Nmow, Nprecip, nsfc4, nut, nutnet, oface2, pennings2, phace, pme, pplots, pq2, ramps, rhps, rmapc2, s_drought, s_irg, sask, sev_edge, snfert3, snow,  study1192, study2782, t72, ter, tface, tide2, tmece, ton, uk2, wapaclip2, warmnut2, warmnit, water, watering2,  wenndex3, wet2, vcrnutnet, yu)%>%
   filter(abundance!='NA')
 
 combine <- combine %>% mutate(genus_species = trimws(genus_species, 'both')) %>%

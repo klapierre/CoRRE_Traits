@@ -372,7 +372,7 @@ npkd<-read.csv("Bt_NPKDNet.csv")%>%
          p=ifelse(treatment == "control", 0, 1), 
          k=ifelse(treatment == "control", 0, 1), 
          CO2=0, 
-         precip=ifelse(treatment == "drought*fert", -40, 0), 
+         precip=ifelse(treatment == "NPKdrought", -40, 0), 
          temp=0,
          mow_clip=0, 
          burn=0, 
@@ -384,12 +384,12 @@ npkd<-read.csv("Bt_NPKDNet.csv")%>%
          plant_mani=0,  
          plant_trt=0,
          pulse=0)%>%
-  mutate(plot_mani=ifelse(treatment=='control', 0, ifelse(treatment == "fert",1,0)))%>%
+  mutate(plot_mani=ifelse(treatment=='control', 0, ifelse(treatment == "NPK",1,0)))%>%
   mutate(resource_mani= 1)%>%
   mutate(max_trt=1)%>%
   mutate(public=0)%>%
   mutate(factorial=0)%>%
-  mutate(trt_type=ifelse(treatment=='control', 'control', ifelse(treatment == 'fert', "mult_nutrient", "mult_nutrient*drought")))%>%
+  mutate(trt_type=ifelse(treatment=='control', 'control', ifelse(treatment == 'NPK', "mult_nutrient", "mult_nutrient*drought")))%>%
   unique()
 
 pq<-read.delim("BUX_PQ.txt")%>%
@@ -1674,6 +1674,33 @@ mwatfer<-read.csv("MNR_watfer.csv")%>%
   mutate(trt_type=ifelse(treatment=='C', 'control', ifelse(treatment=='F', 'mult_nutrient', ifelse(treatment=='W', 'irr', 'mult_nutrient*irr'))))%>%
   unique()
 
+Nprecip <- read.csv('Naiman_Nprecip.csv')%>%
+  select(site_code, project_name, community_type, calendar_year, treatment_year, treatment)%>%
+  mutate(nutrients=1, light=0, carbon=0, water=1, other_manipulation=0,
+         n=ifelse(treatment %in% c('N_W0', 'N_W1', 'N_W2', 'N_'), 10, 0),
+         p=0,
+         k=0, 
+         CO2=0, 
+         precip=ifelse(treatment %in% c('CK_W1', 'CK_W2', 'N_W1', 'N_W2'), 999, 0), 
+         temp=0,
+         mow_clip=0, 
+         burn=0, 
+         herb_removal=0,
+         management=0,
+         other_trt=0, 
+         trt_details=0,
+         successional=0, 
+         plant_mani=0,  
+         plant_trt=0,
+         pulse=0)%>%
+  mutate(plot_mani=ifelse(treatment %in% c('CK_W0', 'CK_'), 0, ifelse(treatment %in% c('CK_W1', 'CK_W2', 'N_W0', 'N_'), 1, 2)))%>%
+  mutate(resource_mani=1)%>%
+  mutate(max_trt=1)%>%
+  mutate(public=0)%>%
+  mutate(factorial=1)%>%
+  mutate(trt_type=ifelse(treatment %in% c('CK_W0', 'CK_'), 'control', ifelse(treatment %in% c('N_W0', 'N_'), 'N', ifelse(treatment %in% c('CK_W1', 'CK_W2'), 'irr', 'N*irr'))))%>%
+  unique()
+
 wet<-read.delim("NANT_wet.txt")%>%
   select(site_code, project_name, community_type, calendar_year, treatment_year, treatment)%>%
   mutate(nutrients=1, light=0, carbon=0, water=0, other_manipulation=0,
@@ -2701,13 +2728,7 @@ nitadd<-read.csv("YMN_NitAdd.csv")%>%
 
 
 ###merge all datasets
-combine<-rbind(atwe, bffert, bgp, biocon, bowman, bt_drought, ccd, change, clip, clonal, culardoch, cxn, e001, e002, 
-               e2, e6, edge, eelplot, events, exp1, face, fert1, fireplots, gane, gap2, gb, 
-               gce, gcme, gcme2, gfert, gfp, grazeprecip, herbdiv, herbwood, hprecip, imagine, interaction, 
-               irg, kgfert, lind, lovegrass, lucero, mat2, megarich, mnt, mwatfer, nde, nfert, 
-               nitadd, nitphos,  nitrogen,npkd, Nmow, nsfc, nsfc2, nut, nutnet, oface, pennings, phace, pme, precip, 
-               pplots, pq, ramps, rhps, rmapc, sedge, snfert, snow, sirg, sdrought, study119, study278, t7, 
-               ter, tface,tide,tmece,ton, uk, vcrnutnet, wapaclip, warmnit, warmnut, water, watering, wenndex, wet, yu)
+combine<-rbind(atwe, bffert, bgp, biocon, bowman, bt_drought, ccd, change, clip, clonal, culardoch, cxn, e001, e002, e2, e6, edge, eelplot, events, exp1, face, fert1, fireplots, gane, gap2, gb, gce, gcme, gcme2, gfert, gfp, grazeprecip, herbdiv, herbwood, hprecip, imagine, interaction, irg, kgfert, lind, lovegrass, lucero, mat2, megarich, mnt, mwatfer, nde, nfert, nitadd, nitphos,  nitrogen, npkd, Nprecip, Nmow, nsfc, nsfc2, nut, nutnet, oface, pennings, phace, pme, precip, pplots, pq, ramps, rhps, rmapc, sedge, snfert, snow, sirg, sdrought, study119, study278, t7, ter, tface,tide,tmece,ton, uk, vcrnutnet, wapaclip, warmnit, warmnut, water, watering, wenndex, wet, yu)
 
 # write.csv(combine, "C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CompiledData\\ExperimentInfo.csv", row.names = FALSE)
 
