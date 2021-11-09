@@ -20,12 +20,13 @@ sampleIntensity <- cover%>%
   select(site_code, project_name, community_type, treatment_year, plot_id)%>%
   unique()%>%
   group_by(site_code, project_name, community_type)%>%
-  mutate(N=length(plot_id))%>%
+  summarise(N=length(plot_id))%>%
   ungroup() #GVN FACE has 24 sampling points, but the next lowest is 34
 
 exp <- cover%>%
   select(exp)%>%
   unique()
+rownames(exp) <- NULL
 
 
 #create empty dataframe for loop
@@ -34,8 +35,7 @@ estimatedRichness=data.frame(row.names=1)
 for(i in 1:length(exp$exp)) {
   
   #creates a dataset for each unique experiment
-  subset <- cover%>%
-    filter(exp==exp[i])%>%
+  subset <- cover[cover$exp==exp$exp[i],]%>%
     select(exp, plot_id, calendar_year, genus_species, abundance)
   
   #transpose data into wide form
@@ -69,14 +69,15 @@ expRichness <- rbind(expRichness, gface)
 
 
 ###getting control ANPP
-ANPP<-read.csv("Data/CompiledData/ANPP2020.csv")
+ANPP<-read.csv("Data/CompiledData/ANPP2021.csv")
 
 expInfo <- read.csv("Data/CompiledData/ExperimentInfo.csv")%>%
   select(site_code, project_name, community_type, treatment, plot_mani)%>%
   unique()
 
-controlANPP<-merge(ANPP, expInfo, by=c("site_code","project_name","community_type","treatment"))%>%
-  filter(plot_mani==0)%>%
+controlANPP<-ANPP%>%
+  left_join(expInfo)%>%
+  filter(plot_mani==0, anpp!='NA')%>%
   group_by(site_code, project_name, community_type, treatment_year)%>%
   summarize(anpp=mean(anpp))%>%
   ungroup()%>%
@@ -85,7 +86,7 @@ controlANPP<-merge(ANPP, expInfo, by=c("site_code","project_name","community_typ
   ungroup()
 
 
-noControlANPP <- read.csv("C:\\Users\\komatsuk\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CleanedData\\ANPP_noControls.csv")
+noControlANPP <- read.csv("C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CleanedData\\ANPP_noControls.csv")
 
 allANPP <- rbind(noControlANPP, controlANPP)
 
