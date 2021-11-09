@@ -3,6 +3,7 @@
 ######################
 
 setwd("~/Dropbox/CoRRE_database")
+setwd("C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\") #kim's laptop
 
 # library
 library(readxl)
@@ -41,3 +42,4 @@ dat$data_type <- "cover"
 dat$treatment_year <- dat$calendar_year-2012
 
 write.csv(dat, "Data/CleanedData/Sites/Species csv/Hayoka_WarmNit.csv", row.names = FALSE)
+

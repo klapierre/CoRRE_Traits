@@ -22,8 +22,6 @@ dat <- dat%>%
   rename(calendar_year=year, plot_id=plot, treatment_year=year_trt, treatment=trt, genus_species=Taxon, abundance=max_cover)%>%
   filter(live==1)%>% # get live abundance
   select(calendar_year, treatment_year, site_code, block, treatment, plot_id, genus_species, abundance)
-names(dat) <- c("calendar_year", "site_code", "block", "plot_id",  "treatment_year",
-                "treatment", "genus_species", "live", "abundance")
 
 # Species names to first letter capital only
 dat$genus_species <- tolower(dat$genus_species)

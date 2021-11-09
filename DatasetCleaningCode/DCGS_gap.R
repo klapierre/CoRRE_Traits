@@ -1,7 +1,9 @@
 setwd("~/Dropbox/CoRRE_database")
+setwd("C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\")
+
 
 library(readxl)
-library(tidyr)
+library(tidyverse)
 
 df <- read.csv("Data/OriginalData/Sites/DCGS_gap/data20082018.csv")
 sp_names <- read_excel("Data/OriginalData/Sites/DCGS_gap/DCGS sp list_2018update.xlsx")
@@ -11,35 +13,18 @@ df <- gather(df, match_col, abundance, 6:144)
 
 names(sp_names) <- c("match_col","genus_species")
 
-df <- merge(df,sp_names, all.x = TRUE)
+df2 <- merge(df,sp_names, all.x = TRUE)%>%
+  filter(abundance>0, abundance!='NA', genus_species!='NA')%>%
+  mutate(plot_id=paste(Block, plot, trtmt, sep='_'))%>%
+  group_by(year, Block, plot_id, trtmt, genus_species)%>%
+  summarise(abundance=mean(abundance))%>%
+  ungroup()%>%
+  mutate(site_code='DCGS', project_name='gap', community_type=0, data_type='cover')%>%
+  rename(calendar_year=year, treatment=trtmt, block=Block)%>%
+  mutate(treatment_year=calendar_year-min(calendar_year)+1)
 
-df[is.na(df)] <- 0
-df <- df[df$Block %in% c(4,7),]
-df <- df[df$match_col != "ExpUnID",]
 
-df <- aggregate(df$abundance, by = list(calendar_year = df$year, treatment = df$trtmt, plot = df$plot,
-                                          block = df$Block, genus_species = df$genus_species, 
-                                        match_col = df$match_col), FUN = mean)
-for (i in 1:nrow(df)){
-  if(df$genus_species[i] == 0){
-    df$genus_species[i] <- df$match_col[i]
-  }
-}
-
-names(df)[7] <- "abundance"
-df$plotmerge <- paste(df$treatment, df$plot, sep = "::")
-plot_id <- data.frame(plotmerge = unique(df$plotmerge))
-plot_id$plot_id <- seq(1:nrow(plot_id))
-df <- merge(df, plot_id)
-df <- df[,-c(1,4)]
-
-df$site_code <- "DCGS"
-df$project_name <- "gap"
-df$treatment_year <- df$calendar_year - 1994
-df$data_type <- "cover"
-df <- df[,-5]
-
-write.csv(df, "Data/CleanedData/Sites/Species csv/dcgs_gap.csv", row.names = FALSE)
+write.csv(df2, "Data/CleanedData/Sites/Species csv/dcgs_gap.csv", row.names = FALSE)
 
 
 # setwd("~/Documents/Dropbox/converge_diverge/datasets/checked data_04292014/not_perfect")

@@ -2,6 +2,10 @@
 #### CDR_e001 ####
 ##################
 #setwd("~/Dropbox/CoRRE_database")
+setwd('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database')
+
+library(tidyverse)
+
 file <- "https://pasta.lternet.edu/package/data/eml/knb-lter-cdr/14/8/057e39850bd748d364df8a5ef60bb08d"
 df <- read.delim(file, header = TRUE)
 df <- df[,c(2,3,4,5,9,10)]
@@ -15,15 +19,20 @@ df <- df[,c(1,4,3,2,8,7,9,10,5,6)]
 # several duplicated rows mostly from 2014, get rid of these
 e001.species <- df[which(duplicated(df) == FALSE),]
 
-#write.csv(df, "Data/CleanedData/Sites/Species csv/CDR_e001.csv", row.names = FALSE)
+df2 <- df%>%
+  group_by(site_code, project_name, community_type, calendar_year, treatment_year, treatment, plot_id, genus_species)%>%
+  summarise(abundance=max(abundance))%>%
+  ungroup()
 
-e001.anpp <- aggregate(df$abundance, by = list(calendar_year = df$calendar_year, treatment = df$treatment, 
-                                          plot_id = df$plot_id, community_type = df$community, 
-                                          data_type = df$data_type, treatment_year = df$treatment_year, 
-                                          site_code = df$site_code, project_name = df$project_name), 
+# write.csv(df2, "Data/CleanedData/Sites/Species csv/CDR_e001.csv", row.names = FALSE)
+
+e001.anpp <- aggregate(df2$abundance, by = list(calendar_year = df2$calendar_year, treatment = df2$treatment, 
+                                          plot_id = df2$plot_id, community_type = df2$community_type, 
+                                          treatment_year = df2$treatment_year, 
+                                          site_code = df2$site_code, project_name = df2$project_name), 
                   FUN = sum)
-names(e001.anpp)[9] <- "anpp"
-#write.csv(anpp, "Data/CleanedData/Sites/ANPP csv/CDR_e001_anpp.csv", row.names = FALSE)
+names(e001.anpp)[8] <- "anpp"
+# write.csv(e001.anpp, "Data/CleanedData/Sites/ANPP csv/CDR_e001_anpp.csv", row.names = FALSE)
 
 # setwd("~/Dropbox/converge_diverge/datasets/ORIGINAL_DATASETS/CDR e001")
 # 

@@ -3,6 +3,8 @@
 ################
 library(stringr)
 
+setwd('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database')
+
 # Pull data from LTER site
 # biomass data
 file <- "https://portal.edirepository.org/nis/dataviewer?packageid=knb-lter-cdr.302.12&entityid=7dfa36f6d8adbc6a669d9501beaa30bf"
@@ -66,13 +68,15 @@ df2$genus_species <- gsub("bromus inermis", "Bromus inermis", df2$genus_species)
 df2$genus_species <- gsub("poa compressa", "Poa compressa", df2$genus_species)
 
 biocon.species <- df2[df2$genus_species %in% planted,]
+df3 <- subset(biocon.species, abundance>0)
+df4 <- subset(df3, data_type=='biomass')
 
-#write.csv(df2, "Data/CleanedData/Sites/Species csv/CDR_BioCON.csv", row.names = FALSE)
+#write.csv(df4, "Data/CleanedData/Sites/Species csv/CDR_BioCON.csv", row.names = FALSE)
 
 ### ANPP data ###
 
-ANPP <- aggregate(df$abundance, by = list(calendar_year = df$calendar_year, treatment = df$treatment,  
-                                        plot_id = df$plot_id, block = df$block), FUN = sum)
+ANPP <- aggregate(df4$abundance, by = list(calendar_year = df4$calendar_year, treatment = df4$treatment,  
+                                        plot_id = df4$plot_id, block = df4$block), FUN = sum)
 names(ANPP)[5] <- "anpp"
 
 ANPP$site_code <- "CDR"

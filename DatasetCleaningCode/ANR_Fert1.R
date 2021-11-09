@@ -4,10 +4,11 @@
 
 setwd("~/Dropbox/CoRRE_database")
 setwd('C:\\Users\\komatsuk\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database')
+setwd('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database')
 
 # library
 library(readxl)
-library(tidyr)
+library(tidyverse)
 
 # data
 dat <- read_excel("Data/OriginalData/Sites/ANR_Fert1/ANR_Fert1_data_formatted.xls")
@@ -67,6 +68,14 @@ dat <- dat[which(dat$abundance > 0),]
 ###split into fert1
 fert1 <- dat%>%
   filter(treatment %in% c('control', 'full_nut', 'NH4NO3', 'NH4PO4', 'KNO3', 'micronut'))
+
+test <- fert1%>%
+  group_by(site_code, project_name, calendar_year, treatment_year, plot_id, genus_species, data_type)%>%
+  summarise(abundance=max(abundance))%>%
+  ungroup()
+
+test2 <- fert1%>%
+  spread(genus_species, abundance, fill=0)
   
 #save
 write.csv(fert1, "Data/CleanedData/Sites/Species csv/ANR_Fert1.csv", row.names = FALSE)
@@ -75,7 +84,7 @@ write.csv(fert1, "Data/CleanedData/Sites/Species csv/ANR_Fert1.csv", row.names =
 #split into fert2
 fert3 <- dat%>%
   filter(!(treatment %in% c('full_nut', 'NH4NO3', 'NH4PO4', 'KNO3', 'micronut')))%>%
-  mutate(treatment_year=ifelse(treatment=='control', treatment_year-1, treatment_year))%>%
+  mutate(treatment_year=ifelse(treatment=='control', treatment_year-1, treatment_year), project_name='Fert3')%>%
   filter(calendar_year>1990)
   
 #save

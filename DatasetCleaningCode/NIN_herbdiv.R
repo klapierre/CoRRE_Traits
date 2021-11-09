@@ -2,25 +2,23 @@
 #### NIN_herbdiv ####
 ####################
 setwd("~/Dropbox/CoRRE_database")
+setwd('C:/Users/lapie/Dropbox (Smithsonian)/working groups/CoRRE/CoRRE_database') #kim's laptop
 
-df <- read.csv("Data/OriginalData/Sites/NIN_HerbDiv/HerbDiv_2019_Cover_Tx_Trait_toKaitlin.csv")
+library(tidyverse)
 
-# Looks like no "Psuedocage" and "Trnch CTL" from previous years, will exclude those for now
-
-df <- df[df$EXCL_Code %in% 1:5,]
-df$Fert[df$Fert == "NoFert"] <- "NF"
-df$Fert[df$Fert == "Fert"] <- "F"
-df$treatment <- paste(df$EXCL_Code, df$Fert, sep = "")
-df$site_code <- "NIN"
-df$project_name <- "HerbDiv"
-df$treatment_year <- df$Year - 2009
-df$data_type <- "cover"
-
-df <- df[,c(3,18,1,5,22,21,19,20,9,4)]
-names(df)[c(1,3,4,9,10)] <- c("calendar_year", "plot_id", "block", "genus_species", "abundance")
+df <- read.csv("Data/OriginalData/Sites/NIN_HerbDiv/HerbDiv_2019_Cover_Tx_Trait_toKaitlin.csv")%>%
+  filter(!(EXCL %in% c('Psuedocage', 'Trnch CTL')), Scientific.name!='na')%>%
+  mutate(fertilization=ifelse(Fert=='NoFert', 'NF', 'F'))%>%
+  mutate(treatment=paste(EXCL_Code, fertilization, sep=''))%>%
+  mutate(site_code='NIN', project_name='HerbDiv', community_type=0, data_type='cover', version=2.0)%>%
+  rename(calendar_year=Year, plot_id=Plot, genus_species=Scientific.name, block=Block, abundance=Cover)%>%
+  mutate(treatment_year=calendar_year-min(calendar_year)+1)%>%
+  select(site_code, project_name, community_type, calendar_year, treatment_year, treatment, block, plot_id, genus_species, abundance, data_type, version)%>%
+  group_by(site_code, project_name, community_type, calendar_year, treatment_year, treatment, block, plot_id, genus_species, data_type, version)%>% 
+  summarise(abundance=mean(abundance))%>% #a subset of the data is repeated, means to remove repeats
+  ungroup()
 
 write.csv(df, "Data/CleanedData/Sites/Species csv/NIN_herbdiv.csv", row.names = FALSE)
-
 
 
 # setwd("~/Dropbox/converge_diverge/datasets/ORIGINAL_DATASETS/houseman and russell/herbdiv")
