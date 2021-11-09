@@ -2,9 +2,7 @@ setwd("~/Dropbox/CoRRE_database/Data/CleanedData/Sites/ANPP csv")
 setwd('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CleanedData\\Sites\\ANPP csv') #kim's laptop
 
 library(gtools)
-library(reshape2)
-library(tidyr)
-library(dplyr)
+library(tidyverse)
 
 # Read in sites
 watering<-read.delim("ANG_watering_anpp.txt")%>%
@@ -29,7 +27,7 @@ events<-read.delim("Bt_EVENT2_anpp.txt")%>%
   mutate(community_type=0)
 btdrought <- read.csv("Bt_DroughtNet_anpp.csv", row.names = 1) %>%
   mutate(community_type = 0, block = 0)
-btnpkd <- read.csv("Bt_NPKDNet.csv") %>%
+btnpkd <- read.csv("Bt_NPKDNet_anpp.csv") %>%
   mutate(community_type = 0, block = 0)
 rmapc<-read.delim("CAU_RMAPC_anpp.txt")%>%
   select(site_code, project_name, community_type, treatment_year, calendar_year, treatment, plot_id, anpp) %>%
@@ -115,6 +113,9 @@ wet<-read.delim("NANT_wet_anpp.txt")%>%
 gb<-read.delim("NGBER_gb_anpp.txt")%>%
   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp, block)%>%
   mutate(community_type=0)
+Nprecip <- read.csv('Naiman_Nprecip_anpp.csv')%>%
+  select(site_code, project_name, community_type, treatment_year, calendar_year, treatment, plot_id, anpp)%>%
+  mutate(block=0)
 nutnet <- read.csv("NutNet_anpp.csv")%>%
   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp, block)%>%
   mutate(community_type=0)
@@ -155,7 +156,6 @@ wenndex<-read.delim("SEV_WENNDEx_anpp.txt")%>%
 #   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp, block)%>%
 #   mutate(community_type=0)
 ton <- read.csv("SIU_TON_anpp.csv") %>%
-  select(-data_type) %>%
   mutate(community_type = 0)
 uk<-read.delim("SKY_UK_anpp.txt")%>%
   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp, block)%>%
@@ -168,12 +168,12 @@ water <- read.csv("SR_Water_anpp.csv")%>%
 #   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp, block)%>%
 #   mutate(community_type=0)
 vcrnutnet<- read.csv('VCR_NutNet_anpp.csv')%>%
-  mutate(site_code='VCR', project_name='NutNet', community_type=0)%>%
+  mutate(site_code='VCR', project_name='NutNet', community_type=0, block=0)%>%
   filter(biomass!='NA')%>%
-  group_by(site_code, project_name, community_type, calendar_year, treatment_year, treatment, plot_id)%>%
+  group_by(site_code, project_name, community_type, calendar_year, treatment_year, treatment, block, plot_id)%>%
   summarise(anpp=sum(biomass))%>%
   ungroup()%>%
-  select(site_code, project_name, community_type, treatment_year, calendar_year, treatment, plot_id, anpp)
+  select(site_code, project_name, community_type, treatment_year, calendar_year, treatment, block, plot_id, anpp)
   
 nitadd <- read.csv("YMN_NitAdd_anpp.csv")%>%
   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp)%>%
@@ -181,11 +181,10 @@ nitadd <- read.csv("YMN_NitAdd_anpp.csv")%>%
 
 anpp <- rbind(atwe, bgp, biocon, bowman, btdrought, btnpkd, change, clonal, cxn, e001, e002, e2, e6, eel, 
               events, exp1, fireplots, gb, gfp, imagine, imgers, irg, kgfert, 
-              lind, megarich, mnr, NDE, nfert, nit, nitadd, nitrogen, nsfc, 
+              lind, megarich, mnr, NDE, nfert, nit, nitadd, nitrogen, Nprecip, nsfc, 
               nsfc2, nutnet, oface, phace, pme, pplots, ramps, rhps, rio, rmapc, 
-              snfert, snow, t7, tide, tmece, ton, uk, wapaclip, water, watering, wenndex, wet)
+              snfert, snow, t7, tide, tmece, ton, uk, wapaclip, water, watering, wenndex, wet, vcrnutnet)
 
-write.csv(anpp, 'C:/Users/lapie/Dropbox (Smithsonian)/working groups/CoRRE/CoRRE_database/Data/CompiledData/ANPP2020.csv')
+write.csv(anpp, 'C:/Users/lapie/Dropbox (Smithsonian)/working groups/CoRRE/CoRRE_database/Data/CompiledData/ANPP2021.csv', row.names=F)
 
-## NA values in MNR watfer and KNZ GFP
 
