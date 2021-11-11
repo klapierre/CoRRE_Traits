@@ -2,11 +2,13 @@ setwd("~/Dropbox/CoRRE_database/Data/CleanedData/Sites/Species csv")
 # Add your working directories here if this doesn't work for you
 setwd('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CleanedData\\Sites\\Species csv') #kim's laptop
 # MEGHAN
+setwd("C:\\Users\\mavolio2\\Dropbox\\CoRRE_database\\Data\\CleanedData\\Sites\\Species csv")
+
 library(gtools)
 library(tidyverse)
 
 #kim's notes 2/8/2021: 
-#Rengen_Nut has a species called '...41', ask PIs what this is
+#Rengen_Nut has a species called '...41', ask PIs what this is. Meghan emailed 11/11/21
 #SGS_Precip, I removed "Unknown", which had 9 entries. Might ask the PIs if this was a conglomerate of all unknowns or not. I left in "Unknown spurge", which I considered akin to something like Euphorbia sp.
 #gmce and gmce2 both have a lot of 'Â' symbols following the genus name; fert1 has this problem for just the species ' Carex canescensÂ'. we should fix this if it isn't something the name cleaning will understand
 # Kaitlin's notes: 
@@ -23,10 +25,12 @@ watering2<-merge(watering, watering_names, by="species_code", all=T)%>%
   filter(abundance!=0) #this drops 3 plots in 2011 and 2013 (plots 3, 4, and 7) which had no pin hits but did have species
 
 fert1 <- read.csv("ANR_Fert1.csv") %>% 
-  mutate(version = 2.0, community_type = 0, block = 0)
+  mutate(version = 2.0, community_type = 0, block = 0) %>%
+  filter(genus_species!="Unknown")
 
 fert3 <- read.csv("ANR_Fert3.csv") %>% 
-  mutate(version = 2.0, community_type = 0, block = 0)
+  mutate(version = 2.0, community_type = 0, block = 0)%>%
+  filter(genus_species!="Unknown")
 
 mat2<-read.delim("ARC_mat2.txt")%>%
   select(-id, -nutrients, -light, -carbon, -water, -other_manipulation, -num_manipulations, -experiment_year, -n, -p, -plot_mani, -species_num)%>%
@@ -100,7 +104,12 @@ events2<-merge(events, events_names, by="species_code", all=T)%>%
   select(-species_code)
 
 btdrought <- read.csv("Bt_DroughtNet.csv") %>%
-  mutate(community_type = 0, block = 0, version = 2.0)
+  mutate(community_type = 0, block = 0, version = 2.0)%>%
+  separate(genus_species, into=c("g", "s"),remove = F, sep="_")%>%
+  mutate(genus_species2=ifelse(!is.na(s), paste(g, s, sep=" "), genus_species))%>%
+  select(-g, -s, -genus_species)%>%
+  rename(genus_species=genus_species2)
+
 
 btnpkd <- read.csv("Bt_NPKDNet.csv") %>%
   mutate(community_type = 0, block = 0, version = 2.0)
@@ -229,7 +238,11 @@ nsfc4 <- rbind(nsfc2, nsfc3)
 
 Nmow<-read.csv("EGN_Nmow.csv")%>%
   rename(abundance=cover)%>%
-  mutate(version = 2.0, block=0)
+  mutate(version = 2.0, block=0)%>%
+  separate(genus_species, into=c("g", "s", "a", "b", "c"), sep=" ", remove=F)%>%
+  mutate(genus_species2=paste(g, s, sep=" "))%>%
+  select(-genus_species, -g, -s, -a, -b, -c)%>%
+  rename(genus_species=genus_species2)
 
 warmnut<-read.delim("Finse_WarmNut.txt")%>%
   select(-id, -nutrients, -light, -carbon, -water, -other_manipulation, -num_manipulations, -experiment_year, -n, -p, -k, -temp,  -plot_mani, -species_num, -plot_id1)%>%
@@ -241,7 +254,9 @@ warmnut2<-merge(warmnut, warmnut_names, by="species_code", all=T)%>%
   select(-species_code)
 
 gfert <- read.csv("Glen_Fert.csv") %>%
-  mutate(community_type = 0, version = 2.0)
+  mutate(community_type = 0, version = 2.0)%>%
+  filter(!(genus_species %in% c("Bare Ground", "Dead Calluna", "lichen", "Liverwort", "Lycopodium sp. (clubmos)", "Rock", "Tiny moss")))
+
 
 face<-read.delim("GVN_FACE.txt")%>%
   select(-id, -nutrients, -light, -carbon, -water, -other_manipulation, -num_manipulations, -experiment_year, -c,  -plot_mani, -species_num, -plot_id1)%>%
@@ -259,6 +274,7 @@ h_precip <- read.csv("HAYS_Precip.csv")
 
 phace <- read.csv("CHY_PHACE.csv")%>%
   mutate(version = 2.0, community_type = 0)
+
 
 nde <- read.csv("IMGERS_NDE.csv") %>% 
   mutate(community_type = 0, version = 1.0) %>% 
@@ -344,7 +360,8 @@ bgp<-read.csv("KNZ_BGP.csv")%>%
 change<-read.csv("KNZ_SGS_change.csv")%>%
   mutate(community_type=0, version=2.0, data_type='cover') %>%
   select(-notes)%>%
-  filter(abundance !=0)
+  filter(abundance !=0)%>%
+  filter(!(genus_species %in% c("Unknown forb", "unknown forb", "Unknown fungi")))
 
 irg<-read.delim("KNZ_IRG.txt")%>%
   select(-id, -nutrients, -light, -carbon, -water, -other_manipulation, -num_manipulations, -experiment_year, -precip,  -plot_mani, -species_num)%>%
@@ -355,9 +372,16 @@ irg2<-merge(irg, irg_names, by="species_code", all=T)%>%
   filter(abundance!=0)%>%
   select(-species_code)
 
-pplots<-read.csv("KNZ_PPLOTS.csv")%>%
+pplots<-read.csv("KNZ_pplots (2).csv")%>%
   mutate(community_type=0, block = 0, version=ifelse(calendar_year<=2015, 1.0,2.0))%>%
   filter(abundance!=0)
+trtyr<-pplots%>%
+  select(calendar_year)%>%
+  unique()%>%
+  arrange(calendar_year)%>%
+  mutate(treatment_year=0:17)
+pplots2<-pplots%>%
+  left_join(trtyr)
 
 ramps<-read.csv("KNZ_RaMPS.csv")%>%
   mutate(community_type=0, block = 0, version = 1.0)%>%
@@ -550,8 +574,6 @@ tmece <- read.csv("SERC_TMECE.csv") %>%
 sev_edge <- read.csv("SEV_EDGE20.csv") %>%
   filter(abundance != 0) %>% mutate(version = 2.0)
 
-###mrme <- read.csv("SEV_MRME.csv")
-
 snfert<-read.delim("SEV_NFert.txt")%>%
   select(-id, -nutrients, -light, -carbon, -water, -other_manipulation, -num_manipulations, -experiment_year, -n, -plot_mani, -species_num)%>%
   gather(species_code, abundance, sp1:sp232)%>%
@@ -591,9 +613,6 @@ s_drought <- read.csv("SGS_Drought.csv")%>%
   mutate(version = 2.0, community_type = 0, block = 0)%>%
   filter(!(genus_species %in% c('Unknown')))
 
-# nash <- read.csv("Sil_NASH.csv") %>%
-#   mutate(version = 2.0, community_type = 0)
-
 ton <- read.csv("SIU_TON.csv") %>%
   mutate(community_type = 0, version = 2.0) %>%
   filter(genus_species != "Soil", 
@@ -612,9 +631,6 @@ uk_names<-read.delim("SKY_UK_specieslist.txt")
 uk2<-merge(uk, uk_names, by="species_code", all=T)%>%
   filter(abundance!=0)%>%
   select(-species_code)
-
-# climarid <- read.csv("SORBAS_CLIMARID.csv") %>%
-#   mutate(version = 2.0, community_type = 0, block = 0)
 
 nitrogen <- read.csv("SR_Nitrogen.csv") %>%
   mutate(version = 1.0) %>%
@@ -651,10 +667,6 @@ edge <- read.csv("USA_EDGE.csv") %>% ## Added new data 2020
   mutate(data_type = "cover", version = 1.0)%>%
   filter(abundance !=0, site_code != "SEV")
 
-# shet <- read.csv("WAG_SHet.csv") %>%
-#   mutate(version = 2.0, community_type = 0)
-
-
 vcrnutnet <- read.csv('VCR_NutNet.csv')%>%
   mutate(community_type = 0, version = 2.0, data_type='cover')%>%
   rename(plot_id=plot, genus_species=taxa, abundance=cover)%>%
@@ -666,38 +678,43 @@ nitadd <- read.csv("YMN_NitAdd.csv") %>%
   filter(abundance != 0)
 
 #merge all datasets
-combine<-rbind(atwe, bffert2, bgp, biocon, bowman2, btdrought, btnpkd, ccd2, change, clip2, clonal2, culardoch2, cxn, d_precip, e001, e0023, e2, e6, edge, eelplot, events2, exp12, face2, fert1, fert3, fireplots2, gane2, gap2, gb2, gce2, gcme, gcme2, gfert, gfp, graze, h_precip, herbdiv, herbwood2, imagine2, interaction2, irg2, kgfert2, lind2, lovegrass,  lucero, mat22, megarich2, mnt2, mwatfer, nde, nfert2, nitadd, nitphos, nitrogen, Nmow, Nprecip, nsfc4, nut, nutnet, oface2, pennings2, phace, pme, pplots, pq2, ramps, rhps, rmapc2, s_drought, s_irg, sask, sev_edge, snfert3, snow,  study1192, study2782, t72, ter, tface, tide2, tmece, ton, uk2, wapaclip2, warmnut2, warmnit, water, watering2,  wenndex3, wet2, vcrnutnet, yu)%>%
+combine<-rbind(atwe, bffert2, bgp, biocon, bowman2, btdrought, btnpkd, ccd2, change, clip2, clonal2, culardoch2, cxn, d_precip, e001, e0023, e2, e6, edge, eelplot, events2, exp12, face2, fert1, fert3, fireplots2, gane2, gap2, gb2, gce2, gcme, gcme2, gfert, gfp, graze, h_precip, herbdiv, herbwood2, imagine2, interaction2, irg2, kgfert2, lind2, lovegrass,  lucero, mat22, megarich2, mnt2, mwatfer, nde, nfert2, nitadd, nitphos, nitrogen, Nmow, Nprecip, nsfc4, nut, nutnet, oface2, pennings2, phace, pme, pplots2, pq2, ramps, rhps, rmapc2, s_drought, s_irg, sask, sev_edge, snfert4, snow,  study1192, study2782, t72, ter, tface, tide2, tmece, ton, uk2, wapaclip2, warmnut2, warmnit, water, watering2,  wenndex3, wet2, vcrnutnet, yu)%>%
   filter(abundance!='NA')
 
-combine <- combine %>% mutate(genus_species = trimws(genus_species, 'both')) %>%
+combine2 <- combine %>% mutate(genus_species = trimws(genus_species, 'both')) %>%
   mutate(genus_species = gsub("\\s\\s"," ",genus_species, perl = TRUE)) %>%
   mutate(genus_species = gsub("\\s\\s"," ",genus_species, perl = TRUE)) %>%
   mutate(genus_species = gsub("[.]"," ",genus_species))  %>%
   mutate(genus_species = gsub("\u00A0", " ",genus_species, fixed = TRUE))
 
-combine$genus_species <- str_trim(combine$genus_species, "right") # get rid of spaces after full species name
-combine$genus_species <- tolower(combine$genus_species)
+combine2$genus_species <- str_trim(combine$genus_species, "right") # get rid of spaces after full species name
+combine2$genus_species <- tolower(combine$genus_species)
 
-write.csv(combine, "C:/Users/lapie/Dropbox (Smithsonian)/working groups/CoRRE/CoRRE_database/Data/CompiledData/RawAbundance.csv")
+write.csv(combine2, "C:/Users/lapie/Dropbox (Smithsonian)/working groups/CoRRE/CoRRE_database/Data/CompiledData/RawAbundance.csv")
+write.csv(combine2, "C:/Users/mavolio2/Dropbox/CoRRE_database/Data/CompiledData/RawAbundance.csv", row.names = F)
 
 ###get species list
-species_list<-combine%>%
+species_list<-combine2%>%
   select(genus_species)%>%
   unique()
 
 write.csv(species_list, "C:/Users/lapie/Dropbox (Smithsonian)/working groups/CoRRE/CoRRE_database/Data/CompiledData/Species_lists/SpeciesList.csv", row.names=F)
 
+write.csv(species_list, "C:/Users/mavolio2/Dropbox/CoRRE_database/Data/CompiledData/Species_lists/SpeciesList.csv", row.names=F)
+
 ###Getting Relative Cover
-totcov<-combine%>%
+totcov<-combine2%>%
   group_by(site_code, project_name, community_type, calendar_year, treatment_year, treatment, block, plot_id, data_type)%>%
   summarise(totcov=sum(abundance))%>%
   ungroup()
 
-relcov<-merge(totcov, combine, by=c("site_code", "project_name", "community_type", "calendar_year", "treatment_year", "treatment", "block", "plot_id", "data_type"))%>%
+relcov<-merge(totcov, combine2, by=c("site_code", "project_name", "community_type", "calendar_year", "treatment_year", "treatment", "block", "plot_id", "data_type"))%>%
   mutate(relcov=abundance/totcov)%>%
   select(-abundance, -totcov)
 
 write.csv(relcov, "C:/Users/lapie/Dropbox (Smithsonian)/working groups/CoRRE/CoRRE_database/Data/CompiledData/RelativeCover.csv", row.names = FALSE)
+
+write.csv(relcov, "C:/Users/mavolio2/Dropbox/CoRRE_database/Data/CompiledData/RelativeCover.csv", row.names = FALSE)
 
 
 # ##### Relative cover and raw abundance for sCoRRE
