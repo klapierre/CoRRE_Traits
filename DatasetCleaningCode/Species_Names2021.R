@@ -11,6 +11,8 @@
 ## to save time so the species list does not always have to be run through TPL()
 ## intermediate stages are saved to run the rest of the code
 
+##this file creates 1) a full list of species names that are cleaned to merge with TRY, FullList_Nov2021, 2) a list of new species that need categorical traits for newsp2021.csv, and 3) a list of family, and whether it is a tree species for all cleaned names. This needs to then be filled by hand for those that are new and unclear species_families_trees_2021_toclean.csv
+
 # Set working directory
 setwd("~/Dropbox/CoRRE_database/")
 setwd("C:\\Users\\mavolio2\\Dropbox\\CoRRE_database/")
