@@ -39,7 +39,7 @@ mat2<-read.delim("ARC_mat2.txt")%>%
 mat2_names<-read.delim("ARC_mat2_specieslist.txt")
 mat22<-merge(mat2, mat2_names, by="species_code", all=T)%>%
   filter(abundance!=0)%>%
-  filter(genus_species!="Caribou feces")%>%
+  filter(genus_species!="Caribou feces", genus_species!="lichen", genus_species!="moss")%>%
   select(-species_code)
 
 mnt<-read.delim("ARC_mnt.txt")%>%
@@ -50,7 +50,7 @@ mnt_names<-read.delim("ARC_mnt_specieslist.txt")
 mnt2<-merge(mnt, mnt_names, by="species_code", all=T)%>%
   filter(abundance!=0)%>%
   filter(genus_species!="Nostoc sp.")%>%
-  filter(genus_species!="Caribou feces")%>%
+  filter(genus_species!="Caribou feces", genus_species!="lichen", genus_species!="moss")%>%
   select(-species_code)
 
 clonal<-read.delim("ASGA_Clonal.txt")%>%
@@ -181,7 +181,8 @@ e0022<-merge(e002, e002_names,by="species_code", all=T)%>%
   select(-species_code, -genus_species)
 e001_names <- read.csv("CDR_e001_e002_specieslist.csv")
 e0023<-merge(e0022, e001_names, by="spcode")%>%
-  select(-spcode)
+  select(-spcode)%>%
+  filter(genus_species!="Mosses &lichens")
 
 megarich<-read.delim("CEH_Megarich.txt")%>%
   select(-id, -nutrients, -light, -carbon, -water, -other_manipulation, -num_manipulations, -true_num_manipulations, -experiment_year, -clip, -c, -temp, -n, -p, -k, -true_plot_mani, -plot_mani,   -species_num)%>%
@@ -251,7 +252,8 @@ warmnut<-read.delim("Finse_WarmNut.txt")%>%
 warmnut_names<-read.delim("Finse_WarmNut_specieslist.txt")
 warmnut2<-merge(warmnut, warmnut_names, by="species_code", all=T)%>%
   filter(abundance!=0)%>%
-  select(-species_code)
+  select(-species_code)%>%
+  filter(genus_species!="mosses and lichens")
 
 gfert <- read.csv("Glen_Fert.csv") %>%
   mutate(community_type = 0, version = 2.0)%>%
@@ -341,7 +343,8 @@ bffert_names<-read.delim("KLU_BFFert_specieslist.txt")%>%
   mutate(species_code=tolower(species_code))
 bffert2<-merge(bffert, bffert_names, by="species_code", all=T)%>%
   filter(abundance!=0)%>%
-  select(-species_code)
+  select(-species_code)%>%
+  filter(genus_species!="Moss")
 
 kgfert<-read.delim("KLU_KGFert.txt")%>%
   select(-id, -nutrients, -light, -carbon, -water, -other_manipulation, -num_manipulations, -experiment_year, -p,-n,-k,-fungicide,  -plot_mani, -species_num)%>%
@@ -542,7 +545,7 @@ tide2<-merge(tide, tide_names, by="species_code", all=T)%>%
 
 nut <- read.csv("Rengen_Nut.csv")%>% #species '...41', what is this? ask PIs
   mutate(version = 2.0, community_type = 0, block = 0)%>%
-  filter(!(genus_species %in% c('Cover of forbs', 'Cover of graminoids', 'Cover of legumes', 'Cover of short forbs', 'Cover of short forbs with legumes', 'Cover of short graminoids', 'Cover of tall graminoids', 'number of all species', 'number of species > 1%', 'short forbs (number of species)', 'short graminoids (number of species)', 'tall grasses (number of species)', 'Total cover', 'Cover of tall forbs', 'Cover of tall forbs with legumes', 'tall forbs (number of species)', 'number of woods', 'cover of woods')))%>%
+  filter(!(genus_species %in% c('...41', 'Cover of forbs', 'Cover of graminoids', 'Cover of legumes', 'Cover of short forbs', 'Cover of short forbs with legumes', 'Cover of short graminoids', 'Cover of tall graminoids', 'number of all species', 'number of species > 1%', 'short forbs (number of species)', 'short graminoids (number of species)', 'tall grasses (number of species)', 'Total cover', 'Cover of tall forbs', 'Cover of tall forbs with legumes', 'tall forbs (number of species)', 'number of woods', 'cover of woods')))%>%
   mutate(genus_species=ifelse(genus_species=='Picea abies seedling', 'Picea abies', as.character(genus_species)))
 
 interaction<-read.delim("RIO_interaction.txt")%>%
@@ -557,7 +560,7 @@ interaction2<-merge(interaction, interaction_names, by="species_code", all=T)%>%
 lucero <- read.csv("SCL_Lucero.csv") %>%
   mutate(community_type = 0, version = 1.0) %>%
   filter(abundance !=0) %>%
-  filter(genus_species!="Standing dead")
+  filter(genus_species!="Standing.dead")
 
 ter <- read.csv("SCL_TER.csv") %>%
   mutate(community_type = 0, version = 1.0) %>%
@@ -661,7 +664,8 @@ tface <- read.csv("TAS_FACE.csv") %>%
 
 lovegrass <- read.csv("TRA_Lovegrass.csv") %>%
   mutate(community_type = 0, version = 1.0) %>%
-  filter(abundance != 0)
+  filter(abundance != 0)%>%
+  filter(genus_species!="Lichen")
 
 edge <- read.csv("USA_EDGE.csv") %>% ## Added new data 2020
   mutate(data_type = "cover", version = 1.0)%>%
@@ -677,18 +681,29 @@ nitadd <- read.csv("YMN_NitAdd.csv") %>%
   mutate(community_type = 0, block = 0, version = 1.0) %>%
   filter(abundance != 0)
 
+names<-nitadd%>%
+  select(genus_species)%>%
+  unique()
+
 #merge all datasets
 combine<-rbind(atwe, bffert2, bgp, biocon, bowman2, btdrought, btnpkd, ccd2, change, clip2, clonal2, culardoch2, cxn, d_precip, e001, e0023, e2, e6, edge, eelplot, events2, exp12, face2, fert1, fert3, fireplots2, gane2, gap2, gb2, gce2, gcme, gcme2, gfert, gfp, graze, h_precip, herbdiv, herbwood2, imagine2, interaction2, irg2, kgfert2, lind2, lovegrass,  lucero, mat22, megarich2, mnt2, mwatfer, nde, nfert2, nitadd, nitphos, nitrogen, Nmow, Nprecip, nsfc4, nut, nutnet, oface2, pennings2, phace, pme, pplots2, pq2, ramps, rhps, rmapc2, s_drought, s_irg, sask, sev_edge, snfert4, snow,  study1192, study2782, t72, ter, tface, tide2, tmece, ton, uk2, wapaclip2, warmnut2, warmnit, water, watering2,  wenndex3, wet2, vcrnutnet, yu)%>%
   filter(abundance!='NA')
 
-combine2 <- combine %>% mutate(genus_species = trimws(genus_species, 'both')) %>%
-  mutate(genus_species = gsub("\\s\\s"," ",genus_species, perl = TRUE)) %>%
-  mutate(genus_species = gsub("\\s\\s"," ",genus_species, perl = TRUE)) %>%
-  mutate(genus_species = gsub("[.]"," ",genus_species))  %>%
-  mutate(genus_species = gsub("\u00A0", " ",genus_species, fixed = TRUE))
+#cleaning the speices name to remove double spaces "\\s\\", remove "." and "_" and clean spaces at at front and end of names 
 
-combine2$genus_species <- str_trim(combine$genus_species, "right") # get rid of spaces after full species name
-combine2$genus_species <- tolower(combine$genus_species)
+combine2 <- combine %>% 
+  mutate(genus_species1 = trimws(genus_species, which='both'))%>%
+  mutate(genus_species2 = gsub("\\s\\s"," ",genus_species1, perl = TRUE)) %>%
+  mutate(genus_species3 = gsub("\\s\\s"," ",genus_species2, perl = TRUE)) %>%
+  mutate(genus_species4 = gsub("[.]"," ",genus_species3))  %>%
+  mutate(genus_species5 = trimws(genus_species4, which='both'))%>%
+  mutate(genus_species6 = gsub("_", " ", genus_species5, fixed = TRUE))%>%
+  mutate(genus_species7 = gsub("\u00A0", " ",genus_species6, fixed = TRUE))%>%
+  mutate(genus_species8 = tolower(genus_species7))%>%
+  select(-genus_species)%>%
+  rename(genus_species=genus_species8)%>%
+  select(-genus_species1, -genus_species2, -genus_species3, -genus_species4, -genus_species5, -genus_species6, -genus_species7)
+           
 
 write.csv(combine2, "C:/Users/lapie/Dropbox (Smithsonian)/working groups/CoRRE/CoRRE_database/Data/CompiledData/RawAbundance.csv")
 write.csv(combine2, "C:/Users/mavolio2/Dropbox/CoRRE_database/Data/CompiledData/RawAbundance.csv", row.names = F)
@@ -698,9 +713,9 @@ species_list<-combine2%>%
   select(genus_species)%>%
   unique()
 
-write.csv(species_list, "C:/Users/lapie/Dropbox (Smithsonian)/working groups/CoRRE/CoRRE_database/Data/CompiledData/Species_lists/SpeciesList.csv", row.names=F)
+write.csv(species_list, "C:/Users/lapie/Dropbox (Smithsonian)/working groups/CoRRE/CoRRE_database/Data/CompiledData/Species_lists/SpeciesList_Nov2021.csv", row.names=F)
 
-write.csv(species_list, "C:/Users/mavolio2/Dropbox/CoRRE_database/Data/CompiledData/Species_lists/SpeciesList.csv", row.names=F)
+write.csv(species_list, "C:/Users/mavolio2/Dropbox/CoRRE_database/Data/CompiledData/Species_lists/SpeciesList_Nov2021.csv", row.names=F)
 
 ###Getting Relative Cover
 totcov<-combine2%>%
