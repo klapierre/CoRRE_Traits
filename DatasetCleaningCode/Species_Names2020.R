@@ -13,37 +13,46 @@
 
 # Set working directory
 setwd("~/Dropbox/CoRRE_database/")
+setwd("C:\\Users\\mavolio2\\Dropbox\\CoRRE_database/")
 
 # load libraries
 library(Taxonstand)
+library(tidyverse)
 
 # import data
-full.list <- read.csv ("Data/CompiledData/Species_lists/SpeciesList.csv", row.names = 1)
-oldsp <- read.csv("Data/CompiledData/CoRRE_TRY_species_list.csv", row.names = 1)
+full.list <- read.csv ("Data/CompiledData/Species_lists/SpeciesList.csv")
+oldsp <- read.csv("Data/CompiledData/CoRRE_TRY_species_list.csv", row.names = 1)%>%
+  mutate(oldsp=1)%>% # create a column to indicate name was in old species list
+  select(genus_species, oldsp)
 moss <- read.delim("Data/OriginalData/Traits/Bryophytes.txt", sep = ",", header = FALSE) #from: http://www.mobot.org/mobot/tropicos/most/bryolist.shtml
 tree.spold <- read.csv("Data/TRYCoRREMerge/species_families_trees_compelete.csv")
-# Manipulating oldsp to prepare to merge with the new species list
-oldsp$oldsp <- 1 # create a column to indicate name was in old species list
-oldsp1 <- oldsp[,c(1,4)] # get rid of extra columns
+
 
 # Merge new list with old list
-merged.list<- merge(full.list, oldsp1, all.x = TRUE) 
+merged.list<- merge(full.list, oldsp, all.x = TRUE) 
+merged.list<-full.list%>%
+  left_join(oldsp)
 
 # get species that are not in old list 
-unidentified.sp <- data.frame(genus_species=merged.list[which(is.na(merged.list$oldsp)),1])
+unidentified.sp<-merged.list%>%
+  filter(is.na(oldsp))%>%
+  select(genus_species)
 
 # Run species which were not identified in the old list through the TPL function to match with accepted species names
 clean.list <- TPL(unidentified.sp$genus_species)
 
 # Pull out matched species (i.e. those that had a match in The Plant List) -
 # These do not need to nbe checked further. 
-matched.sp <- clean.list[clean.list$Plant.Name.Index == TRUE | clean.list$Taxonomic.status == "Accepted",]
-matched.sp$species_matched <- paste(matched.sp$New.Genus, matched.sp$New.Species, sep = " ") # creating column with cleaned name
-matched.sp <- matched.sp[,c(1,27,13,26)] # getting two relevant columns
-names(matched.sp)[1] <- "genus_species" #renaming column
-matched.sp <- matched.sp[-which(is.na(matched.sp$genus_species)),] # one na value.. not sure why
+
+matched.sp<-clean.list%>%
+  filter(Plant.Name.Index==TRUE | Taxonomic.status=="Accepted")%>%
+  mutate(species_matched=paste(New.Genus, New.Species, sep=" "))%>%
+  select(Taxon, species_matched, Family)%>%
+  rename(genus_species=Taxon)
 matched.sp$species_matched[matched.sp$species_matched == "unkown big"] <- "Unknown"
+
 write.csv(matched.sp, "Data/CompiledData/Species_lists/good_sp.csv") # saving to load back in later
+
 
 ## Pull out species with no match in TPL to hand fix names
 unmatched.sp <- clean.list[clean.list$Plant.Name.Index == FALSE & clean.list$Taxonomic.status != "Accepted",]
