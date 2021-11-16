@@ -37,7 +37,7 @@ dat2<-dat%>%
   filter(!is.na(TraitID))
 
 #mering corre with try
-key<-read.csv("TRYCoRREMerge/corre2trykey.csv")%>%
+key<-read.csv("TRYCoRREMerge/corre2trykey_2021.csv")%>%
   select(species_matched, AccSpeciesID, AccSpeciesName)%>%
   unique()
 
@@ -47,10 +47,8 @@ splist<-key%>%
   select(species_matched)%>%
   unique
 
-##subset out only new species
-new<-read.csv("CompiledData/Species_lists/newsp2020.csv")%>%
-  select(-X, -new.sp, -old.sp)
-
+##subset out only new species - why do this?
+new<-read.csv("CompiledData/Species_lists/newsp2021.csv")
 keyNew<-key%>%
   right_join(new)%>%
   select(-Family)
