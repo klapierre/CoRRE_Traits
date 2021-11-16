@@ -42,7 +42,7 @@ dat2<-dat%>%
 #mering corre with try
 
 #read in species links to merge try with core
-key<-read.csv("TRYCoRREMerge/corre2trykey.csv")%>%
+key<-read.csv("TRYCoRREMerge/corre2trykey_2021.csv")%>%
   select(species_matched, AccSpeciesID, AccSpeciesName)%>%
   unique()
 
@@ -249,7 +249,7 @@ healthy<-cont_traits%>%
 
 ##drop out trees that not seedlings
 #read in which species are trees
-treesp<-read.csv("TRYCoRREMerge/species_families_trees_compelete_2020.csv")%>%
+treesp<-read.csv("C:/Users/mavolio2/Dropbox/CoRRE_database/Data/CompiledData/Species_lists/species_families_trees_2021.csv")%>%
   mutate(AccSpeciesName=species_matched)
 
 #get list of tree observations that were made on seedlings
@@ -357,5 +357,5 @@ ttraits<-cont_traits4%>%
   spread(CleanTraitName, StdValue, fill=NA)
   
 
-write.csv(ttraits, "C:/Users/mavolio2/Dropbox/sDiv_sCoRRE_shared/TRY/For Franzi/TRY_trait_data_continuous_Feb2021.csv", row.names = F)
-write.csv(cont_traits4, "C:/Users/mavolio2/Dropbox/sDiv_sCoRRE_shared/TRY/For Franzi/TRY_trait_data_continuous_long.csv_Feb2021", row.names = F)
+write.csv(ttraits, "C:\\Users\\mavolio2\\Dropbox\\sDiv_sCoRRE_shared\\Trait Data\\TRY Data\\TRY Continuous data/TRY_trait_data_continuous_Nov2021.csv", row.names = F)
+write.csv(cont_traits4, "C:\\Users\\mavolio2\\Dropbox\\sDiv_sCoRRE_shared\\Trait Data\\TRY Data\\TRY Continuous data/TRY_trait_data_continuous_long_Nov2021.csv", row.names = F)
