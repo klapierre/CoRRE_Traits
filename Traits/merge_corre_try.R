@@ -28,12 +28,11 @@ taxdat<-taxdat %>%
   select(species, species_matched)
 
 #load corre species
-corre <- read_csv("CompiledData/Species_lists/fullsp_list2020.csv")
+corre <- read_csv("CompiledData/Species_lists/FullList_Nov2021.csv")
 
 corre<-corre %>%
   filter(remove==0)%>%#this filters out only to sp., unknowns, and non-vasular plants except ferns.
-  select(species, species_matched)%>%
-  rename(genus_species=species)
+  select(genus_species, species_matched)
 
 #get rid of taxize matches - we manually did all this
 # ii <- is.na(taxcorre$species_Taxonstand) & !is.na(taxcorre$species_taxize)
@@ -65,7 +64,7 @@ corre2try <- left_join(corre,try2, by="species_matched")%>%
 
 
 str(corre2try)
-#write.csv(corre2try, "TRYCoRREMerge/corre2trykey.csv", row.names=F)
+#write.csv(corre2try, "TRYCoRREMerge/corre2trykey_2021.csv", row.names=F)
 
 #make comma separted row to submit to try 
 
