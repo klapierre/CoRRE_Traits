@@ -47,14 +47,13 @@ splist<-key%>%
   select(species_matched)%>%
   unique
 
-##subset out only new species - why do this?
+##subset out only new species to add on to existing spreadsheet
 new<-read.csv("CompiledData/Species_lists/newsp2021.csv")
 keyNew<-key%>%
-  right_join(new)%>%
-  select(-Family)
+  right_join(new)
 
 dat3<-dat2%>%
-  right_join(key)%>%
+  right_join(keyNew)%>%
   select(-ErrorRisk, -ErrorRisk2)
 
 
@@ -70,6 +69,11 @@ traitnum<-dat3%>%
 
 # write.csv(traitnum, "try_traits_export_nov2019.csv", row.names=F)
 
+#how many do we have with this short list?
+catsp<-dat3%>%
+  filter(TraitID!="NA")%>%
+  select(species_matched)%>%
+  unique()
 
 ###lifespan
 trait59<-dat3%>%
@@ -80,7 +84,7 @@ trait59<-dat3%>%
   filter(!is.na(CleanTraitValue))%>%
   select(species_matched, CleanTraitValue)%>%
   unique()%>%
-  spread(CleanTraitValue, CleanTraitValue)%>%
+  spread(CleanTraitValue, CleanTraitValue)%>%###STOP HERE TO GET CONFLICTS
   mutate(CleanTraitValue=ifelse(is.na(Biennial)&is.na(Perennial), "annual", ifelse(is.na(Annual)&is.na(Perennial)|Annual=="Annual"&Biennial=="Biennial"&is.na(Perennial), "biennial", "perennial")))%>%
   select(species_matched, CleanTraitValue)%>%
   mutate(CleanTraitName="lifespan", CleanTraitUnit=NA, source='TRY_59')
@@ -377,7 +381,7 @@ trait613 <- dat3%>%
 
 clonality <- rbind(trait208, trait329, trait341, trait334, trait344, trait357, trait609, trait613)%>%
   unique()%>%
-  spread(key=CleanTraitValue, value=CleanTraitValue)%>%
+  spread(key=CleanTraitValue, value=CleanTraitValue)%>%##STOP here for remove conflicts
   mutate(CleanTraitValue=ifelse(yes=='yes', 'yes', 'no'))%>%
   mutate(CleanTraitName='clonal', CleanTraitUnit=NA, source='TRY_208:329:334:341:344:357:609:613')%>%
   filter(!is.na(CleanTraitValue))%>%
