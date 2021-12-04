@@ -33,8 +33,11 @@ tree.spold <- read.csv("Data/TRYCoRREMerge/species_families_trees_compelete_2020
 
 WFO.file<-read.delim("Data/CompiledData/Species_lists/WFO_Backbone/classification.txt")
 
+test<-WFO.file%>%
+  filter(genus=="Paspalidium")
 
-#Merge new list with old list
+
+#Merge new list with old list - this merge doesn't not work because of spacing and "_" differences between old and new species. I think this will be less of a problem going forward if the old species have all the spaces removed as they do now....
 merged.list<-full.list%>%
   left_join(oldsp)
 
