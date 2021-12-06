@@ -1373,6 +1373,7 @@ gfp<-read.csv("KNZ_KNP_GFP.csv")%>%
   unique()
 
 pplots<-read.csv("KNZ_PPLOTS.csv")%>%
+  mutate(treatment_year=calendar_year-min(calendar_year))%>%
   select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
   mutate(community_type=0, 
          nutrients=1, light=0, carbon=0, water=0, other_manipulation=0,

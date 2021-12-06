@@ -1,5 +1,6 @@
 
-setwd('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\datasets\\longform')
+setwd('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\datasets\\longform') #kim's laptop
+setwd('C:\\Users\\komatsuk\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CompiledData') #kim's desktop
 
 setwd('C:\\Users\\mavolio2\\Dropbox\\converge_diverge\\datasets\\LongForm')
 setwd("~/Dropbox/converge_diverge/datasets/LongForm")
@@ -11,11 +12,11 @@ library(maps)
 library(mapdata)
 library(mapproj)
 
-loc<-read.csv("siteList_LatLong.csv")%>%
-  mutate(site_code=name)%>%
-  left_join(read.csv('SiteExperimentDetails_March2019.csv'))%>%
+loc<-read.csv("siteLocationClimate.csv")%>%
+  left_join(read.csv('ExperimentInfo.csv'))%>%
+  left_join(read.csv('siteBiotic.csv'))%>%
   group_by(site_code)%>%
-  summarise(lat=mean(latitude), long=mean(longitude), gamma=mean(rrich))%>%
+  summarise(lat=mean(Latitude), long=mean(Longitude), gamma=mean(rrich))%>%
   ungroup()
 
 anppsites<-loc%>%
