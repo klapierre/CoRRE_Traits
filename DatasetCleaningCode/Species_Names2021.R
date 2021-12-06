@@ -28,15 +28,35 @@ oldsp <- read.csv("Data/CompiledData/Species_lists/fullsp_list2020.csv")%>%
   mutate(oldsp=1)%>% # create a column to indicate name was in old species list
   rename(genus_species=species)
 
+oldsp2 <- oldsp %>% 
+  mutate(genus_species1 = trimws(genus_species, which='both'))%>%
+  mutate(genus_species2 = gsub("\\s\\s"," ",genus_species1, perl = TRUE)) %>%
+  mutate(genus_species3 = gsub("\\s\\s"," ",genus_species2, perl = TRUE)) %>%
+  mutate(genus_species4 = gsub("[.]"," ",genus_species3))  %>%
+  mutate(genus_species5 = trimws(genus_species4, which='both'))%>%
+  mutate(genus_species6 = gsub("_", " ", genus_species5, fixed = TRUE))%>%
+  mutate(genus_species7 = gsub("\u00A0", " ",genus_species6, fixed = TRUE))%>%
+  mutate(genus_species8 = tolower(genus_species7))%>%
+  select(-genus_species)%>%
+  rename(genus_species=genus_species8)%>%
+  select(-genus_species1, -genus_species2, -genus_species3, -genus_species4, -genus_species5, -genus_species6, -genus_species7)
+
+
 # moss <- read.delim("Data/OriginalData/Traits/Bryophytes.txt", sep = ",", header = FALSE) #from: http://www.mobot.org/mobot/tropicos/most/bryolist.shtml
 tree.spold <- read.csv("Data/TRYCoRREMerge/species_families_trees_compelete_2020.csv")
 
 WFO.file<-read.delim("Data/CompiledData/Species_lists/WFO_Backbone/classification.txt")
 
+test<-WFO.file%>%
+  filter(genus=="Paspalidium")
 
-#Merge new list with old list
+
+#Merge new list with old list - this merge doesn't not work because of spacing and "_" differences between old and new species. I think this will be less of a problem going forward if the old species have all the spaces removed as they do now....
+
+#I am pretty sure by cleaning the names as I just did in the above step cleared up this problem.
+
 merged.list<-full.list%>%
-  left_join(oldsp)
+  left_join(oldsp2)
 
 #species already matched
 newmatched<-merged.list%>%
