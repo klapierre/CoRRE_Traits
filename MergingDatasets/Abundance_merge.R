@@ -376,7 +376,7 @@ irg2<-merge(irg, irg_names, by="species_code", all=T)%>%
   select(-species_code)
 
 pplots<-read.csv("KNZ_pplots.csv")%>%
-  mutate(community_type=0, block = 0, version=ifelse(calendar_year<=2015, 1.0,2.0))%>%
+  mutate(site_code="KNZ", project_name="pplots", data_type="cover", community_type=0, block = 0, version=ifelse(calendar_year<=2015, 1.0,2.0))%>%
   filter(abundance!=0)
 trtyr<-pplots%>%
   select(calendar_year)%>%
