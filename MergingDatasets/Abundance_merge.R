@@ -375,7 +375,7 @@ irg2<-merge(irg, irg_names, by="species_code", all=T)%>%
   filter(abundance!=0)%>%
   select(-species_code)
 
-pplots<-read.csv("KNZ_pplots (2).csv")%>%
+pplots<-read.csv("KNZ_pplots.csv")%>%
   mutate(community_type=0, block = 0, version=ifelse(calendar_year<=2015, 1.0,2.0))%>%
   filter(abundance!=0)
 trtyr<-pplots%>%
@@ -705,17 +705,17 @@ combine2 <- combine %>%
   select(-genus_species1, -genus_species2, -genus_species3, -genus_species4, -genus_species5, -genus_species6, -genus_species7)
            
 
-write.csv(combine2, "C:/Users/lapie/Dropbox (Smithsonian)/working groups/CoRRE/CoRRE_database/Data/CompiledData/RawAbundance.csv")
-write.csv(combine2, "C:/Users/mavolio2/Dropbox/CoRRE_database/Data/CompiledData/RawAbundance.csv", row.names = F)
+# write.csv(combine2, "C:/Users/lapie/Dropbox (Smithsonian)/working groups/CoRRE/CoRRE_database/Data/CompiledData/RawAbundance.csv")
+# write.csv(combine2, "C:/Users/mavolio2/Dropbox/CoRRE_database/Data/CompiledData/RawAbundance.csv", row.names = F)
 
 ###get species list
 species_list<-combine2%>%
   select(genus_species)%>%
   unique()
 
-write.csv(species_list, "C:/Users/lapie/Dropbox (Smithsonian)/working groups/CoRRE/CoRRE_database/Data/CompiledData/Species_lists/SpeciesList_Nov2021.csv", row.names=F)
+# write.csv(species_list, "C:/Users/lapie/Dropbox (Smithsonian)/working groups/CoRRE/CoRRE_database/Data/CompiledData/Species_lists/SpeciesList_Nov2021.csv", row.names=F)
 
-write.csv(species_list, "C:/Users/mavolio2/Dropbox/CoRRE_database/Data/CompiledData/Species_lists/SpeciesList_Nov2021.csv", row.names=F)
+# write.csv(species_list, "C:/Users/mavolio2/Dropbox/CoRRE_database/Data/CompiledData/Species_lists/SpeciesList_Nov2021.csv", row.names=F)
 
 ###Getting Relative Cover
 totcov<-combine2%>%
@@ -727,9 +727,9 @@ relcov<-merge(totcov, combine2, by=c("site_code", "project_name", "community_typ
   mutate(relcov=abundance/totcov)%>%
   select(-abundance, -totcov)
 
-write.csv(relcov, "C:/Users/lapie/Dropbox (Smithsonian)/working groups/CoRRE/CoRRE_database/Data/CompiledData/RelativeCover.csv", row.names = FALSE)
+# write.csv(relcov, "C:/Users/lapie/Dropbox (Smithsonian)/working groups/CoRRE/CoRRE_database/Data/CompiledData/RelativeCover.csv", row.names = FALSE)
 
-write.csv(relcov, "C:/Users/mavolio2/Dropbox/CoRRE_database/Data/CompiledData/RelativeCover.csv", row.names = FALSE)
+# write.csv(relcov, "C:/Users/mavolio2/Dropbox/CoRRE_database/Data/CompiledData/RelativeCover.csv", row.names = FALSE)
 
 
 # ##### Relative cover and raw abundance for sCoRRE

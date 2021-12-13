@@ -1372,7 +1372,7 @@ gfp<-read.csv("KNZ_KNP_GFP.csv")%>%
   mutate(trt_type=ifelse(treatment=='Open_Ungrazed', 'control', ifelse(treatment=='Open_Grazed', 'mow_clip', ifelse(treatment=='Rainout_Ungrazed', 'drought', 'drought*mow_clip'))))%>%
   unique()
 
-pplots<-read.csv("KNZ_PPLOTS.csv")%>%
+pplots<-read.csv("KNZ_pplots.csv")%>%
   mutate(treatment_year=calendar_year-min(calendar_year))%>%
   select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
   mutate(community_type=0, 

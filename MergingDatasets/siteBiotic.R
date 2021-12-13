@@ -13,7 +13,7 @@ library(tidyverse)
 setwd("C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\")
 
 ###getting relative richness
-cover <- read.csv("Data/CompiledData/RawAbundance.csv", row.names = 1)%>%
+cover <- read.csv("Data/CompiledData/RawAbundance.csv")%>%
   mutate(exp=paste(site_code, project_name, community_type, sep="::"))
 
 sampleIntensity <- cover%>%
