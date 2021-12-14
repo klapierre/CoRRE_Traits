@@ -1373,6 +1373,7 @@ gfp<-read.csv("KNZ_KNP_GFP.csv")%>%
   unique()
 
 pplots<-read.csv("KNZ_pplots.csv")%>%
+  mutate(site_code='KNZ', project_name='pplots', community_type=0)%>%
   mutate(treatment_year=calendar_year-min(calendar_year))%>%
   select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
   mutate(community_type=0, 
@@ -2187,6 +2188,7 @@ tmece<-read.csv("SERC_TMECE.csv")%>%
 
 snfert<-read.csv("SEV_NFert20.csv")%>%
   select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
+  mutate(project_name='Nfert')%>%
   mutate(community_type=0, 
          nutrients=1, light=0, carbon=0, water=0, other_manipulation=0,
          n=ifelse(treatment=='F', 10, 0),
@@ -2729,7 +2731,7 @@ nitadd<-read.csv("YMN_NitAdd.csv")%>%
 
 
 ###merge all datasets
-combine<-rbind(atwe, bffert, bgp, biocon, bowman, bt_drought, ccd, change, clip, clonal, culardoch, cxn, e001, e002, e2, e6, edge, eelplot, events, exp1, face, fert1, fireplots, gane, gap2, gb, gce, gcme, gcme2, gfert, gfp, grazeprecip, herbdiv, herbwood, hprecip, imagine, interaction, irg, kgfert, lind, lovegrass, lucero, mat2, megarich, mnt, mwatfer, nde, nfert, nitadd, nitphos,  nitrogen, npkd, Nprecip, Nmow, nsfc, nsfc2, nut, nutnet, oface, pennings, phace, pme, precip, pplots, pq, ramps, rhps, rmapc, sedge, snfert, snow, sirg, sdrought, study119, study278, t7, ter, tface,tide,tmece,ton, uk, vcrnutnet, wapaclip, warmnit, warmnut, water, watering, wenndex, wet, yu)
+combine<-rbind(atwe, bffert, bgp, biocon, bowman, bt_drought, ccd, change, clip, clonal, culardoch, cxn, e001, e002, e2, e6, edge, eelplot, events, exp1, face, fert1, fert3, fireplots, gane, gap2, gb, gce, gcme, gcme2, gfert, gfp, grazeprecip, herbdiv, herbwood, hprecip, imagine, interaction, irg, kgfert, lind, lovegrass, lucero, mat2, megarich, mnt, mwatfer, nde, nfert, nitadd, nitphos,  nitrogen, npkd, Nprecip, Nmow, nsfc, nsfc2, nut, nutnet, oface, pennings, phace, pme, precip, pplots, pq, ramps, rhps, rmapc, sedge, snfert, snow, sirg, sdrought, study119, study278, t7, ter, tface,tide,tmece,ton, uk, vcrnutnet, wapaclip, warmnit, warmnut, water, watering, wenndex, wet, yu)
 
 # write.csv(combine, "C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CompiledData\\ExperimentInfo.csv", row.names = FALSE)
 
