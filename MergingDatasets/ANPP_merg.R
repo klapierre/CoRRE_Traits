@@ -147,6 +147,7 @@ tmece <- read.csv("SERC_TMECE_anpp.csv")%>%
   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp, community_type) %>%
   mutate(block = 0)
 snfert<-read.delim("SEV_NFert_anpp.txt")%>%
+  mutate(project_name='Nfert')%>%
   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp)%>%
   mutate(community_type=0, block = 0)
 wenndex<-read.delim("SEV_WENNDEx_anpp.txt")%>%
@@ -185,6 +186,6 @@ anpp <- rbind(atwe, bgp, biocon, bowman, btdrought, btnpkd, change, clonal, cxn,
               nsfc2, nutnet, oface, phace, pme, pplots, ramps, rhps, rio, rmapc, 
               snfert, snow, t7, tide, tmece, ton, uk, wapaclip, water, watering, wenndex, wet, vcrnutnet)
 
-write.csv(anpp, 'C:/Users/lapie/Dropbox (Smithsonian)/working groups/CoRRE/CoRRE_database/Data/CompiledData/ANPP2021.csv', row.names=F)
+# write.csv(anpp, 'C:/Users/lapie/Dropbox (Smithsonian)/working groups/CoRRE/CoRRE_database/Data/CompiledData/ANPP2021.csv', row.names=F)
 
 
