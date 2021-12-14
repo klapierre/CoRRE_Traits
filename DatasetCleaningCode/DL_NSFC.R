@@ -1,44 +1,50 @@
 #################
 ####DL_NSFC ####
 ################
-library(tidyr)
+library(tidyverse)
 
 setwd("~/Dropbox/CoRRE_database")
-### biomass data from 2013-2016
-df <- read.csv("Data/OriginalData/Sites/DL_NSFC/DL species biomass-3-16.csv")
+setwd('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\')
 
-# imported a lot of empty columns and rows for some reason...
-df <- df[,c(1:58)]
-df <- df[-which(is.na(df$Stipa.krylovii)),]
+### biomass data from 2004-2012
+nsfc_names<-read.delim("Data\\OriginalData\\Sites\\DL_NSFC\\DL_NSFC_specieslist.txt")%>%
+  mutate(species_code=tolower(species_list))
+
+df1 <- read.delim("Data\\OriginalData\\Sites\\DL_NSFC\\DL_NSFC.txt")%>%
+  gather(species_code, abundance, sp1:sp53)%>%
+  left_join(nsfc_names)%>%
+  filter(abundance>0)%>%
+  mutate(community_type=0)%>%
+  select(site_code, project_name, community_type, plot_id, treatment, calendar_year, treatment_year, genus_species, abundance)
+
+### biomass data from 2013-2016
+df2 <- read.csv("Data\\OriginalData\\Sites\\DL_NSFC\\DL species biomass-3-16.csv")%>%
+  rename(calendar_year=ï..calendar_year)%>%
+  select(calendar_year:Cynanchum_thesioides)%>%
+  filter(!(is.na(calendar_year)))%>%
+  mutate(site_code='DL', project_name='NSFC', community_type=0, treatment_year=(calendar_year-2004))%>%
+  rename(treatment2=treatment)%>%
+  mutate(treatment=ifelse(treatment2=='CK', 'C', ifelse(treatment2=='N10', 'N', ifelse(treatment2=='WCK', 'W', 'WN'))))%>%
+  gather(genus_species, abundance, Stipa_krylovii:Cynanchum_thesioides)%>%
+  filter(abundance>0)%>%
+  select(site_code, project_name, community_type, plot_id, treatment, calendar_year, treatment_year, genus_species, abundance)%>%
+  separate(genus_species, into=c("genus", "species"), sep='_', remove=F)%>%
+  select(-genus_species)%>%
+  mutate(genus_species=paste(genus, species, sep=' '))%>%
+  select(site_code, project_name, community_type, plot_id, treatment, calendar_year, treatment_year, genus_species, abundance)
+
+
+### combine data
+df <- rbind(df1, df2)
+
+# write.csv(df, "Data\\CleanedData\\Sites\\Species csv\\DL_NSFC.csv", row.names=F)
+
 
 # get total biomass production
-df$anpp <- rowSums(df[,-c(1,2)])
-#adding other columns
-df$site_code <- "DL"
-df$project_name <- "NSFC"
-df$data_type <- "ANPP"
-df$treatment_year <- df$Y - 2004
+anpp <- df%>%
+  group_by(site_code, project_name, community_type, plot_id, treatment, calendar_year, treatment_year)%>%
+  summarise(anpp=sum(abundance))%>%
+  ungroup()
 
-# making a unique plot number for each treatment-plot combination
-trt_plot <- as.data.frame(unique(df$species))
-trt_plot <- cbind(seq(1:28), trt_plot)
-names(trt_plot)<- c("plot_id", "species")
-# take out number in front of treatment
-trt_plot$treatment <- sub('.', '', trt_plot$species)
-trt_plot$block <- substr(trt_plot$species, 1, 1)
-# add data back into df
-df <- merge(df, trt_plot)
-
-
-df1 <- gather(df, key = genus_species, value = abundance, 3:58)
-df1 <- df1[,c(2,4:12)]
-names(df1)[1] <- "calendar_year"
-df1 <- df1[which(df1$abundance > 0),]
-write.csv(df1, "Data/CleanedData/Sites/Species csv/DL_NSFC20132016.csv", row.names = FALSE)
-
-## pull out anpp dataset
-df2 <- df[,c(2,59:66)]
-names(df2)[1] <- "calendar_year"
-df2 <- df2[,c(1,8,7,5,6,9,3,4,2)]
-write.csv(df2, "Data/CleanedData/Sites/ANPP csv/DL_NSFC_anpp20132016.csv", row.names = FALSE)
+# write.csv(anpp, "Data\\CleanedData\\Sites\\ANPP csv\\DL_NSFC_anpp.csv", row.names = FALSE)
 
