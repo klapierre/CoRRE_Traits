@@ -86,7 +86,8 @@ controlANPP<-ANPP%>%
   ungroup()
 
 
-noControlANPP <- read.csv("C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CleanedData\\ANPP_noControls.csv")
+noControlANPP <- read.csv("C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CleanedData\\ANPP_noControls.csv")%>%
+  filter(site_code!='maerc')
 
 allANPP <- rbind(noControlANPP, controlANPP)
 
