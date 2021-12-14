@@ -1,17 +1,14 @@
 setwd("~/Dropbox/CoRRE_database")
+setwd("C:\\Users\\mavolio2\\Dropbox\\CoRRE_database")
 
-dat<-read.csv("Data/OriginalData/Sites/SERC_CXN/4-CO2xN Total Shoot Biomass 2005-2014 (1).csv")
+dat<-read.csv("Data/OriginalData/Sites/SERC_CXN/SERC CO2xN 2005-2019 zeroes removed.csv")
 
 anpp<-dat%>%
-  mutate(anpp=SCbiomass_m2+SPbiomass_m2+DIbiomass_m2)%>%
-  select(calendar_year, plot_id, treatment, anpp)
-names(anpp)[names(anpp)=="treatment"]<-"treat1"
-
-anpp2<-anpp%>%
-  mutate(treat="t", treatment=paste(treat, treat1, sep=""))%>%
-  select(-treat, -treat1)%>%
-  mutate(site_code="SERC", project_name="CXN")
-
+  rename(treatment=Treatment, 
+         community_type=Community) %>% 
+  group_by(site_code, project_name, community_type, block, plot_id, calendar_year, treatment_year, treatment) %>% 
+  summarize(anpp=sum(abundance))
+  
 species<-dat
 names(species)[names(species)=="SCbiomass_m2"]<-"Scirpus.olneyi"
 names(species)[names(species)=="SPbiomass_m2"]<-"Spartina.patens"
@@ -31,7 +28,7 @@ treatment_year<-anpp%>%
   mutate(treatment_year=seq(1,10, by=1))
 
 anpp3<-merge(anpp2, treatment_year, by="calendar_year")
-write.csv(anpp3, "Data/CleanedData/Sites/ANPP csv/SERC_CXN_anpp.csv")
+write.csv(anpp, "Data/CleanedData/Sites/ANPP csv/SERC_CXN_anpp.csv")
 
 
 species3<-merge(species2, treatment_year, by="calendar_year")
