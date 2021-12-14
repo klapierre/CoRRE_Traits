@@ -13,7 +13,7 @@ library(data.table)
 library(sp)
 
 olddat <- read.csv("Data/OriginalData/CoRRE_experiment_locations.csv")
-alldat <- read.csv("Data/CompiledData/RawAbundance.csv", row.names = 1)
+alldat <- read.csv("Data/CompiledData/RawAbundance.csv")
 nutnet.sites <- read.csv("Data/OriginalData/Sites/NutNet/nutnet_siteData_01272021.csv", row.names = 1)
 
 sites <- data.frame(site_code = unique(alldat$site_code))

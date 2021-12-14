@@ -20,7 +20,8 @@ df <- read.csv("Data/OriginalData/Sites/SIU_TON/TON_Div.csv")%>%
   filter(!treatment %in% c('1C', '1S', '1B'))%>% #remove some treatments
   group_by(site_code, project_name, community_type, calendar_year, treatment_year, treatment, block, plot_id, genus_species, data_type, version)%>%
   summarise(abundance=mean(abundance))%>% #remove dupliate rows
-  ungroup()
+  ungroup()%>%
+  filter(abundance>0)
 
 
 write.csv(df, "Data/CleanedData/Sites/Species csv/SIU_TON.csv", row.names = FALSE)
