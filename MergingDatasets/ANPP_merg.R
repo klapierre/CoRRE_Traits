@@ -47,10 +47,8 @@ megarich<-read.delim("CEH_Megarich_anpp.txt")%>%
 imagine<-read.delim("CLE_imagine_anpp.txt")%>%
   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp, block)%>%
   mutate(community_type=0)
-nsfc<-read.delim("DL_NSFC_anpp.txt")%>%
-  select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp, block)%>%
-  mutate(community_type=0)
-nsfc2<-read.csv("DL_NSFC_anpp20132016.csv")%>%
+nsfc<-read.csv("DL_NSFC_anpp.csv")%>%
+  mutate(block=0)%>%
   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp, block)%>%
   mutate(community_type=0)
 phace <- read.csv("CHY_PHACE_anpp.csv")%>%
@@ -183,7 +181,7 @@ nitadd <- read.csv("YMN_NitAdd_anpp.csv")%>%
 anpp <- rbind(atwe, bgp, biocon, bowman, btdrought, btnpkd, change, clonal, cxn, e001, e002, e2, e6, eel, 
               events, exp1, fireplots, gb, gfp, imagine, imgers, irg, kgfert, 
               lind, megarich, mnr, NDE, nfert, nit, nitadd, nitrogen, Nprecip, nsfc, 
-              nsfc2, nutnet, oface, phace, pme, pplots, ramps, rhps, rio, rmapc, 
+              nutnet, oface, phace, pme, pplots, ramps, rhps, rio, rmapc, 
               snfert, snow, t7, tide, tmece, ton, uk, wapaclip, water, watering, wenndex, wet, vcrnutnet)
 
 # write.csv(anpp, 'C:/Users/lapie/Dropbox (Smithsonian)/working groups/CoRRE/CoRRE_database/Data/CompiledData/ANPP2021.csv', row.names=F)
