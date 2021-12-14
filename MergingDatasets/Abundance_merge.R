@@ -577,19 +577,11 @@ tmece <- read.csv("SERC_TMECE.csv") %>%
 sev_edge <- read.csv("SEV_EDGE20.csv") %>%
   filter(abundance != 0) %>% mutate(version = 2.0)
 
-snfert<-read.delim("SEV_NFert.txt")%>%
-  select(-id, -nutrients, -light, -carbon, -water, -other_manipulation, -num_manipulations, -experiment_year, -n, -plot_mani, -species_num)%>%
-  gather(species_code, abundance, sp1:sp232)%>%
-  mutate(community_type=0, block=0, version = 1.0)
-snfert_names<-read.delim("SEV_NFert_specieslist.txt")%>%
-  mutate(species_code=tolower(species_code))
-snfert2<-merge(snfert, snfert_names, by="species_code", all=T)%>%
-  filter(abundance!=0)%>%
-  select(-species_code)
 snfert3 <- read.csv("SEV_NFERT20.csv") %>%
   mutate(community_type = 0, block = 0, version = 2.0) %>%
-  filter(abundance!= 0)
-snfert4 <- rbind(snfert2,snfert3)
+  filter(abundance!= 0)%>%
+  select(-project_name)%>%
+  mutate(project_name="Nfert")
   
 # wenndex<-read.delim("SEV_WENNDEx.txt")%>%
 #   select(-id, -nutrients, -light, -carbon, -water, -other_manipulation, -num_manipulations, -experiment_year, -n, -temp, -precip,   -plot_mani, -species_num)%>%
@@ -686,7 +678,7 @@ names<-nitadd%>%
   unique()
 
 #merge all datasets
-combine<-rbind(atwe, bffert2, bgp, biocon, bowman2, btdrought, btnpkd, ccd2, change, clip2, clonal2, culardoch2, cxn, d_precip, e001, e0023, e2, e6, edge, eelplot, events2, exp12, face2, fert1, fert3, fireplots2, gane2, gap2, gb2, gce2, gcme, gcme2, gfert, gfp, graze, h_precip, herbdiv, herbwood2, imagine2, interaction2, irg2, kgfert2, lind2, lovegrass,  lucero, mat22, megarich2, mnt2, mwatfer, nde, nfert2, nitadd, nitphos, nitrogen, Nmow, Nprecip, nsfc4, nut, nutnet, oface2, pennings2, phace, pme, pplots2, pq2, ramps, rhps, rmapc2, s_drought, s_irg, sask, sev_edge, snfert4, snow,  study1192, study2782, t72, ter, tface, tide2, tmece, ton, uk2, wapaclip2, warmnut2, warmnit, water, watering2,  wenndex3, wet2, vcrnutnet, yu)%>%
+combine<-rbind(atwe, bffert2, bgp, biocon, bowman2, btdrought, btnpkd, ccd2, change, clip2, clonal2, culardoch2, cxn, d_precip, e001, e0023, e2, e6, edge, eelplot, events2, exp12, face2, fert1, fert3, fireplots2, gane2, gap2, gb2, gce2, gcme, gcme2, gfert, gfp, graze, h_precip, herbdiv, herbwood2, imagine2, interaction2, irg2, kgfert2, lind2, lovegrass,  lucero, mat22, megarich2, mnt2, mwatfer, nde, nfert2, nitadd, nitphos, nitrogen, Nmow, Nprecip, nsfc4, nut, nutnet, oface2, pennings2, phace, pme, pplots2, pq2, ramps, rhps, rmapc2, s_drought, s_irg, sask, sev_edge, snfert3, snow,  study1192, study2782, t72, ter, tface, tide2, tmece, ton, uk2, wapaclip2, warmnut2, warmnit, water, watering2,  wenndex3, wet2, vcrnutnet, yu)%>%
   filter(abundance!='NA')
 
 #cleaning the speices name to remove double spaces "\\s\\", remove "." and "_" and clean spaces at at front and end of names 
