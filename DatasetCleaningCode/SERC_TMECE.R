@@ -1,12 +1,15 @@
 setwd("~/Dropbox/CoRRE_database")
+setwd("C:\\Users\\mavolio2\\Dropbox\\CoRRE_database")
 
 library(tidyr)
 library(dplyr)
 
-anpp<-read.csv("Data/OriginalData/Sites/SERC_TMECE/4-CO2xComm Total Shoot Biomass 1987-2013.csv")%>%
-  select(calendar_year, community_type, treatment, plot_id, SCbiomass_m2,SPbiomass_m2,DIbiomass_m2,OTHERbiomass_m2)%>%
-  filter(OTHERbiomass_m2!=-99, DIbiomass_m2!=-99)%>%
-  mutate(anpp=SCbiomass_m2+SPbiomass_m2+DIbiomass_m2+OTHERbiomass_m2)
+anpp<-read.csv("Data/OriginalData/Sites/SERC_TMECE/SERC1 1997-2019 stacked.csv")%>%
+  rename(treatment=Treatment,
+         community_type=Community,
+         abundance=abundance.2)%>%
+  group_by(site_code, project_name, community_type, block, plot_id, calendar_year, treatment_year, treatment) %>% 
+  summarize(anpp=sum(abundance))
 
 treatment_year<-anpp%>%
   select(calendar_year)%>%
@@ -19,7 +22,7 @@ anpp2<-merge(anpp, treatment_year, by="calendar_year")%>%
   select(-SCbiomass_m2, -SPbiomass_m2, -DIbiomass_m2, -OTHERbiomass_m2)
 
 
-write.csv(anpp2,"Data/CleanedData/Sites/ANPP csv/SERC_TMECE_anpp.csv")
+write.csv(anpp, "Data/CleanedData/Sites/ANPP csv/SERC_TMECE_anpp.csv")
 
 
 count<-read.csv("Data/OriginalData/Sites/SERC_TMECE/CO2xComm Master C4 Harvest 1987-2013 (08-21-2015) (2).csv")%>%
