@@ -1,6 +1,6 @@
 setwd("~/Dropbox/CoRRE_database")
 setwd("C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\")
-
+setwd("C:\\Users\\mavolio2\\Dropbox\\CoRRE_database\\")
 
 library(readxl)
 library(tidyverse)
@@ -13,9 +13,10 @@ df <- gather(df, match_col, abundance, 6:144)
 
 names(sp_names) <- c("match_col","genus_species")
 
+
 df2 <- merge(df,sp_names, all.x = TRUE)%>%
   filter(abundance>0, abundance!='NA', genus_species!='NA')%>%
-  mutate(plot_id=paste(Block, plot, trtmt, sep='_'))%>%
+  mutate(plot_id=paste(Block, Rep, trtmt, sep='_'))%>%
   group_by(year, Block, plot_id, trtmt, genus_species)%>%
   summarise(abundance=mean(abundance))%>%
   ungroup()%>%
