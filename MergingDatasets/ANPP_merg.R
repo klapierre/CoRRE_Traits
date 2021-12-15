@@ -173,7 +173,6 @@ vcrnutnet<- read.csv('VCR_NutNet_anpp.csv')%>%
   summarise(anpp=sum(biomass))%>%
   ungroup()%>%
   select(site_code, project_name, community_type, treatment_year, calendar_year, treatment, block, plot_id, anpp)
-  
 nitadd <- read.csv("YMN_NitAdd_anpp.csv")%>%
   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp)%>%
   mutate(community_type = 0, block = 0)

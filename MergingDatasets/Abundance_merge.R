@@ -692,7 +692,6 @@ species_list<-combine2%>%
   unique()
 
 # write.csv(species_list, "C:/Users/lapie/Dropbox (Smithsonian)/working groups/CoRRE/CoRRE_database/Data/CompiledData/Species_lists/SpeciesList_Nov2021.csv", row.names=F)
-
 # write.csv(species_list, "C:/Users/mavolio2/Dropbox/CoRRE_database/Data/CompiledData/Species_lists/SpeciesList_Nov2021.csv", row.names=F)
 
 ###Getting Relative Cover
