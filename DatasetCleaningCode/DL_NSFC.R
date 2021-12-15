@@ -35,7 +35,7 @@ df2 <- read.csv("Data\\OriginalData\\Sites\\DL_NSFC\\DL species biomass-3-16.csv
 
 
 ### combine data
-df <- rbind(df1, df2)
+df <- rbind(df1, df2) #need to fix the plot id for df2 to be consecutive and not repeating
 
 # write.csv(df, "Data\\CleanedData\\Sites\\Species csv\\DL_NSFC.csv", row.names=F)
 

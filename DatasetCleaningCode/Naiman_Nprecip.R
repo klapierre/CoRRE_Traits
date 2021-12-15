@@ -12,7 +12,8 @@ cover <- read.csv('Data\\OriginalData\\Sites\\Naiman_Nprecip\\Naiman County Nitr
   mutate(site_code='Naiman', project_name='Nprecip', community_type=0, version=2.0, data_type='biomass')%>%
   mutate(treatment=paste(fertilization, water, sep='_'))%>%
   rename(calendar_year=year, plot_id=plot)%>%
-  mutate(treatment_year=calendar_year-min(calendar_year)+1)
+  mutate(treatment_year=calendar_year-min(calendar_year)+1)%>%
+  filter(calendar_year<2015)
 
 # write.csv(cover, "Data/CleanedData/Sites/Species csv/Naiman_Nprecip.csv", row.names = FALSE)
 
