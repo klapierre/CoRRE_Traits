@@ -8,7 +8,7 @@ setwd('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_dat
 
 # library
 library(readxl)
-library(tidyr)
+library(tidyverse)
 
 # data
 dat <- read.csv("Data/OriginalData/Sites/EGN_Nmow/EGN_Nmow.csv")%>%

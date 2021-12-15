@@ -712,6 +712,6 @@ relcov<-merge(totcov, combine2, by=c("site_code", "project_name", "community_typ
 
 # ##### Relative cover and raw abundance for sCoRRE
 # 
-# write.csv(sCoRRERaw, "~/Dropbox/sDiv_sCoRRE_shared/CoRRE data/CoRRE data/community composition/CoRRE_RawAbundanceMar2021.csv", row.names = FALSE)  
+# write.csv(sCoRRERaw, "~/Dropbox/sDiv_sCoRRE_shared/CoRRE data/CoRRE data/community composition/CoRRE_RawAbundance_Dec2021.csv", row.names = FALSE)  
 # sCoRRERel <- relcov[-which(relcov$project_name %in% c("BioCON", "EELplot") & relcov$data_type == "cover"),]
-# write.csv(sCoRRERel, "~/Dropbox/sDiv_sCoRRE_shared/CoRRE data/CoRRE data/community composition/CoRRE_RelativeAbundanceMar2021.csv", row.names = FALSE)  
+# write.csv(sCoRRERel, "~/Dropbox/sDiv_sCoRRE_shared/CoRRE data/CoRRE data/community composition/CoRRE_RelativeAbundance_Dec2021.csv", row.names = FALSE)  
