@@ -143,7 +143,8 @@ cxn <- read.csv("SERC_CXN_anpp.csv")%>%
   mutate(community_type = 0, block = 0)
 tmece <- read.csv("SERC_TMECE_anpp.csv")%>%
   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp, community_type) %>%
-  mutate(block = 0)
+  mutate(block = 0)%>%
+  filter(treatment!='C')
 snfert<-read.delim("SEV_NFert_anpp.txt")%>%
   mutate(project_name='Nfert')%>%
   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp)%>%
@@ -173,7 +174,6 @@ vcrnutnet<- read.csv('VCR_NutNet_anpp.csv')%>%
   summarise(anpp=sum(biomass))%>%
   ungroup()%>%
   select(site_code, project_name, community_type, treatment_year, calendar_year, treatment, block, plot_id, anpp)
-  
 nitadd <- read.csv("YMN_NitAdd_anpp.csv")%>%
   select(site_code, project_name, treatment_year, calendar_year, treatment, plot_id, anpp)%>%
   mutate(community_type = 0, block = 0)

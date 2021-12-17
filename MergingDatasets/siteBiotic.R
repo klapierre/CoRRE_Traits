@@ -69,7 +69,8 @@ expRichness <- rbind(expRichness, gface)
 
 
 ###getting control ANPP
-ANPP<-read.csv("Data/CompiledData/ANPP2021.csv")
+ANPP<-read.csv("Data/CompiledData/ANPP2021.csv")%>%
+  filter(project_name!='TMECE')
 
 expInfo <- read.csv("Data/CompiledData/ExperimentInfo.csv")%>%
   select(site_code, project_name, community_type, treatment, plot_mani)%>%

@@ -1651,11 +1651,11 @@ mwatfer<-read.csv("MNR_watfer.csv")%>%
 Nprecip <- read.csv('Naiman_Nprecip.csv')%>%
   select(site_code, project_name, community_type, calendar_year, treatment_year, treatment)%>%
   mutate(nutrients=1, light=0, carbon=0, water=1, other_manipulation=0,
-         n=ifelse(treatment %in% c('N_W0', 'N_W1', 'N_W2', 'N_'), 10, 0),
+         n=ifelse(treatment %in% c('N_W0', 'N_W1', 'N_W2'), 10, 0),
          p=0,
          k=0, 
          CO2=0, 
-         precip=ifelse(treatment %in% c('CK_W1', 'CK_W2', 'N_W1', 'N_W2'), 999, 0), 
+         precip=ifelse(treatment %in% c('CK_W1', 'N_W1'), 28, ifelse(treatment %in% c('CK_W2', 'N_W2'), 1, 0)), 
          temp=0,
          mow_clip=0, 
          burn=0, 
@@ -1667,7 +1667,7 @@ Nprecip <- read.csv('Naiman_Nprecip.csv')%>%
          plant_mani=0,  
          plant_trt=0,
          pulse=0)%>%
-  mutate(plot_mani=ifelse(treatment %in% c('CK_W0', 'CK_'), 0, ifelse(treatment %in% c('CK_W1', 'CK_W2', 'N_W0', 'N_'), 1, 2)))%>%
+  mutate(plot_mani=ifelse(treatment %in% c('CK_W0'), 0, ifelse(treatment %in% c('CK_W1', 'CK_W2', 'N_W0'), 1, 2)))%>%
   mutate(resource_mani=1)%>%
   mutate(max_trt=1)%>%
   mutate(public=0)%>%
@@ -2132,6 +2132,7 @@ cxn<-read.csv("SERC_CXN.csv")%>%
   unique()
 
 tmece<-read.csv("SERC_TMECE.csv")%>%
+  filter(treatment!='C')%>%
   select(site_code, project_name, calendar_year, treatment_year, treatment, community_type)%>%
   mutate(nutrients=0, light=0, carbon=1, water=0, other_manipulation=0,
          n=0,
