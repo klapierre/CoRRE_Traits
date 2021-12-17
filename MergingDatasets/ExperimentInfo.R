@@ -2132,6 +2132,7 @@ cxn<-read.csv("SERC_CXN.csv")%>%
   unique()
 
 tmece<-read.csv("SERC_TMECE.csv")%>%
+  filter(treatment!='C')%>%
   select(site_code, project_name, calendar_year, treatment_year, treatment, community_type)%>%
   mutate(nutrients=0, light=0, carbon=1, water=0, other_manipulation=0,
          n=0,
