@@ -557,8 +557,12 @@ ter <- read.csv("SCL_TER.csv") %>%
   filter(abundance != 0)
 
 cxn <- read.csv("SERC_CXN.csv") 
+test<-cxn%>%
+  select(calendar_year) %>% 
+  unique()
 
-tmece <- read.csv("SERC_TMECE.csv") 
+tmece <- read.csv("SERC_TMECE.csv") %>%
+  filter(treatment!="C")
   
 sev_edge <- read.csv("SEV_EDGE20.csv") %>%
   filter(abundance != 0) %>% mutate(version = 2.0)
