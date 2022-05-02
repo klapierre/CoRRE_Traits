@@ -14,7 +14,8 @@ setwd("C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_dat
 
 ###getting relative richness
 cover <- read.csv("Data/CompiledData/RawAbundance.csv")%>%
-  mutate(exp=paste(site_code, project_name, community_type, sep="::"))
+  mutate(exp=paste(site_code, project_name, community_type, sep="::"))%>%
+  filter(project_name!='NSFC') #filter out DL NSFC because of duplicate entries for each plot/date
 
 sampleIntensity <- cover%>%
   select(site_code, project_name, community_type, treatment_year, plot_id)%>%
