@@ -25,10 +25,10 @@ df <- df[df$MOW == "u",]
 
 df <- df[-which(is.na(df$FORBS) & is.na(df$LVGRASS)),]
 
-df$anpp <- df$LVGRASS + df$FORBS + df$CUYRDD
+df$anpp <- df$LVGRASS + df$FORBS + df$CUYRDD + df$WOODY
 
 df <- aggregate(df$anpp, by = list(calendar_year = df$RECYEAR, plot_id = df$PLOT, 
-                                     treatment = df$treatment), FUN = mean)
+                                     treatment = df$treatment), FUN = mean) #average across the two replicate clip strips
 df$site_code <- "KNZ"
 df$project_name <- "BGP"
 df$data_type <- "anpp"
@@ -38,14 +38,15 @@ df$anpp <- df$anpp*10 # mulitply by 10 to get g/m2, currently g/0.1 m2
 
 bgp.anpp <- df[,c(1,3,2,7,8,5,6,4)]
 
-#write.csv(df, "Data/CleanedData/Sites/ANPP csv/KNZ_BGP_anpp.csv", row.names = FALSE)
+#write.csv(df, "C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CleanedData\\Sites\\ANPP csv\\KNZ_BGP_anpp.csv", row.names = FALSE)
 
 
 file1 <- "https://pasta.lternet.edu/package/data/eml/knb-lter-knz/17/11/410e032a0651ce990c8c497be62c68f7"
 df1 <- read.csv(file1, header = TRUE)
 file2 <- "http://lter.konza.ksu.edu/file/1607/download"
 spdf <- read.csv(file2, header = TRUE)
-trtdf <- read.csv("Data/OriginalData/Sites/KNZ_BGP/BGP_treatments.csv")
+trtdf <- read.csv("C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\OriginalData\\Sites\\KNZ_BGP\\BGP_treatments.csv")
+colnames(trtdf)[1] <- "plot_id"
 
 ## Convert cover class to mid-points
 # 1 = 0.5, 2 = 3.5, 3 = 15, 4 = 37.5, 5=62.5, 6 = 85, 7 = 97.5
@@ -79,5 +80,5 @@ df2$treatment <- paste(df2$burned, df2$mowed, df2$nutrient, sep = "_")
 
 bgp.species <- df2[,c(1,4:8,17,18,22)]
 
-#write.csv(df1, "Data/CleanedData/Sites/Species csv/KNZ_BGP.csv", row.names = FALSE)
+#write.csv(bgp.species, "C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CleanedData\\Sites\\Species csv\\KNZ_BGP.csv", row.names = FALSE)
 
