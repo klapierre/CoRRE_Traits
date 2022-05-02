@@ -1234,8 +1234,12 @@ kgfert<-read.delim("KLU_KGFert.txt")%>%
   mutate(trt_type=ifelse(treatment=='N0B0', 'control', ifelse(treatment=='N0B1', 'fungicide', ifelse(treatment=='N1B0', 'mult_nutrient', 'mult_nutrient*fungicide'))))%>%
   unique()
 
+
+bgpYears <- data.frame(site_code='KNZ', project_name='BGP', calendar_year=1986:2019, treatment_year=1:34)
 bgp<-read.csv("KNZ_BGP.csv")%>%
-  select(site_code, project_name, calendar_year, treatment_year, treatment)%>%
+  select(site_code, project_name, treatment)%>%
+  unique()%>%
+  left_join(bgpYears)%>%
   mutate(community_type=0, 
          nutrients=1, light=0, carbon=0, water=0, other_manipulation=1,
          n=ifelse(treatment %in% c('u_u_p','u_u_c','u_m_p','u_m_c','b_u_p','b_u_c','b_m_p','b_m_c'), 0, 10),
