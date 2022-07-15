@@ -87,9 +87,9 @@ controlANPP<-ANPP%>%
   summarize(anpp=mean(anpp))%>%
   ungroup()
 
-
 noControlANPP <- read.csv("C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CleanedData\\ANPP_noControls.csv")%>%
-  filter(site_code!='maerc')
+  filter(site_code!='maerc')%>%
+  select(site_code, project_name, community_type, anpp)
 
 allANPP <- rbind(noControlANPP, controlANPP)
 
