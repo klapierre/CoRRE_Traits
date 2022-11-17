@@ -10,13 +10,15 @@ AusTraits <- read.csv('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working grou
   left_join(names)%>%
   mutate(species_matched2=species_matched)%>%
   separate(species_matched2, into=c('genus', 'species'))%>%
-  select(DatasetID, ObservationID, family, species_matched, genus, CleanTraitName, StdValue)
+  mutate(DatabaseID='AusTraits')%>%
+  select(DatabaseID, DatasetID, ObservationID, family, species_matched, genus, CleanTraitName, StdValue)
   
 
 
 
 #read in TRY
-TRY <- read.csv('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\CoRRE data\\trait data\\Raw TRY Data\\TRY Continuous data\\TRY_trait_data_continuous_long_Nov2021.csv')
+TRY <- read.csv('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\CoRRE data\\trait data\\Raw TRY Data\\TRY Continuous data\\TRY_trait_data_continuous_long_Nov2021.csv')%>%
+  mutate(DatabaseID='TRY')
 
 
 #rbind
