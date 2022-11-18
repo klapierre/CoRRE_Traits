@@ -69,7 +69,7 @@ splistinclude<-biensubsptraits %>%
 contributors=biensubsptraits %>% 
   select(url_source, project_pi) %>% 
   unique() %>% 
-  mutate(DatabaseID=seq(1:47))
+  mutate(DatasetID=seq(1:47))
 
 Bienoutput<-biensubsptraits %>% 
   left_join(contributors) %>% 
@@ -77,8 +77,28 @@ Bienoutput<-biensubsptraits %>%
   rename(ObservationID=id,
          family=scrubbed_family,
          genus=scrubbed_genus) %>% 
-  select(DatabaseID, DatasetID, ObervationID, family, genus, species_matched, CleanTraitValue, StdValue)
+  select(DatabaseID, DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue) %>% 
+  filter(StdValue!=0)
   
+Bien2<-Bienoutput%>% 
+  group_by(species_matched, CleanTraitName, StdValue) %>% 
+  summarize(n=length(StdValue)) %>% 
+  filter(n>1)
 
 #read in try traits
 try<-read.csv('C:\\Users\\mavolio2\\Dropbox\\sDiv_sCoRRE_shared\\CoRRE data\\trait data\\Raw TRY Data\\TRY Continuous data\\TRY_trait_data_continuous_long_Nov2021.csv')
+
+#how many values are the same in try alone?
+try2<-try %>% 
+  group_by(species_matched, CleanTraitName, StdValue) %>% 
+  summarize(n=length(StdValue)) %>% 
+  filter(n>1)
+
+
+##what is try and bien overlap
+trybien<-try %>% 
+  mutate(DatabaseID="TRY") %>% 
+  bind_rows(Bienoutput) %>% 
+  group_by(species_matched, CleanTraitName, StdValue) %>% 
+  summarize(n=length(StdValue))%>% 
+  filter(n>1)
