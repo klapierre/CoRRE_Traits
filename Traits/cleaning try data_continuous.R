@@ -7,6 +7,7 @@ theme_set(theme_bw(12))
 ##update Feb 2021
 ##we are adding new species with the CoRRE database 2.0 update
 ## we also found we were missing species in the Nov 2019 datapull b/c of naming inconsistencies so we now redoing traits for all species.
+###update Nov 22 Finding errors with some databases there there are many same values for all the species. Trying to fix this.
 
 
 #meghan's
@@ -328,21 +329,50 @@ d428<-cont_traits3%>% #this dataset has two height values per plant, we are taki
   group_by(DatasetID, ObservationID, species_matched, CleanTraitName, family, genus)%>%
   summarise(StdValue=max(StdValue))
 
-#dropping probelm datasets and reappending clean ones
+#all values have 52 identical measurements. I am taking one value from each
+d415sub<-cont_traits3 %>% 
+  filter(DatasetID==415) %>% 
+  select(DatasetID, ObservationID, family, species_matched, genus) %>% 
+  unique() %>% 
+  group_by(species_matched) %>% 
+  mutate(count=seq(1:length(species_matched))) %>% 
+  filter(count==1)
+d415<-cont_traits3 %>% 
+  filter(DatasetID==415) %>% 
+  right_join(d415sub) %>% 
+  select(-count)
+
+#dataset 237 has lots of repeated values - I looked into this. I think it is okay. The values are similar for LDMC but vary for other things.
+d237<-cont_traits3 %>% 
+  filter(DatasetID==237) %>% 
+  group_by(species_matched, CleanTraitName, StdValue) %>% 
+  summarise(n=length(StdValue))
+
+
+#dropping problem datasets and re-appending clean ones
 cont_traits4<-cont_traits3%>%
   filter(DatasetID!=453)%>%
+  filter(DatasetID!=415) %>% 
   mutate(remove=ifelse(DatasetID==428&CleanTraitName=="plant_height_vegetative", 1, 
                 ifelse(DatasetID==428&CleanTraitName=="root_P", 1, 0)))%>%
   filter(remove==0)%>%
   select(-remove)%>%
   bind_rows(d453)%>%
-  bind_rows(d428)
+  bind_rows(d428) %>% 
+  bind_rows(d415)
 
-#making sure there is just on measuremnt per variable.  
+#making sure there is just on measurement per variable.  
 cont_traits5<-cont_traits4%>%
   mutate(present=1)%>%
   group_by(DatasetID, ObservationID, species_matched, CleanTraitName)%>%
   summarise(n=sum(present))
+
+#making sure there aren't too many repeat measurements per variable.  
+cont_traits6<-cont_traits4%>%
+  group_by(DatasetID, species_matched, CleanTraitName, StdValue)%>%
+  summarise(n=length(CleanTraitName)) %>% 
+  filter(n>10) %>% 
+  filter(CleanTraitName!='seedbank_duration')
 
 #troubleshooting the problems
 probtraits<-subset(cont_traits5, n>1)%>%
@@ -357,5 +387,5 @@ ttraits<-cont_traits4%>%
   spread(CleanTraitName, StdValue, fill=NA)
   
 
-write.csv(ttraits, "C:\\Users\\mavolio2\\Dropbox\\sDiv_sCoRRE_shared\\Trait Data\\TRY Data\\TRY Continuous data/TRY_trait_data_continuous_Nov2021.csv", row.names = F)
-write.csv(cont_traits4, "C:\\Users\\mavolio2\\Dropbox\\sDiv_sCoRRE_shared\\Trait Data\\TRY Data\\TRY Continuous data/TRY_trait_data_continuous_long_Nov2021.csv", row.names = F)
+write.csv(ttraits, "C:\\Users\\mavolio2\\Dropbox\\sDiv_sCoRRE_shared\\CoRRE data\\Trait Data\\Raw TRY Data\\TRY Continuous data/TRY_trait_data_continuous_Nov2022.csv", row.names = F)
+write.csv(cont_traits4, "C:\\Users\\mavolio2\\Dropbox\\sDiv_sCoRRE_shared\\CoRRE data\\Trait Data\\Raw TRY Data\\TRY Continuous data/TRY_trait_data_continuous_long_Nov2022.csv", row.names = F)
