@@ -80,6 +80,8 @@ Bienoutput<-biensubsptraits %>%
   select(DatabaseID, DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue) %>% 
   filter(StdValue!=0)
   
+write.csv(Bienoutput, 'C:\\Users\\mavolio2\\Dropbox\\sDiv_sCoRRE_shared\\CoRRE data\\Trait Data\\BIEN\\BIEN_trait_data_continuous_Nov2022.csv', row.names = F)
+
 Bien2<-Bienoutput%>% 
   group_by(species_matched, CleanTraitName, StdValue) %>% 
   summarize(n=length(StdValue)) %>% 
@@ -87,13 +89,6 @@ Bien2<-Bienoutput%>%
 
 #read in try traits
 try<-read.csv('C:\\Users\\mavolio2\\Dropbox\\sDiv_sCoRRE_shared\\CoRRE data\\trait data\\Raw TRY Data\\TRY Continuous data\\TRY_trait_data_continuous_long_Nov2021.csv')
-
-#how many values are the same in try alone?
-try2<-try %>% 
-  group_by(species_matched, CleanTraitName, StdValue) %>% 
-  summarize(n=length(StdValue)) %>% 
-  filter(n>1)
-
 
 ##what is try and bien overlap
 trybien<-try %>% 
