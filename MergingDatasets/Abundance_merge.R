@@ -227,7 +227,7 @@ d_precip <- read.csv("DL_Precip.csv")%>%
 nsfc<-read.csv("DL_NSFC.csv")%>%
  mutate(data_type=0, version = 2.0, block=0)
 
-Nmow<-read.csv("EGN_Nmow.csv")%>%
+Nmow<-read.csv("EGN_Nmow.csv", encoding="UTF-8")%>%
   rename(abundance=cover)%>%
   mutate(version = 2.0, block=0)%>%
   separate(genus_species, into=c("g", "s", "a", "b", "c"), sep=" ", remove=F)%>%
@@ -356,14 +356,8 @@ change<-read.csv("KNZ_SGS_change.csv")%>%
   filter(abundance !=0)%>%
   filter(!(genus_species %in% c("Unknown forb", "unknown forb", "Unknown fungi")))
 
-irg<-read.delim("KNZ_IRG.txt")%>%
-  select(-id, -nutrients, -light, -carbon, -water, -other_manipulation, -num_manipulations, -experiment_year, -precip,  -plot_mani, -species_num)%>%
-  gather(species_code, abundance, sp1:sp220)%>%
-  mutate(block=0, version = 1.0)
-irg_names<-read.delim("KNZ_IRG_specieslist.txt")
-irg2<-merge(irg, irg_names, by="species_code", all=T)%>%
-  filter(abundance!=0)%>%
-  select(-species_code)
+irg<-read.csv("KNZ_IRG.csv") %>% 
+  mutate(block=0, version=ifelse(calendar_year<=2015, 1.0,2.0))
 
 pplots<-read.csv("KNZ_pplots.csv")%>%
   mutate(site_code="KNZ", project_name="pplots", data_type="cover", community_type=0, block = 0, version=ifelse(calendar_year<=2015, 1.0,2.0))%>%
@@ -679,13 +673,14 @@ combine2 <- combine %>%
   mutate(genus_species3 = gsub("\\s\\s"," ",genus_species2, perl = TRUE)) %>%
   mutate(genus_species4 = gsub("[.]"," ",genus_species3))  %>%
   mutate(genus_species5 = trimws(genus_species4, which='both'))%>%
-  mutate(genus_species6 = gsub("_", " ", genus_species5, fixed = TRUE))%>%
-  mutate(genus_species7 = gsub("\u00A0", " ",genus_species6, fixed = TRUE))%>%
+  mutate(genus_species6 = gsub("\u00A0", " ", genus_species5, fixed = TRUE))%>%
+  mutate(genus_species7 = gsub("_", " ",genus_species6, fixed = TRUE))%>%
   mutate(genus_species8 = tolower(genus_species7))%>%
   select(-genus_species)%>%
   rename(genus_species=genus_species8)%>%
   select(-genus_species1, -genus_species2, -genus_species3, -genus_species4, -genus_species5, -genus_species6, -genus_species7)
-           
+
+combine["218199",]           
 
 # write.csv(combine2, "C:/Users/lapie/Dropbox (Smithsonian)/working groups/CoRRE/CoRRE_database/Data/CompiledData/RawAbundance.csv")
 # write.csv(combine2, "C:/Users/mavolio2/Dropbox/CoRRE_database/Data/CompiledData/RawAbundance.csv", row.names = F)
