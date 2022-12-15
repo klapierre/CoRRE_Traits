@@ -1,6 +1,6 @@
 setwd("C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CleanedData\\Sites\\Species csv") #kim's laptop
 setwd('C:\\Users\\komatsuk\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CleanedData\\Sites\\Species csv') #kim's desktop
-
+setwd('C:\\Users\\mavolio2\\Dropbox\\CoRRE_database\\Data\\CleanedData\\Sites\\Species csv')
 library(tidyverse)
 
 
@@ -2711,7 +2711,7 @@ nitadd<-read.csv("YMN_NitAdd.csv")%>%
 combine<-rbind(atwe, bffert, bgp, biocon, bowman, bt_drought, ccd, change, clip, clonal, culardoch, cxn, e001, e002, e2, e6, edge, eelplot, events, exp1, face, fert1, fert3, fireplots, gane, gap2, gb, gce, gcme, gcme2, gfert, gfp, grazeprecip, herbdiv, herbwood, hprecip, imagine, interaction, irg, kgfert, lind, lovegrass, lucero, mat2, megarich, mnt, mwatfer, nde, nfert, nitadd, nitphos,  nitrogen, npkd, Nprecip, Nmow, nsfc, nut, nutnet, oface, pennings, phace, pme, precip, pplots, pq, ramps, rhps, rmapc, sedge, snfert, snow, sirg, sdrought, study119, study278, t7, ter, tface,tide,tmece,ton, uk, vcrnutnet, wapaclip, warmnit, warmnut, water, watering, wenndex, wet, yu)
 
 # write.csv(combine, "C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CompiledData\\ExperimentInfo.csv", row.names = FALSE)
-
+# write.csv(combine, "C:\\Users\\mavolio2\\Dropbox\\CoRRE_database\\Data\\CompiledData\\ExperimentInfo.csv", row.names = FALSE)
 
 temp_df <- unique(combine[,c(1,2,6,33)])
 trt_sum <- as.data.frame(table(temp_df$trt_type))
