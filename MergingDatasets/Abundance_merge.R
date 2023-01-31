@@ -357,7 +357,7 @@ change<-read.csv("KNZ_SGS_change.csv")%>%
   filter(!(genus_species %in% c("Unknown forb", "unknown forb", "Unknown fungi")))
 
 irg<-read.csv("KNZ_IRG.csv") %>% 
-  mutate(block=0, version=ifelse(calendar_year<=2015, 1.0,2.0))
+  mutate(block=0, version=ifelse(calendar_year<=2009, 1.0,2.0))
 
 pplots<-read.csv("KNZ_pplots.csv")%>%
   mutate(site_code="KNZ", project_name="pplots", data_type="cover", community_type=0, block = 0, version=ifelse(calendar_year<=2015, 1.0,2.0))%>%
@@ -645,8 +645,8 @@ lovegrass <- read.csv("TRA_Lovegrass.csv") %>%
 
 edge <- read.csv("USA_EDGE.csv") %>% ## Added new data 2020
   mutate(data_type = "cover", version = 1.0)%>%
-  filter(abundance !=0, site_code != "SEV")
-
+  filter(abundance !=0, site_code != "SEV") 
+  
 vcrnutnet <- read.csv('VCR_NutNet.csv')%>%
   mutate(community_type = 0, version = 2.0, data_type='cover')%>%
   rename(plot_id=plot, genus_species=taxa, abundance=cover)%>%
@@ -662,10 +662,10 @@ names<-nitadd%>%
   unique()
 
 #merge all datasets
-combine<-rbind(atwe, bffert2, bgp, biocon, bowman2, btdrought, btnpkd, ccd2, change, clip2, clonal2, culardoch2, cxn, d_precip, e001, e0023, e2, e6, edge, eelplot, events2, exp12, face2, fert1, fert3, fireplots2, gane2, gap2, gb2, gce2, gcme, gcme2, gfert, gfp, graze, h_precip, herbdiv, herbwood2, imagine2, interaction2, irg2, kgfert2, lind2, lovegrass,  lucero, mat22, megarich2, mnt2, mwatfer, nde, nfert2, nitadd, nitphos, nitrogen, Nmow, Nprecip, nsfc, nut, nutnet, oface2, pennings2, phace, pme, pplots2, pq2, ramps, rhps, rmapc2, s_drought, s_irg, sask, sev_edge, snfert3, snow,  study1192, study2782, t72, ter, tface, tide2, tmece, ton, uk2, wapaclip2, warmnut2, warmnit, water, watering2,  wenndex3, wet2, vcrnutnet, yu)%>%
+combine<-rbind(atwe, bffert2, bgp, biocon, bowman2, btdrought, btnpkd, ccd2, change, clip2, clonal2, culardoch2, cxn, d_precip, e001, e0023, e2, e6, edge, eelplot, events2, exp12, face2, fert1, fert3, fireplots2, gane2, gap2, gb2, gce2, gcme, gcme2, gfert, gfp, graze, h_precip, herbdiv, herbwood2, imagine2, interaction2, irg, kgfert2, lind2, lovegrass,  lucero, mat22, megarich2, mnt2, mwatfer, nde, nfert2, nitadd, nitphos, nitrogen, Nmow, Nprecip, nsfc, nut, nutnet, oface2, pennings2, phace, pme, pplots2, pq2, ramps, rhps, rmapc2, s_drought, s_irg, sask, sev_edge, snfert3, snow,  study1192, study2782, t72, ter, tface, tide2, tmece, ton, uk2, wapaclip2, warmnut2, warmnit, water, watering2,  wenndex3, wet2, vcrnutnet, yu)%>%
   filter(abundance!='NA')
 
-#cleaning the speices name to remove double spaces "\\s\\", remove "." and "_" and clean spaces at at front and end of names 
+#cleaning the species name to remove double spaces "\\s\\", remove "." and "_" and clean spaces at at front and end of names 
 
 combine2 <- combine %>% 
   mutate(genus_species1 = trimws(genus_species, which='both'))%>%
@@ -680,8 +680,6 @@ combine2 <- combine %>%
   rename(genus_species=genus_species8)%>%
   select(-genus_species1, -genus_species2, -genus_species3, -genus_species4, -genus_species5, -genus_species6, -genus_species7)
 
-combine["218199",]           
-
 # write.csv(combine2, "C:/Users/lapie/Dropbox (Smithsonian)/working groups/CoRRE/CoRRE_database/Data/CompiledData/RawAbundance.csv")
 # write.csv(combine2, "C:/Users/mavolio2/Dropbox/CoRRE_database/Data/CompiledData/RawAbundance.csv", row.names = F)
 
@@ -691,7 +689,7 @@ species_list<-combine2%>%
   unique()
 
 # write.csv(species_list, "C:/Users/lapie/Dropbox (Smithsonian)/working groups/CoRRE/CoRRE_database/Data/CompiledData/Species_lists/SpeciesList_May2022.csv", row.names=F)
-# write.csv(species_list, "C:/Users/mavolio2/Dropbox/CoRRE_database/Data/CompiledData/Species_lists/SpeciesList_May2022.csv", row.names=F)
+# write.csv(species_list, "C:/Users/mavolio2/Dropbox/CoRRE_database/Data/CompiledData/Species_lists/SpeciesList_Jan2023.csv", row.names=F)
 
 ###Getting Relative Cover
 totcov<-combine2%>%
