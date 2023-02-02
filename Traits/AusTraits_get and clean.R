@@ -6,12 +6,12 @@ vignette("austraits")
 library(austraits)
 library(tidyverse)
 
-austraits <- load_austraits(version = "3.0.2", path = "data/austraits")
+austraits <- load_austraits(version = "4.1.0", path = "data/austraits")
 
 traits <- summarise_austraits(austraits, "trait_name")
 
 #doesn't have seed number, stem specific density, rooting depth
-data <- extract_trait(austraits, c('seed_mass',
+data <- extract_trait(austraits, c('seed_dry_mass',
                                    'leaf_CN_ratio', 
                                    'leaf_N_per_dry_mass', 'leaf_N_per_area',
                                    'leaf_C_per_dry_mass', 
@@ -19,8 +19,8 @@ data <- extract_trait(austraits, c('seed_mass',
                                    'leaf_dry_matter_content', 
                                    'leaf_dry_mass', 
                                    'plant_height', 
-                                   'specific_leaf_area', 
-                                   'specific_root_length', 
+                                   'leaf_mass_per_area', #need to inverse this
+                                   'root_specific_root_length', 
                                    'leaf_water_content_per_dry_mass'#, 'leaf_water_content_per_area', 'leaf_water_content_per_fresh_mass', 'leaf_water_content_per_saturated_mass'
                                    ))
 
@@ -30,7 +30,9 @@ traitData <- data$traits%>%
   rename(DatasetID=dataset_id,
          ObservationID=observation_id,
          species_matched=taxon_name,
-         StdValue=value)
+         StdValue=value) %>% 
+  mutate(StdValue=ifelse(trait_name=='leaf_mass_per_area', 1/StdValue, StdValue),
+         trait_name=ifelse(trait_name=='leaf_mass_per_area', 'specific_leaf_area', trait_name))
 
 names <- read.csv('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CompiledData\\Species_lists\\FullList_Nov2021.csv')%>%
   select(-X)%>%
@@ -39,10 +41,9 @@ names <- read.csv('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\
   unique()%>%
   mutate(corre='y')
 
-
 traitDataCoRRE <- traitData%>%
   left_join(names)%>%
-  filter(corre=='y', value_type=='raw_value')%>%
+  filter(corre=='y')%>%
   mutate(CleanTraitName=ifelse(trait_name=='seed_mass', 'seed_dry_mass',
                                ifelse(trait_name=='leaf_CN_ratio', 'leaf_C:N',
                                       ifelse(trait_name=='leaf_N_per_dry_mass', 'leaf_N',
@@ -53,11 +54,12 @@ traitDataCoRRE <- traitData%>%
                                                                          ifelse(trait_name=='leaf_dry_matter_content', 'LDMC',
                                                                                 ifelse(trait_name=='plant_height', 'plant_height_vegetative',
                                                                                        ifelse(trait_name=='specific_leaf_area', 'SLA',
-                                                                                              ifelse(trait_name=='specific_root_length', 'SRL',
+                                                                                              ifelse(trait_name=='root_specific_root_length
+', 'SRL',
                                                                                                      ifelse(trait_name=='leaf_water_content_per_dry_mass', 'water_content', trait_name)))))))))))))
 
 spp <- traitDataCoRRE%>%
   select(species_matched)%>%
   unique()
 
-# write.csv(traitDataCoRRE, 'C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\OriginalData\\Traits\\AusTraits_2022\\AusTraits_CoRRE_Nov2022.csv')
+# write.csv(traitDataCoRRE, 'C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\OriginalData\\Traits\\AusTraits_2022\\AusTraits_CoRRE_Feb2023.csv')
