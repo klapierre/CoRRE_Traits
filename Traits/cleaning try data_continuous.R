@@ -11,6 +11,7 @@ theme_set(theme_bw(12))
 
 #meghan's
 setwd("C:/Users/mavolio2/Dropbox/CoRRE_database/Data/")
+setwd("E:/Dropbox/CoRRE_database/Data/")
 
 #kim's desktop
 setwd('C:\\Users\\komatsuk\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\datasets\\Traits\\Try Data Nov 2019')
