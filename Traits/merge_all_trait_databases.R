@@ -1,11 +1,14 @@
 library(tidyverse)
 
+setwd('C:\\Users\\mavolio2\\Dropbox\\CoRRE_database\\Data') #meghan's
+setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data') #kim's
+
 #read in names
-names <- read.csv("C:\\Users\\mavolio2\\Dropbox\\CoRRE_database\\Data\\CompiledData\\Species_lists\\species_families_trees_2021.csv")
+names <- read.csv("CompiledData\\Species_lists\\species_families_trees_2021.csv")
 
 
 #read in AusTraits
-AusTraits <- read.csv('C:\\Users\\mavolio2\\Dropbox\\CoRRE_database\\Data\\OriginalData\\Traits\\AusTraits_2022\\AusTraits_CoRRE_Nov2022.csv')%>%
+AusTraits <- read.csv('OriginalData\\Traits\\AusTraits_2022\\AusTraits_CoRRE_Feb2023.csv')%>%
   left_join(names)%>%
   filter(tree.non.tree=="non-tree") %>% 
   mutate(species_matched2=species_matched)%>%
@@ -17,11 +20,11 @@ AusTraits <- read.csv('C:\\Users\\mavolio2\\Dropbox\\CoRRE_database\\Data\\Origi
 
 
 #read in TRY
-TRY <- read.csv('C:\\Users\\mavolio2\\Dropbox\\sDiv_sCoRRE_shared\\CoRRE data\\trait data\\Raw TRY Data\\TRY Continuous data\\TRY_trait_data_continuous_long_Nov2022.csv') %>% 
+TRY <- read.csv('OriginalData\\Traits\\Try Data Nov 2019\\TRY_trait_data_continuous_long_Nov2022.csv') %>% 
   mutate(DatabaseID="TRY")
 
 #read in BIEN
-BIEN<-read.csv('C:\\Users\\mavolio2\\Dropbox\\sDiv_sCoRRE_shared\\CoRRE data\\Trait Data\\BIEN\\BIEN_trait_data_continuous_Nov2022.csv')
+BIEN<-read.csv('OriginalData\\Traits\\BIEN\\BIEN_trait_data_continuous_Nov2022.csv')
 
 #rbind all together
 allTraits <- rbind(TRY, AusTraits, BIEN) %>% 
@@ -32,9 +35,9 @@ talltraits<-allTraits %>%
   group_by(DatabaseID, DatasetID, ObservationID, family, genus, species_matched)%>%
   spread(CleanTraitName, StdValue, fill=NA)
 
-write.csv(allTraits, 'C:\\Users\\mavolio2\\Dropbox\\sDiv_sCoRRE_shared\\CoRRE data\\trait data\\AllTraits\\TRYAusBIEN_continuous_Nov2022_long.csv', row.names = F)
+# write.csv(allTraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_Nov2022_long.csv', row.names = F)
 
-write.csv(talltraits, 'C:\\Users\\mavolio2\\Dropbox\\sDiv_sCoRRE_shared\\CoRRE data\\trait data\\AllTraits\\TRYAusBIEN_continuous_Nov2022.csv', row.names = F)
+# write.csv(talltraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_Nov2022.csv', row.names = F)
 
 ##checking traits
 test<-allTraits %>% 
