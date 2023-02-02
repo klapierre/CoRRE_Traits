@@ -20,7 +20,7 @@ AusTraits <- read.csv('OriginalData\\Traits\\AusTraits_2022\\AusTraits_CoRRE_Feb
 
 
 #read in TRY
-TRY <- read.csv('OriginalData\\Traits\\Try Data Nov 2019\\TRY_trait_data_continuous_long_Nov2022.csv') %>% 
+TRY <- read.csv('OriginalData\\Traits\\TRY\\TRY_trait_data_continuous_long_Nov2022.csv') %>% 
   mutate(DatabaseID="TRY")
 
 #read in BIEN
