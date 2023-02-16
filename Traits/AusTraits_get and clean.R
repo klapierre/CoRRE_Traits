@@ -31,7 +31,7 @@ traitData <- data$traits%>%
          ObservationID=observation_id,
          species_matched=taxon_name,
          StdValue=value) %>% 
-  mutate(StdValue=ifelse(trait_name=='leaf_mass_per_area', 1/StdValue, StdValue),
+  mutate(StdValue=ifelse(trait_name=='leaf_mass_per_area', (1/StdValue)*1000, StdValue),
          trait_name=ifelse(trait_name=='leaf_mass_per_area', 'specific_leaf_area', trait_name))
 
 names <- read.csv('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CompiledData\\Species_lists\\FullList_Nov2021.csv')%>%

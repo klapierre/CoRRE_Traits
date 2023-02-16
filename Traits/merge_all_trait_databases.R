@@ -30,6 +30,23 @@ BIEN<-read.csv('OriginalData\\Traits\\BIEN\\BIEN_trait_data_continuous_Nov2022.c
 allTraits <- rbind(TRY, AusTraits, BIEN) %>% 
   select(DatabaseID, DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue)
 
+# How well correlated is BIEN SLA with the others?
+# test <- allTraits %>% 
+#   group_by(DatabaseID, species_matched, CleanTraitName) %>% 
+#   summarise(mean=mean(StdValue)) %>% 
+#   ungroup() %>% 
+#   pivot_wider(names_from=DatabaseID, values_from=mean)
+# 
+# ggplot(data=subset(test, !is.na(TRY) & !is.na(BIEN) & CleanTraitName=='SLA'), aes(x=TRY, y=BIEN)) +
+#   geom_point() +
+#   geom_abline(slope=1)
+# 
+# test2 <- subset(test, !is.na(TRY) & !is.na(BIEN) & CleanTraitName=='SLA')
+# 
+# cor.test(test2$TRY, test2$BIEN)
+# cor.test(test2$TRY, test2$AusTraits)
+
+
 #transpose data like Franzi wants
 talltraits<-allTraits %>% 
   group_by(DatabaseID, DatasetID, ObservationID, family, genus, species_matched)%>%
