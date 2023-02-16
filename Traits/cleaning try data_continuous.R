@@ -37,7 +37,7 @@ units <- dat%>%
 dat2<-dat%>%
   select(DatasetID,DataID, ObsDataID, ObservationID, AccSpeciesID, AccSpeciesName, TraitID, OriglName, TraitName, OrigValueStr, OrigUnitStr, StdValue, UnitName, ErrorRisk)%>%
   mutate(ErrorRisk2=ifelse(is.na(ErrorRisk), 0, ErrorRisk))%>%
-  filter(ErrorRisk2<8)%>%
+  filter(ErrorRisk2<3)%>%
   filter(!is.na(TraitID))
 
 #mering corre with try
@@ -250,7 +250,7 @@ healthy<-cont_traits%>%
 
 ##drop out trees that not seedlings
 #read in which species are trees
-treesp<-read.csv("C:/Users/mavolio2/Dropbox/CoRRE_database/Data/CompiledData/Species_lists/species_families_trees_2021.csv")%>%
+treesp<-read.csv("E:/Dropbox/CoRRE_database/Data/CompiledData/Species_lists/species_families_trees_2021.csv")%>%
   mutate(AccSpeciesName=species_matched)
 
 #get list of tree observations that were made on seedlings
@@ -329,21 +329,49 @@ d428<-cont_traits3%>% #this dataset has two height values per plant, we are taki
   group_by(DatasetID, ObservationID, species_matched, CleanTraitName, family, genus)%>%
   summarise(StdValue=max(StdValue))
 
-#dropping probelm datasets and reappending clean ones
+d415<-cont_traits3 %>% #this dataset has 415 repeats of all data
+  filter(DatasetID==415) %>% 
+  group_by(DatasetID, species_matched, CleanTraitName, family, genus)%>%
+  summarise(StdValue=mean(StdValue)) %>% 
+  ungroup() %>% 
+  mutate(ObservationID=row_number())
+
+d25<-cont_traits3 %>% #this dataset has repeats of many repeats with no pattern
+  filter(DatasetID==25) %>% 
+  group_by(DatasetID, species_matched, CleanTraitName, family, genus)%>%
+  summarise(StdValue=mean(StdValue)) %>% 
+  ungroup() %>% 
+  mutate(ObservationID=row_number())
+
+
+#dropping problem datasets and reappending clean ones
 cont_traits4<-cont_traits3%>%
-  filter(DatasetID!=453)%>%
+  filter(DatasetID!=453&DatasetID!=415&DatasetID!=25)%>%
   mutate(remove=ifelse(DatasetID==428&CleanTraitName=="plant_height_vegetative", 1, 
-                ifelse(DatasetID==428&CleanTraitName=="root_P", 1, 0)))%>%
+                ifelse(DatasetID==428&CleanTraitName=="root_P", 1, 
+                ifelse(DatasetID==339&CleanTraitName=="rooting_depth", 1,
+                ifelse(CleanTraitName=="seed_number"&StdValue==0, 1, 
+                ifelse(CleanTraitName==1104&StdValue==0, 1, 0))))))%>%
   filter(remove==0)%>%
   select(-remove)%>%
   bind_rows(d453)%>%
-  bind_rows(d428)
+  bind_rows(d428) %>% 
+  filter(CleanTraitName!="seedbank_duration") %>% 
+  bind_rows(d415) %>% 
+  bind_row(d25)
 
 #making sure there is just on measuremnt per variable.  
 cont_traits5<-cont_traits4%>%
   mutate(present=1)%>%
   group_by(DatasetID, ObservationID, species_matched, CleanTraitName)%>%
   summarise(n=sum(present))
+
+#prob obs
+repeats<-cont_traits4 %>% 
+  group_by(species_matched, CleanTraitName, StdValue) %>% 
+  summarize(n=length(StdValue)) %>% 
+  filter(n>1)
+  
 
 #troubleshooting the problems
 probtraits<-subset(cont_traits5, n>1)%>%
