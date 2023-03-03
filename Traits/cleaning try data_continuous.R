@@ -33,14 +33,14 @@ units <- dat%>%
 # write.csv(units, 'TRY_all traits_units.csv')
 
 
-#removing trait outliers
+#removing trait outlines
 dat2<-dat%>%
   select(DatasetID,DataID, ObsDataID, ObservationID, AccSpeciesID, AccSpeciesName, TraitID, OriglName, TraitName, OrigValueStr, OrigUnitStr, StdValue, UnitName, ErrorRisk)%>%
   mutate(ErrorRisk2=ifelse(is.na(ErrorRisk), 0, ErrorRisk))%>%
   filter(ErrorRisk2<3)%>%
   filter(!is.na(TraitID))
 
-#mering corre with try
+#merging corre with try
 
 #read in species links to merge try with core
 key<-read.csv("TRYCoRREMerge/corre2trykey_2021.csv")%>%
@@ -57,15 +57,15 @@ dat3<-dat2%>%
 ####selecting desired continuous traits
 #figuring out how clean traits are
 ###FEB 15 
-
-tests<-dat3%>%
-  filter(TraitID %in% c(3109))%>%
-  #select(TraitID, OrigUnitStr, UnitName)%>%
-  #unique()
-  select(TraitID, UnitName, OrigUnitStr, OriglName, TraitName)%>%
-  #filter(UnitName!="g/m2/d")%>%
-  group_by(TraitID, UnitName, OrigUnitStr, OriglName, TraitName)%>%
-  summarize(n=length(TraitID))
+# 
+# tests<-dat3%>%
+#   filter(TraitID %in% c(3109))%>%
+#   #select(TraitID, OrigUnitStr, UnitName)%>%
+#   #unique()
+#   select(TraitID, UnitName, OrigUnitStr, OriglName, TraitName)%>%
+#   #filter(UnitName!="g/m2/d")%>%
+#   group_by(TraitID, UnitName, OrigUnitStr, OriglName, TraitName)%>%
+#   summarize(n=length(TraitID))
 
 #subsetting out traits and naming them
 #if origlname or unit is blank but there are no duplicates we are keepping it.
@@ -250,7 +250,7 @@ healthy<-cont_traits%>%
 
 ##drop out trees that not seedlings
 #read in which species are trees
-treesp<-read.csv("E:/Dropbox/CoRRE_database/Data/CompiledData/Species_lists/species_families_trees_2021.csv")%>%
+treesp<-read.csv("C:/Users/mavolio2/Dropbox/CoRRE_database/Data/CompiledData/Species_lists/species_families_trees_2021.csv")%>%
   mutate(AccSpeciesName=species_matched)
 
 #get list of tree observations that were made on seedlings
@@ -267,7 +267,7 @@ develop<-dat%>%
 
 table(unique(develop$drop))
 
-#merge to drop tree obseravtions that are not seedlings - none were.
+#merge to drop tree observations that are not seedlings - none were.
 developed<-cont_traits%>%
   full_join(develop)
 
@@ -286,7 +286,7 @@ setting<-dat%>%
 table(setting$drop)
 
 
-#merge with out traits - there is no overalp
+#merge with out traits - there is no overlap
 settings<-cont_traits%>%
   full_join(setting)
 
@@ -301,7 +301,7 @@ splist<-key%>%
   na.omit()
 
 
-##drop trees
+##drop trees - check are keeping tree seedlings if the data exists.
 cont_traits2<-cont_traits%>%
   left_join(splist, by="species_matched")%>%
   mutate(remove=ifelse(tree.non.tree=="non-tree", 0, 1))%>%
@@ -316,7 +316,7 @@ cont_traits3<-cont_traits2%>%
   select(-species)
 
 
-###getting dataset to give to Frazni
+###getting dataset to give to Frazni and Padu
 
 #investigating problem traits
 d453<-cont_traits3%>%#this dataset has 3 obs per plant, but no way to link leaves so we are averaging
@@ -343,10 +343,84 @@ d25<-cont_traits3 %>% #this dataset has repeats of many repeats with no pattern
   ungroup() %>% 
   mutate(ObservationID=row_number())
 
+#two data sets with repeated Arabidopsis data and 102 has repeats with 226 all same data provider
+d359<-cont_traits3 %>% #all arabidopsis
+  filter(DatasetID==359) 
+d102<-cont_traits3 %>% 
+  filter(DatasetID==102)%>% 
+  rename(did=DatasetID, 
+         ob=ObservationID) 
+d226<-cont_traits3 %>% 
+  filter(DatasetID==226) %>% 
+  filter(species_matched!="Arabidopsis thaliana") %>% 
+  bind_rows(d359) %>% 
+  full_join(d102, join_by=c("family", "species_matches", "genus", "CleanTraitName", "StdValue")) %>% 
+  mutate(DatasetID=ifelse(is.na(DatasetID), did, DatasetID),
+         ObservationID=ifelse(is.na(ObservationID), ob, ObservationID)) %>% 
+  select(-ob, -did) %>% 
+  unique()
 
-#dropping problem datasets and reappending clean ones
+#two datasets with lot of repeated data - same basic database
+d327<-cont_traits3 %>% #has one more species than 353
+  filter(DatasetID==327) %>% 
+  rename(did=DatasetID, 
+         ob=ObservationID) 
+d353<-cont_traits3 %>% #getting rid of repeated data by full joining by unique values
+  filter(DatasetID==353) %>% 
+  full_join(d327, join_by=c("family", "species_matches", "genus", "CleanTraitName", "StdValue")) %>% 
+  mutate(DatasetID=ifelse(is.na(DatasetID), did, DatasetID),
+         ObservationID=ifelse(is.na(ObservationID), ob, ObservationID)) %>% 
+  select(-ob, -did) %>% 
+  unique() 
+
+# dataset has lot of repeated data randomly
+d1<-cont_traits3 %>% 
+  filter(DatasetID==1) %>% 
+  pivot_wider(names_from=CleanTraitName, values_from = StdValue, names_prefix = "d__") %>% 
+  group_by(species_matched, d__3115, d__leaf_N, d__leaf_C ,d__plant_height_vegetative, d__leaf_longevity, d__3109  , d__leaf_thickness, d__40, d__50 , d__photosynthesis_rate, d__570  ) %>% 
+  mutate(n=length(species_matched), obid2=min(ObservationID)) %>% 
+  select(-ObservationID) %>% 
+  unique() %>% 
+  pivot_longer(d__3115:d__570, names_to = "CleanTraitName1", values_to = "StdValue") %>% 
+  separate(CleanTraitName1, into = c("prefix", "CleanTraitName"), "__") %>% 
+  select( -prefix, -n) %>% 
+  na.omit %>% 
+  rename(ObservationID=obid2)
+
+
+##we investigated many repeats of similar LDMC and water content values. We think this is probably not the best way to have collected this data, but we think the values are real and not duplicated data and are keeping it. This applies to plant vegeative height, LDMC and water content.
+
+#dataset 412 I suspect has lots of duplicated datasets in TRY. I am doing an inner join to try to correct this with the full trait database
+d412<-cont_traits3 %>% 
+  filter(DatasetID==412) %>% 
+  mutate(CleanTraitName=ifelse(CleanTraitName=="leaf_C:N", "LeafCN", CleanTraitName)) %>% 
+  pivot_wider(names_from=CleanTraitName, values_from = StdValue, names_prefix = "d__") %>% 
+  group_by(species_matched, d__40,d__3117,d__leaf_N, d__leaf_P,d__dark_resp_rate,d__leaf_density,   d__leaf_thickness,d__LDMC,d__water_content,d__leaf_C,
+           d__LeafCN, d__leaf_longevity,d__3122,d__50,d__51,d__photosynthesis_rate,d__570) %>% 
+  mutate(n=length(species_matched), obid2=min(ObservationID)) %>% 
+  select(-ObservationID) %>% 
+  unique() %>% 
+  pivot_longer(d__40:d__570, names_to = "CleanTraitName1", values_to = "StdValue") %>% 
+  separate(CleanTraitName1, into = c("prefix", "CleanTraitName"), "__") %>% 
+  select( -prefix, -n) %>% 
+  na.omit %>% 
+  mutate(CleanTraitName=ifelse(CleanTraitName=="LeafCN", "leaf_C:N", CleanTraitName)) %>% 
+  rename(did=DatasetID) 
+
+#dataset 20 I suspect has lots of duplicated datasets in TRY. I am doing an inner join to try to correct this with the full trait database
+d20<-cont_traits3 %>% 
+  filter(DatasetID==20) %>% 
+  rename(did=DatasetID, 
+         ob=ObservationID) 
+
+#this dataset has a lot of repeated values for 3117 (sla), but they are attached to unique observations for other traits and I think we just need to keep what is there.
+d400<-cont_traits3 %>% 
+  filter(DatasetID==400) %>% 
+  pivot_wider(names_from=CleanTraitName, values_from=StdValue)
+
+#dropping problem datasets and re appending clean ones and removing repeated datasets
 cont_traits4<-cont_traits3%>%
-  filter(DatasetID!=453&DatasetID!=415&DatasetID!=25)%>%
+  filter(DatasetID!=453&DatasetID!=415&DatasetID!=25&DatasetID!=226&DatasetID!=359&DatasetID!=327&DatasetID!=353&DatasetID!=412&DatasetID!=102&DatasetID!=1&DatasetID!=20)%>%
   mutate(remove=ifelse(DatasetID==428&CleanTraitName=="plant_height_vegetative", 1, 
                 ifelse(DatasetID==428&CleanTraitName=="root_P", 1, 
                 ifelse(DatasetID==339&CleanTraitName=="rooting_depth", 1,
@@ -358,9 +432,23 @@ cont_traits4<-cont_traits3%>%
   bind_rows(d428) %>% 
   filter(CleanTraitName!="seedbank_duration") %>% 
   bind_rows(d415) %>% 
-  bind_row(d25)
+  bind_rows(d25) %>% 
+  bind_rows(d226) %>% 
+  bind_rows(d353) %>% 
+  bind_rows(d1) %>% 
+  full_join(d412, join_by=c("family", "species_matches", "genus", "CleanTraitName", "StdValue")) %>% 
+  mutate(DatasetID=ifelse(is.na(DatasetID), did, DatasetID),
+         ObservationID=ifelse(is.na(ObservationID), obid2, ObservationID)) %>% 
+  select(-obid2, -did) %>% 
+  unique() %>% 
+  full_join(d20, join_by=c("family", "species_matches", "genus", "CleanTraitName", "StdValue")) %>% 
+  mutate(DatasetID=ifelse(is.na(DatasetID), did, DatasetID),
+         ObservationID=ifelse(is.na(ObservationID), ob, ObservationID)) %>% 
+  select(-ob, -did) %>% 
+  unique()
 
-#making sure there is just on measuremnt per variable.  
+
+#making sure there is just on measurement per variable.  
 cont_traits5<-cont_traits4%>%
   mutate(present=1)%>%
   group_by(DatasetID, ObservationID, species_matched, CleanTraitName)%>%
@@ -371,7 +459,7 @@ repeats<-cont_traits4 %>%
   group_by(species_matched, CleanTraitName, StdValue) %>% 
   summarize(n=length(StdValue)) %>% 
   filter(n>1)
-  
+
 
 #troubleshooting the problems
 probtraits<-subset(cont_traits5, n>1)%>%
