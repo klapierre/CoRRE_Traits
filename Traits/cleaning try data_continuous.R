@@ -418,7 +418,7 @@ d400<-cont_traits3 %>%
   filter(DatasetID==400) %>% 
   pivot_wider(names_from=CleanTraitName, values_from=StdValue)
 
-#dropping problem datasets and re appending clean ones and removing repeated datasets
+#dropping problem datasets and re appending clean ones and removing repeated datasets - Triple check correct things are dropped and added.
 cont_traits4<-cont_traits3%>%
   filter(DatasetID!=453&DatasetID!=415&DatasetID!=25&DatasetID!=226&DatasetID!=359&DatasetID!=327&DatasetID!=353&DatasetID!=412&DatasetID!=102&DatasetID!=1&DatasetID!=20)%>%
   mutate(remove=ifelse(DatasetID==428&CleanTraitName=="plant_height_vegetative", 1, 
