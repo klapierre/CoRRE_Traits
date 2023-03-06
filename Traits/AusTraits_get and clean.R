@@ -56,18 +56,17 @@ traitDataCoRRE <- traitData %>%
   left_join(names) %>%
   filter(corre=='y') %>%
   mutate(CleanTraitName=ifelse(trait_name=='seed_mass', 'seed_dry_mass',
-                               ifelse(trait_name=='leaf_CN_ratio', 'leaf_C:N',
-                                      ifelse(trait_name=='leaf_N_per_dry_mass', 'leaf_N',
-                                             ifelse(trait_name=='leaf_N_per_area', '50',
-                                                    ifelse(trait_name=='leaf_C_per_dry_mass', 'leaf_C',
-                                                           ifelse(trait_name=='leaf_P_per_dry_mass', 'leaf_P',
-                                                                  ifelse(trait_name=='leaf_P_per_area', '51',
-                                                                         ifelse(trait_name=='leaf_dry_matter_content', 'LDMC',
-                                                                                ifelse(trait_name=='plant_height', 'plant_height_vegetative',
-                                                                                       ifelse(trait_name=='specific_leaf_area', 'SLA',
-                                                                                              ifelse(trait_name=='root_specific_root_length
-', 'SRL',
-                                                                                                     ifelse(trait_name=='leaf_water_content_per_dry_mass', 'water_content', trait_name)))))))))))))
+                        ifelse(trait_name=='leaf_CN_ratio', 'leaf_C:N',
+                        ifelse(trait_name=='leaf_N_per_dry_mass', 'leaf_N',
+                        ifelse(trait_name=='leaf_N_per_area', '50',
+                        ifelse(trait_name=='leaf_C_per_dry_mass', 'leaf_C',
+                        ifelse(trait_name=='leaf_P_per_dry_mass', 'leaf_P',
+                        ifelse(trait_name=='leaf_P_per_area', '51',
+                        ifelse(trait_name=='leaf_dry_matter_content', 'LDMC',
+                        ifelse(trait_name=='plant_height', 'plant_height_vegetative',
+                        ifelse(trait_name=='specific_leaf_area', 'SLA',
+                        ifelse(trait_name=='root_specific_root_length', 'SRL',
+                        ifelse(trait_name=='leaf_water_content_per_dry_mass', 'water_content', trait_name)))))))))))))
 
 spp <- traitDataCoRRE %>%
   select(species_matched) %>%
