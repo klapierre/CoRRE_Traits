@@ -66,7 +66,10 @@ traitDataCoRRE <- traitData %>%
                         ifelse(trait_name=='plant_height', 'plant_height_vegetative',
                         ifelse(trait_name=='specific_leaf_area', 'SLA',
                         ifelse(trait_name=='root_specific_root_length', 'SRL',
-                        ifelse(trait_name=='leaf_water_content_per_dry_mass', 'water_content', trait_name)))))))))))))
+                        ifelse(trait_name=='leaf_water_content_per_dry_mass', 'water_content', trait_name))))))))))))) %>% 
+  group_by(DatabaseID, DatasetID, ObservationID, species_matched, CleanTraitName) %>% 
+  summarize(StdValue=max(StdValue)) %>% 
+  ungroup()
 
 spp <- traitDataCoRRE %>%
   select(species_matched) %>%
