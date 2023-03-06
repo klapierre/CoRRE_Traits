@@ -1,8 +1,18 @@
-remotes::install_github("traitecoevo/austraits", 
-                        dependencies = TRUE, upgrade = "ask", 
-                        build_vignettes = TRUE, force=T)
+################################################################################
+##  AusTraits_get and clean.R: Gathering data from AusTraits database for CoRRE database plant species.
+##
+##  Authors: Kimberly Komatsu, Meghan Avolio
+################################################################################
 
-vignette("austraits")
+#kim's
+setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data')
+
+
+# remotes::install_github("traitecoevo/austraits", 
+#                         dependencies = TRUE, upgrade = "ask", 
+#                         build_vignettes = TRUE, force=T)
+
+# vignette("austraits")
 library(austraits)
 library(tidyverse)
 
@@ -21,12 +31,13 @@ data <- extract_trait(austraits, c('seed_dry_mass',
                                    'plant_height', 
                                    'leaf_mass_per_area', #need to inverse this
                                    'root_specific_root_length', 
-                                   'leaf_water_content_per_dry_mass'#, 'leaf_water_content_per_area', 'leaf_water_content_per_fresh_mass', 'leaf_water_content_per_saturated_mass'
+                                   'leaf_water_content_per_dry_mass'
+                                   #, 'leaf_water_content_per_area', 'leaf_water_content_per_fresh_mass', 'leaf_water_content_per_saturated_mass'
                                    ))
 
 
-traitData <- data$traits%>%
-  mutate(DatabaseID='AusTraits')%>%
+traitData <- data$traits %>%
+  mutate(DatabaseID='AusTraits') %>%
   rename(DatasetID=dataset_id,
          ObservationID=observation_id,
          species_matched=taxon_name,
@@ -34,16 +45,16 @@ traitData <- data$traits%>%
   mutate(StdValue=ifelse(trait_name=='leaf_mass_per_area', (1/StdValue)*1000, StdValue),
          trait_name=ifelse(trait_name=='leaf_mass_per_area', 'specific_leaf_area', trait_name))
 
-names <- read.csv('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CompiledData\\Species_lists\\FullList_Nov2021.csv')%>%
-  select(-X)%>%
-  filter(remove==0)%>%
-  select(species_matched)%>%
-  unique()%>%
+names <- read.csv('CompiledData\\Species_lists\\FullList_Nov2021.csv') %>%
+  select(-X) %>%
+  filter(remove==0) %>%
+  select(species_matched) %>%
+  unique() %>%
   mutate(corre='y')
 
-traitDataCoRRE <- traitData%>%
-  left_join(names)%>%
-  filter(corre=='y')%>%
+traitDataCoRRE <- traitData %>%
+  left_join(names) %>%
+  filter(corre=='y') %>%
   mutate(CleanTraitName=ifelse(trait_name=='seed_mass', 'seed_dry_mass',
                                ifelse(trait_name=='leaf_CN_ratio', 'leaf_C:N',
                                       ifelse(trait_name=='leaf_N_per_dry_mass', 'leaf_N',
@@ -58,8 +69,8 @@ traitDataCoRRE <- traitData%>%
 ', 'SRL',
                                                                                                      ifelse(trait_name=='leaf_water_content_per_dry_mass', 'water_content', trait_name)))))))))))))
 
-spp <- traitDataCoRRE%>%
-  select(species_matched)%>%
+spp <- traitDataCoRRE %>%
+  select(species_matched) %>%
   unique()
 
-# write.csv(traitDataCoRRE, 'C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\OriginalData\\Traits\\AusTraits_2022\\AusTraits_CoRRE_Feb2023.csv')
+# write.csv(traitDataCoRRE, 'OriginalData\\Traits\\AusTraits_2022\\AusTraits_CoRRE_March2023.csv')
