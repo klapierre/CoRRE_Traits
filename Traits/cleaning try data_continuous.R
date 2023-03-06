@@ -16,11 +16,11 @@ library(Taxonstand)
 theme_set(theme_bw(12))
 
 #meghan's working directory
-setwd("C:/Users/mavolio2/Dropbox/CoRRE_database/Data/")
-setwd("E:/Dropbox/CoRRE_database/Data/")
+setwd("C:/Users/mavolio2/Dropbox/CoRRE_database/Data/OriginalData/Traits/TRY")
+setwd("E:/Dropbox/CoRRE_database/Data/OriginalData/Traits/TRY")
 
 #kim's working directory
-setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data')
+setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\OriginalData\\Traits\\TRY')
 
 
 #### Reading in data ####
