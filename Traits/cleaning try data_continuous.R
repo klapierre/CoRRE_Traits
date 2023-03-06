@@ -6,18 +6,15 @@ theme_set(theme_bw(12))
 
 ##update Feb 2021
 ##we are adding new species with the CoRRE database 2.0 update
-## we also found we were missing species in the Nov 2019 datapull b/c of naming inconsistencies so we now redoing traits for all species.
+## we also found we were missing species in the Nov 2019 data pull b/c of naming inconsistencies so we now redoing traits for all species.
 
 
 #meghan's
 setwd("C:/Users/mavolio2/Dropbox/CoRRE_database/Data/")
 setwd("E:/Dropbox/CoRRE_database/Data/")
 
-#kim's desktop
-setwd('C:\\Users\\komatsuk\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\datasets\\Traits\\Try Data Nov 2019')
-
-#kim's laptop
-setwd('C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\converge_diverge\\datasets\\Traits\\Try Data Nov 2019')
+#kim's
+setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data')
 
 #read in both datasets
 # dat1<-fread("TRYCoRREMerge/TRY_Traits_Download_Nov2019.txt",sep = "\t",data.table = FALSE,stringsAsFactors = FALSE,strip.white = TRUE)
