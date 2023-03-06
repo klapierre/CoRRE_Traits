@@ -1,11 +1,20 @@
+################################################################################
+##  gather BIEN data.R: Gathering BIEN trait data for CoRRE database plant species.
+##
+##  Authors: Tim Ohlert, Meghan Avolio, Kimberly Komatsu
+################################################################################
+
 library(BIEN)
 library(tidyverse)
-library(plyr)
 
+#kim's
+setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data')
 
+# Get species list from BIEN dataset
 species_list<-BIEN_list_all()
 
-corre_species <- read_csv("C:/Users/ohler/Dropbox/sDiv_sCoRRE_shared/CoRRE data/sCoRRE_tnrs_matching.csv")#species names are standardized to tnrs which is what BIEN uses
+
+corre_species <- read_csv("CompiledData\\Species_lists\\FullList_Nov2021.csv") #species names are standardized 
 corre_species <- corre_species[,c("genus species","Name_matched")] #helps with merging later to prevent duplicate entries due to multiple subspecies
 corre_species <- unique(corre_species)
 
