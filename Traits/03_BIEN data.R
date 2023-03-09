@@ -28,8 +28,7 @@ continuous <- bienData %>%
                            'leaf life span', 'leaf nitrogen content per leaf area', 'leaf nitrogen content per leaf dry mass',
                            'leaf phosphorus content per leaf area', 'leaf phosphorus content per leaf dry mass',
                            'leaf photosynthetic rate per leaf area', 'leaf stomatal conductance for H2O per leaf area',
-                           'leaf stomatal conductance per leaf area', 'leaf thickness', 'seed length', 'seed mass', 'stem wood density',
-                           'whole plant height')) %>% 
+                           'leaf stomatal conductance per leaf area', 'leaf thickness', 'seed length', 'seed mass', 'stem wood density')) %>% 
   mutate(trait_value=as.numeric(trait_value)) %>% 
   # Standardize units to fit TRY
   mutate(clean_trait_value=ifelse(trait_name=='leaf dry mass per leaf fresh mass', trait_value/1000, #LDMC (BIEN mg/g   TRY g/g)
@@ -38,9 +37,7 @@ continuous <- bienData %>%
                            ifelse(trait_name=='leaf nitrogen content per area', trait_value*1000, #leaf N per area (BIEN kg/m2  TRY g/m2)
                            ifelse(trait_name=='leaf phosphorous content per area', trait_value*1000, #leaf P per area (BIEN kg/m2  TRY g/m2)
                            ifelse(trait_name=='leaf dry mass', trait_value*1000, #leaf dry mass (BIEN g   TRY mg)
-                           ifelse(trait_name=='leaf stomatal conductance for H2O per leaf area', trait_value*1000, #stomatal conductance (BIEN mol/m2/s   TRY millimol/m2/s
-                           ifelse(trait_name=='leaf stomatal conductance per leaf area', trait_value/1000, #stomatal conductance (BIEN micromol/m2/s   TRY millimol/m2/s
-                                  trait_value)))))))))
+                                  trait_value)))))))
     
 # Change BIEN trait names to fit TRY trait names
 continuous$trait_name <- recode(continuous$trait_name, 
@@ -61,8 +58,7 @@ continuous$trait_name <- recode(continuous$trait_name,
                                 'leaf thickness'='leaf_thickness',
                                 'seed length'='seed_length',
                                 'seed mass'='seed_dry_mass',
-                                'stem wood density'='stem_spec_density',
-                                'whole plant height'='plant_height_generative')
+                                'stem wood density'='stem_spec_density')
 
 
 # Unify with other dataset columns
