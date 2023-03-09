@@ -1,7 +1,7 @@
 ################################################################################
 ##  gather BIEN data.R: Gathering BIEN trait data for CoRRE database plant species.
 ##
-##  Authors: Tim Ohlert, Meghan Avolio, Kimberly Komatsu
+##  Authors: Kimberly Komatsu, Tim Ohlert, Meghan Avolio
 ################################################################################
 
 library(BIEN)
