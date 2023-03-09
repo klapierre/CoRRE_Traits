@@ -1,48 +1,54 @@
-### Cleaning continuous trait data
-### 
-### Authors: Kimberly Komatsu (komatsuk@si.edu), Meghan Avolio (meghan.avolio@jhu.edu), Kevin Wilcox (kevin.wilcox@uwyo.edu)
-### Created: December 14, 2021; last updated: June 20, 2022
-### Created with R version 4.1.1
-###
+################################################################################
+##  finalizing continuous and categorical traits.R: Checking imputed continuous data and gathered categorical data.
+##
+##  Authors: Kimberly Komatsu, Meghan Avolio, Kevin Wilcox
+################################################################################
 
-###################################
-### Set up working space
-###################################
+#### Set up working space ####
 
 # rm(list=ls()) clean up workspace
 #library(FD)
 library(PerformanceAnalytics)
 library(tidyverse)
 
+# setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CleanedData\\Traits') #Kim's 
 # setwd("C:\\Users\\wilco\\Dropbox\\shared working groups\\sDiv_sCoRRE_shared\\CoRRE data\\") # Kevin's laptop wd
-# setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\CoRRE data\\trait data\\Final TRY Traits\\') #Kim's 
 
 
-############################
-##### Continous traits #####
-############################
 
-### Continuous traits to include: LDMC, SLA, Vegetative_height, seed dry mass, seed number, rooting density, rooting depth 
+#### Categorical trait data ####
+# NOTE: Categorical traits to include: growth_form, life_span, mycorrhizal_type, n_fixation, clonal, photosynthetic_pathway.
+# The rest were not complete (dispersal mode, pollinaton syndrome).
 
-
-##### Read in trait data #####
-imputedRaw <- read.csv("Imputed Continuous_Traits\\Backtrans_GapFilled_sCorre.csv") %>%
-  dplyr::select(-SRL) #need to remove SRL because input data was flawed
-
-
-##### Look at histograms #####
-# hist(imputedRaw$LDMC)
-# hist(imputedRaw$SLA)
-# hist(imputedRaw$plant_height_vegetative)
-# hist(imputedRaw$seed_dry_mass)
-# hist(imputedRaw$seed_number)
-# hist(imputedRaw$rooting_depth)
-# filter(imputedRaw, SLA == max(SLA))
-# filter(imputedRaw, SLA > 200)
+catagoricalTraits <- read.csv("complete categorical traits\\sCoRRE categorical trait data_12142022.csv") %>%
+  dplyr::select(species_matched, growth_form, photosynthetic_pathway, lifespan,  clonal, mycorrhizal_type, n_fixation) %>%
+  mutate(photosynthetic_pathway = replace(photosynthetic_pathway, grep("possible", photosynthetic_pathway), NA)) %>%
+  mutate(clonal = replace(clonal, clonal=="uncertain", NA)) %>%
+  mutate(mycorrhizal_type = replace(mycorrhizal_type, mycorrhizal_type=="uncertain", NA)) %>%
+  mutate(lifespan = replace(lifespan, lifespan=="uncertain", NA)) %>%
+  filter(lifespan != "moss")
 
 
-##### Removing Mosses #####
-mossKey <- read.csv("sCoRRE categorical trait data_final_20211209.csv") %>%
+#### Continuous traits ####
+# NOTE: Continuous traits to include: LDMC, SLA, Vegetative_height, seed dry mass, seed number, rooting density, rooting depth. 
+
+# Read in trait data
+imputedRaw <- read.csv("gap filled continuous traits\\imputed_traits_mice.csv") %>%
+  dplyr::select(-X)
+
+# Look at histograms
+hist(imputedRaw$LDMC)
+hist(imputedRaw$SLA)
+hist(imputedRaw$plant_height_vegetative)
+hist(imputedRaw$seed_dry_mass)
+hist(imputedRaw$seed_number)
+hist(imputedRaw$rooting_depth)
+filter(imputedRaw, SLA == max(SLA))
+filter(imputedRaw, SLA > 200)
+
+
+#### Removing mosses ####
+mossKey <- read.csv("complete categorical traits\\sCoRRE categorical trait data_12142022.csv") %>%
   dplyr::select(species_matched, leaf_type) %>%
   mutate(moss = ifelse(leaf_type=="moss", "moss","non-moss")) %>%
   dplyr::select(-leaf_type)
@@ -140,25 +146,7 @@ ggplot(data=subset(traitsContCheck, species_matched=='Achillea millefolium'), ae
 
 rm(imputedRaw)
 
-#########################################################################
-### Categorical trait data 
-#########################################################################
 
-#### NOTES:
-###
-### Categorical traits to include: growth_form, life_span, mycorrhizal_type, n_fixation, clonal, photosynthetic_pathway 
-###
-#########
-
-
-#all_traits_raw <- openxlsx::read.xlsx("sCoRRE categorical trait data_final_20211209.xlsx", sheet=1) %>%
-traits_catag_clean <- read.csv("CoRRE data\\trait data\\Final Cleaned Traits\\sCoRRE categorical trait data_final_20211209.csv") %>%
-  dplyr::select(species_matched, growth_form, photosynthetic_pathway, lifespan,  clonal, mycorrhizal_type, n_fixation) %>%
-  mutate(photosynthetic_pathway = replace(photosynthetic_pathway, grep("possible", photosynthetic_pathway), NA)) %>%
-  mutate(clonal = replace(clonal, clonal=="uncertain", NA)) %>%
-  mutate(mycorrhizal_type = replace(mycorrhizal_type, mycorrhizal_type=="uncertain", NA)) %>%
-  mutate(lifespan = replace(lifespan, lifespan=="uncertain", NA)) %>%
-  filter(lifespan != "moss")
 
 
 ###########################################################
@@ -166,7 +154,7 @@ traits_catag_clean <- read.csv("CoRRE data\\trait data\\Final Cleaned Traits\\sC
 ###########################################################
 
 traits_all <- dplyr::select(imputedSubset, -LDMC_sd:-rooting_depth_sd) %>%
-  full_join(traits_catag_clean, by="species_matched")
+  full_join(catagoricalTraits, by="species_matched")
 
 # Find species that have continuous data but no categorical data -- 3 of these are mosses, so I will remove them from continuous data in that cleaning script
 # TO DO: We will want to populate categorical data for three species: "Galium mollugo" "Heracleum sphondylium" "Trachypogon spicatus"
