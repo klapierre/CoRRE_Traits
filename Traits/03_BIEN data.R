@@ -10,18 +10,18 @@ library(tidyverse)
 #kim's
 setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data')
 
-# Get species list from BIEN dataset
-species_list<-BIEN_list_all()
 
+# Import CoRRE species names
+corre_species <- read.csv("CompiledData\\Species_lists\\FullList_Nov2021.csv") %>%  #species names are standardized 
+  select(genus_species, species_matched) %>% 
+  unique()
 
-corre_species <- read_csv("CompiledData\\Species_lists\\FullList_Nov2021.csv") #species names are standardized 
-corre_species <- corre_species[,c("genus species","Name_matched")] #helps with merging later to prevent duplicate entries due to multiple subspecies
-corre_species <- unique(corre_species)
+sp.vector <- unique(corre_species$species_matched)
 
-
-sp.vector <- unique(corre_species$Name_matched)
+# Get BIEN data
 bien_data <- BIEN_trait_species(species=sp.vector)
-      #try grabbing all traits for desired species, THEN subset to desired traits
+
+# Subset to data that we want
 continuous_for_corre <- subset(bien_data, 
                          trait_name == "seed mass"|
                          trait_name ==  "maximum whole plant height"|
@@ -50,10 +50,10 @@ continuous_for_corre$trait_value <- as.numeric(continuous_for_corre$trait_value)
 
 
 #standardize units to fit TRY
-    #convert LDMC (BIEN mg/g    TRY g/g)
-     #leaf N per area (BIEN kg/m2  g/m2)
-    #leaf C per area (BIEN kg/m2  g/m2)
-    #leaf P per area (BIEN kg/m2  g/m2)
+    #convert LDMC    (BIEN mg/g   TRY g/g)
+    #leaf N per area (BIEN kg/m2  TRY g/m2)
+    #leaf C per area (BIEN kg/m2  TRY g/m2)
+    #leaf P per area (BIEN kg/m2  TRY g/m2)
 continuous_for_corre$cleaned_trait_value <- ifelse(
   continuous_for_corre$trait_name == "leaf dry mass per leaf fresh mass", continuous_for_corre$trait_value*1000, 
   ifelse(
