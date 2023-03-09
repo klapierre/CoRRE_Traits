@@ -11,8 +11,8 @@
 library(PerformanceAnalytics)
 library(tidyverse)
 
-# setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CleanedData\\Traits') #Kim's 
-# setwd("C:\\Users\\wilco\\Dropbox\\shared working groups\\sDiv_sCoRRE_shared\\CoRRE data\\") # Kevin's laptop wd
+setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data') #Kim's
+setwd("C:\\Users\\wilco\\Dropbox\\shared working groups\\sDiv_sCoRRE_shared\\CoRRE data\\") # Kevin's laptop wd
 
 
 
@@ -20,7 +20,7 @@ library(tidyverse)
 # NOTE: Categorical traits to include: growth_form, life_span, mycorrhizal_type, n_fixation, clonal, photosynthetic_pathway.
 # The rest were not complete (dispersal mode, pollinaton syndrome).
 
-catagoricalTraits <- read.csv("complete categorical traits\\sCoRRE categorical trait data_12142022.csv") %>%
+catagoricalTraits <- read.csv("CleanedData\\Traits\\complete categorical traits\\sCoRRE categorical trait data_12142022.csv") %>%
   dplyr::select(species_matched, growth_form, photosynthetic_pathway, lifespan,  clonal, mycorrhizal_type, n_fixation) %>%
   mutate(photosynthetic_pathway = replace(photosynthetic_pathway, grep("possible", photosynthetic_pathway), NA)) %>%
   mutate(clonal = replace(clonal, clonal=="uncertain", NA)) %>%
@@ -32,63 +32,74 @@ catagoricalTraits <- read.csv("complete categorical traits\\sCoRRE categorical t
 #### Continuous traits ####
 # NOTE: Continuous traits to include: LDMC, SLA, Vegetative_height, seed dry mass, seed number, rooting density, rooting depth. 
 
-# Read in trait data
-imputedRaw <- read.csv("gap filled continuous traits\\imputed_traits_mice.csv") %>%
-  dplyr::select(-X)
+# Read in imputed trait data and bind on species information
+imputedRaw <- read.csv("CleanedData\\Traits\\gap filled continuous traits\\imputed_traits_mice.csv") %>%
+  dplyr::select(-X) %>% 
+  bind_cols(read.csv('OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_March2023.csv')[,c('DatabaseID', 'DatasetID', 'ObservationID', 'family', 'genus', 'species_matched')])
 
-# Look at histograms
-hist(imputedRaw$LDMC)
-hist(imputedRaw$SLA)
-hist(imputedRaw$plant_height_vegetative)
-hist(imputedRaw$seed_dry_mass)
-hist(imputedRaw$seed_number)
-hist(imputedRaw$rooting_depth)
-filter(imputedRaw, SLA == max(SLA))
-filter(imputedRaw, SLA > 200)
+imputedLong <- imputedRaw %>% 
+  pivot_longer(names_to='trait', values_to='imputed_value', seed_dry_mass:X58)
 
 
-#### Removing mosses ####
-mossKey <- read.csv("complete categorical traits\\sCoRRE categorical trait data_12142022.csv") %>%
-  dplyr::select(species_matched, leaf_type) %>%
-  mutate(moss = ifelse(leaf_type=="moss", "moss","non-moss")) %>%
-  dplyr::select(-leaf_type)
-
-imputedSubset <- imputedRaw %>%
-  left_join(mossKey, by="species_matched") %>%
-  mutate(moss=ifelse(moss=="moss","moss","non-moss")) %>%
-  filter(moss!="moss") %>%
-  dplyr::select(-moss) #%>%
-# group_by(genus, family, species_matched) %>%
-# summarize_at(vars(seed_dry_mass:seed_number), list(mean=mean, sd=sd), na.rm=T) %>%
-# ungroup() #total of 1786 species remain
-
-# #total species count = 2403 (so 617 species dropped [likely because they had zero trait data and therefore can't have any data imputed])
-# sppList <- mossKey %>%
-#   filter(moss=='non-moss')
+# Read original trait data and join with imputed data
+originalRaw <- read.csv('OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_March2023.csv') %>%
+  pivot_longer(names_to='trait', values_to='original_value', seed_dry_mass:X58) %>%
+  na.omit()
 
 
-# write.csv(imputedSubset, 'C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\CoRRE data\\trait data\\Final TRY Traits\\Imputed Continuous_Traits\\data to play with\\imputed_continuous_20220620.csv')
+# Join original trait data with imputed data. Only keep traits of interest.
+allContinuous <- imputedLong %>% 
+  left_join(originalRaw) %>% 
+  filter(trait %in% c('dark_resp_rate', 'LDMC', 'leaf_area', 'leaf_C', 'leaf_C.N', 'leaf_density', 'leaf_dry_mass',
+                      'leaf_K', 'leaf_longevity', 'leaf_N', 'leaf_N.P', 'leaf_P', 'leaf_thickness', 'leaf_transp_rate', 
+                      'leaf_width', 'photosynthesis_rate', 'plant_height_generative', 'plant_height_vegetative', 'RGR',
+                      'root.shoot', 'root_C', 'root_density', 'root_diameter', 'root_dry_mass', 'root_N', 'root_P',
+                      'rooting_depth', 'seed_dry_mass', 'seed_length', 'seed_number', 'seed_terminal_velocity', 'SLA',
+                      'SRL', 'stem_spec_density', 'stomatal_conductance')) # dropped J_max and Vc_max because they directly relate to photosynthesis
 
 
-##### outlier check #####
-hierarchy <- read.csv('Imputed Continuous_Traits\\hierarchy_info.txt')
-# hierarchy2 <- filter(hierarchy, X0>0)
-
-imputedMean <- read.delim('Imputed Continuous_Traits\\mean_gap_filled2.txt', header=T)
-imputedSD <- read.delim('Imputed Continuous_Traits\\std_gap_filled2.txt', header=T)
-
-#trying to link files, but won't bind becasue of column mismatch, checking with Franzi
-# bhpmf_means <- imputedMean 
-# Final_Mean_Traits <- cbind(hierarchy,bhpmf_means)
+# Calculate averages for each species
+meanContinuous <- allContinuous %>% 
+  group_by(species_matched, trait) %>% 
+  summarize_at(.vars=c('imputed_value', 'original_value'),
+               .funs=list(mean=mean, sd=sd),
+               na.rm=T) %>% 
+  ungroup()
 
 
-apply(imputedSD[], 2, quantile, probs=c(0, 0.05, 0.25, 0.5, 0.75, 0.95, 1))
+# Compare imputed to original continuous trait data
+ggplot(data=na.omit(allContinuous), aes(x=original_value, y=imputed_value)) +
+  geom_point() +
+  geom_abline(slope=1) +
+  facet_wrap(~trait, scales='free')
 
-imputedSDLong <- imputedSD%>%
-  pivot_longer(names_to='trait', values_to='sd', seed_dry_mass:seed_number)
+ggplot(data=na.omit(meanContinuous), aes(x=original_value_mean, y=imputed_value_mean)) +
+  geom_point() +
+  geom_abline(slope=1) +
+  facet_wrap(~trait, scales='free')
 
 
-ggplot(data=imputedSDLong, aes(x=trait, y=sd)) + geom_boxplot() + geom_point()
+# Look at boxplots for each trait
+ggplot(data=na.omit(allContinuous), aes(x=trait, y=imputed_value)) +
+  geom_boxplot() +
+  facet_wrap(~trait, scales='free')
+
+
+#### Clean imputed continuous trait data ####
+####Check these decisions with Meghan!
+
+cleanContinuous <- allContinuous %>% 
+  #filtering out negative values for everything except leaf transpiration rate (where photosynthesis rate is negative, should actually be 0)
+  mutate(drop=ifelse(trait!='leaf_transp_rate' & imputed_value<0, 1, 0)) %>% 
+  filter(drop==0) %>% #drops 44695 observations
+  #RGR and seed terminal velocity look great! shouldn't drop any of their values
+  
+
+
+# Look at boxplots for each trait
+ggplot(data=na.omit(cleanContinuous), aes(x=trait, y=imputed_value)) +
+  geom_boxplot() +
+  facet_wrap(~trait, scales='free')
 
 
 ##### TO DO #####
@@ -109,30 +120,7 @@ ggplot(data=imputedSDLong, aes(x=trait, y=sd)) + geom_boxplot() + geom_point()
 
 
 
-##### Correlate imputed data with input data #####
-originalTRY <- read.csv('Imputed Continuous_Traits\\Final_Input_sCorr.csv')%>%
-  select(-X)%>%
-  pivot_longer(names_to='trait', values_to='TRY_value', seed_dry_mass:seed_number)%>%
-  na.omit()
 
-traitsContCheck <- imputedSubset%>%
-  select(-X)%>%
-  pivot_longer(names_to='trait', values_to='imputed_value', seed_dry_mass:seed_number)%>%
-  left_join(originalTRY)%>%
-  na.omit()
-
-ggplot(data=traitsContCheck, aes(x=TRY_value, y=imputed_value)) +
-  geom_point() +
-  geom_abline(slope=1) +
-  facet_wrap(~trait, scales='free')
-### traits that are very well correlated with input data
-#seed_number
-
-#getting figures for a few test species
-ggplot(data=subset(traitsContCheck, species_matched=='Achillea millefolium'), aes(x=TRY_value, y=imputed_value)) +
-  geom_point() +
-  geom_abline(slope=1) +
-  facet_wrap(~trait, scales='free')
 
 
 
@@ -146,6 +134,27 @@ ggplot(data=subset(traitsContCheck, species_matched=='Achillea millefolium'), ae
 
 rm(imputedRaw)
 
+
+
+
+#### Removing mosses ####
+mossKey <- read.csv("complete categorical traits\\sCoRRE categorical trait data_12142022.csv") %>%
+  dplyr::select(species_matched, leaf_type) %>%
+  mutate(moss = ifelse(leaf_type=="moss", "moss","non-moss")) %>%
+  dplyr::select(-leaf_type)
+
+imputedSubset <- imputedRaw %>%
+  left_join(mossKey, by="species_matched") %>%
+  mutate(moss=ifelse(moss=="moss","moss","non-moss")) %>%
+  filter(moss!="moss") %>%
+  dplyr::select(-moss) #%>%
+# group_by(genus, family, species_matched) %>%
+# summarize_at(vars(seed_dry_mass:seed_number), list(mean=mean, sd=sd), na.rm=T) %>%
+# ungroup() #total of 1786 species remain
+
+# #total species count = 2403 (so 617 species dropped [likely because they had zero trait data and therefore can't have any data imputed])
+# sppList <- mossKey %>%
+#   filter(moss=='non-moss')
 
 
 
