@@ -37,6 +37,19 @@ BIEN <- read.csv('OriginalData\\Traits\\BIEN\\BIEN_trait_data_continuous_Nov2022
 allTraits <- rbind(TRY, AusTraits, BIEN) %>% 
   select(DatabaseID, DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue)
 
+# Are there any outlier datasets for each trait?
+ggplot(data=subset(allTraits, CleanTraitName %in% c('dark_resp_rate', 'LDMC', 'leaf_area', 'leaf_C', 'leaf_C.N', 'leaf_density',
+                                                    'leaf_dry_mass', 'leaf_K', 'leaf_longevity', 'leaf_N', 'leaf_N.P', 'leaf_P',
+                                                    'leaf_thickness', 'leaf_transp_rate', 'leaf_width', 'photosynthesis_rate',
+                                                    'plant_height_generative', 'plant_height_vegetative', 'RGR', 'root.shoot',
+                                                    'root_C', 'root_density', 'root_diameter', 'root_dry_mass', 'root_N', 'root_P',
+                                                    'rooting_depth', 'seed_dry_mass', 'seed_length', 'seed_number', 
+                                                    'seed_terminal_velocity', 'SLA', 'SRL', 'stem_spec_density',
+                                                    'stomatal_conductance')),
+       aes(x=DatabaseID, y=StdValue, color=DatabaseID)) +
+  geom_boxplot() +
+  facet_wrap(~CleanTraitName, scales='free')
+
 # How well correlated is BIEN SLA with the others? Pretty good, despite not knowing whether the data was collected with or without petiole or on leaves or leaflets when leaves are compound.
 # test <- allTraits %>%
 #   group_by(DatabaseID, species_matched, CleanTraitName) %>%
