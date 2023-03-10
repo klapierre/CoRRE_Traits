@@ -10,28 +10,31 @@ setwd('C:\\Users\\mavolio2\\Dropbox\\CoRRE_database\\Data') #meghan's
 setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data') #kim's
 
 
-
 #### Read in data ####
 
 # Cleaned species names
 names <- read.csv("CompiledData\\Species_lists\\species_families_trees_2021.csv")
 
 # AusTraits
-AusTraits <- read.csv('OriginalData\\Traits\\AusTraits_2022\\AusTraits_CoRRE_March2023.csv')%>%
-  left_join(names)%>%
+AusTraits <- read.csv('OriginalData\\Traits\\AusTraits_2022\\AusTraits_CoRRE_March2023.csv') %>%
+  left_join(names) %>%
   filter(tree.non.tree=="non-tree") %>% 
   mutate(species_matched2=species_matched)%>%
   separate(species_matched2, into=c('genus', 'species'))%>%
   mutate(DatabaseID='AusTraits')%>%
-  select(DatabaseID, DatasetID, ObservationID, family, species_matched, genus, CleanTraitName, StdValue)
+  select(DatabaseID, DatasetID, ObservationID, family, species_matched, genus, CleanTraitName, StdValue) %>% 
+  filter(StdValue!=0)
 
 
 # TRY
 TRY <- read.csv('OriginalData\\Traits\\TRY\\TRYCoRREMerge\\TRY_trait_data_continuous_long_March2023.csv') %>% 
-  mutate(DatabaseID="TRY")
+  mutate(DatabaseID="TRY") %>% 
+  filter(StdValue!=0)
 
 # BIEN
-BIEN <- read.csv('OriginalData\\Traits\\BIEN\\BIEN_trait_data_continuous_Nov2022.csv')
+BIEN <- read.csv('OriginalData\\Traits\\BIEN\\BIEN_for_scorre_20230309.csv') %>% 
+  left_join(names) %>%
+  select(DatabaseID, DatasetID, ObservationID, family, species_matched, genus, CleanTraitName, StdValue)
 
 # Bind all together
 allTraits <- rbind(TRY, AusTraits, BIEN) %>% 
@@ -40,17 +43,17 @@ allTraits <- rbind(TRY, AusTraits, BIEN) %>%
 # Are there any outlier datasets for each trait?
 ggplot(data=subset(allTraits, CleanTraitName %in% c('dark_resp_rate', 'LDMC', 'leaf_area', 'leaf_C', 'leaf_C.N', 'leaf_density',
                                                     'leaf_dry_mass', 'leaf_K', 'leaf_longevity', 'leaf_N', 'leaf_N.P', 'leaf_P',
-                                                    'leaf_thickness', 'leaf_transp_rate', 'leaf_width', 'photosynthesis_rate',
-                                                    'plant_height_generative', 'plant_height_vegetative', 'RGR', 'root.shoot',
-                                                    'root_C', 'root_density', 'root_diameter', 'root_dry_mass', 'root_N', 'root_P',
-                                                    'rooting_depth', 'seed_dry_mass', 'seed_length', 'seed_number', 
-                                                    'seed_terminal_velocity', 'SLA', 'SRL', 'stem_spec_density',
-                                                    'stomatal_conductance')),
+                                                    'leaf_thickness', 'leaf_transp_rate', 'leaf_width', 'plant_height_generative',
+                                                    'plant_height_vegetative', 'RGR', 'root.shoot', 'root_C', 'root_density', 
+                                                    'root_diameter', 'root_dry_mass', 'root_N', 'root_P', 'rooting_depth', 
+                                                    'seed_dry_mass', 'seed_length', 'seed_number', 'seed_terminal_velocity', 'SLA', 
+                                                    'SRL', 'stem_spec_density', 'stomatal_conductance')),
        aes(x=DatabaseID, y=StdValue, color=DatabaseID)) +
   geom_boxplot() +
   facet_wrap(~CleanTraitName, scales='free')
 
-# How well correlated is BIEN SLA with the others? Pretty good, despite not knowing whether the data was collected with or without petiole or on leaves or leaflets when leaves are compound.
+
+# How well correlated is BIEN SLA with the others? No overlap, so not relevent.
 # test <- allTraits %>%
 #   group_by(DatabaseID, species_matched, CleanTraitName) %>%
 #   summarise(mean=mean(StdValue)) %>%
@@ -73,16 +76,18 @@ talltraits <- allTraits %>%
   pivot_wider(names_from=CleanTraitName, values_from=StdValue, values_fill=NA) %>% 
   ungroup()
 
-# write.csv(allTraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_March2023_long.csv', row.names = F)
+# write.csv(allTraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_March2023b_long.csv', row.names = F)
 
-# write.csv(talltraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_March2023.csv', row.names = F)
+# write.csv(talltraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_March2023b.csv', row.names = F)
 
 ##checking traits
 test <- allTraits %>% 
   group_by(species_matched, CleanTraitName, StdValue, DatabaseID) %>% 
   summarize(n=length(StdValue)) %>% 
   ungroup() %>% 
-  filter(n>9)
+  filter(n>10)
 
-## all databases have repeats - 72,936 across all data
-## only 5597 are the same values repeated 10 or more times and were designated as keepers from cleaning code
+sum(test[,'n'])
+
+## all databases have repeats - 28,042 across all data
+## only 2298 are the same values repeated 10 or more times and were designated as keepers from cleaning code
