@@ -37,10 +37,39 @@ continuous <- bienData %>%
                            ifelse(trait_name=='leaf nitrogen content per area', trait_value*1000, #leaf N per area (BIEN kg/m2  TRY g/m2)
                            ifelse(trait_name=='leaf phosphorous content per area', trait_value*1000, #leaf P per area (BIEN kg/m2  TRY g/m2)
                            ifelse(trait_name=='leaf dry mass', trait_value*1000, #leaf dry mass (BIEN g   TRY mg)
-                                  trait_value)))))))
-    
+                                  trait_value))))))) %>% 
+  # Remove data that was not from a naturally growing plant
+  filter(method!='laboratory/greenhouse/garden experiment',
+         trait_value!=0) %>% 
+  rename(species_matched=scrubbed_species_binomial) %>% 
+  #Remove trees
+  left_join(read.csv("CompiledData\\Species_lists\\species_families_trees_2021.csv")) %>% 
+  filter(tree.non.tree != "tree") %>% 
+  # Problem: A few datasets have lots of repeated data for some traits*species.
+  # Solution: For each species, find if there is repeated data for all traits collected on an individual. 
+  # Where this occurs, keep the lowest ObservationID.
+  select(species_matched, trait_name, project_pi, id, clean_trait_value) %>% 
+  pivot_wider(names_from=trait_name, values_from=clean_trait_value, names_prefix = "d__") %>% 
+  group_by_at(vars(!id)) %>% 
+  mutate(n=length(species_matched), obid2=min(id)) %>% 
+  ungroup() %>% 
+  select(-id) %>% 
+  unique() %>% 
+  pivot_longer(3:16, names_to = "CleanTraitName1", values_to = "StdValue") %>% 
+  separate(CleanTraitName1, into = c("prefix", "CleanTraitName"), "__") %>% 
+  select( -prefix, -n) %>% 
+  na.omit() %>% 
+  rename(ObservationID=obid2)
+
+# Checking for duplicate data
+test <- continuous %>% 
+  group_by(species_matched, CleanTraitName, StdValue) %>% 
+  summarize(n=length(StdValue)) %>% 
+  ungroup() %>% 
+  filter(n>2)
+
 # Change BIEN trait names to fit TRY trait names
-continuous$trait_name <- recode(continuous$trait_name, 
+continuous$CleanTraitName <- recode(continuous$CleanTraitName, 
                                 'leaf area'='leaf_area',
                                 'leaf area per dry mass'='SLA',
                                 'leaf carbon content per leaf dry mass'='leaf_C',
@@ -62,23 +91,22 @@ continuous$trait_name <- recode(continuous$trait_name,
 
 
 # Unify with other dataset columns
-continuousFinal <- continuous %>% 
+continuousClean <- continuous %>% 
   mutate(DatabaseID='BIEN') %>% 
-  rename(DatasetID=project_pi,
-         ObservationID=id,
-         species_matched=scrubbed_species_binomial,
-         CleanTraitName=trait_name,
-         StdValue=clean_trait_value) %>% 
+  rename(DatasetID=project_pi) %>% 
   select(DatabaseID, DatasetID, ObservationID, species_matched, CleanTraitName, StdValue) %>% 
-#Remove trees
-  left_join(read.csv("CompiledData\\Species_lists\\species_families_trees_2021.csv")) %>% 
-  filter(tree.non.tree != "tree") %>% 
 # Make a genus column
   separate(species_matched, into = c("genus","species"), sep=" ", remove=FALSE) %>% 
-  select(-species)
+  select(-species) %>% 
+# Filter outliers
+  mutate(drop=ifelse(DatasetID %in% c('Abakumova M', 'Liu Y', 'Osborne CP') & CleanTraitName=='leaf_area', 1, #these studies did something other than leaf area (e.g., total leaf area for the whole plant)
+              ifelse(DatasetID %in% c('Schmid B') & CleanTraitName=='leaf_dry_mass', 1, 0))) %>% #this study did something other than leaf dry mass (e.g., plant mass)
+  filter(drop==0) %>% 
+  select(-drop)
 
 
-# write.csv(continuousFinal, "OriginalData\\Traits\\BIEN\\BIEN_for_scorre_20230309.csv")
+
+# write.csv(continuousClean, "OriginalData\\Traits\\BIEN\\BIEN_for_scorre_20230309.csv", row.names=F)
 
 
 
