@@ -16,7 +16,8 @@ library(mice)
 #####
 #read original trait matrix for imputation:
 setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data')
-traits <- read.table("OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_March2023b.csv", row.names=NULL, sep=",", header=T)
+
+traits <- read.table("OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_March2023c.csv", row.names=NULL, sep=",", header=T)
 
 #remove trait values with > 4 SD:
 spp<-unique(traits$species_matched) #get vector with species names

@@ -16,16 +16,16 @@ library(Taxonstand)
 theme_set(theme_bw(12))
 
 #meghan's working directory
-setwd("C:/Users/mavolio2/Dropbox/CoRRE_database/Data/OriginalData/Traits/TRY")
-setwd("E:/Dropbox/CoRRE_database/Data/OriginalData/Traits/TRY")
+setwd("C:/Users/mavolio2/Dropbox/CoRRE_database/Data/")
+setwd("E:/Dropbox/CoRRE_database/Data/")
 
 #kim's working directory
-setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\OriginalData\\Traits\\TRY')
+setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\')
 
 
 #### Reading in data ####
 # TRY data
-dat <- fread("TRYCoRREMerge/TRY_Traits_Download_Feb15_2021.txt",sep = "\t",data.table = FALSE,stringsAsFactors = FALSE,strip.white = TRUE)
+dat <- fread("OriginalData\\Traits\\TRY\\TRYCoRREMerge/TRY_Traits_Download_Feb15_2021.txt",sep = "\t",data.table = FALSE,stringsAsFactors = FALSE,strip.white = TRUE)
 
 # generate list of units for ALL TRY traits
 units <- dat %>%
@@ -36,7 +36,7 @@ units <- dat %>%
 
 #### Merging CoRRE with TRY ####
 # Read in cleaned CoRRE species names that link with TRY
-key <- read.csv("TRYCoRREMerge/corre2trykey_2021.csv") %>%
+key <- read.csv("OriginalData\\Traits\\TRY\\TRYCoRREMerge\\corre2trykey_2021.csv") %>%
   select(species_matched, AccSpeciesID, AccSpeciesName) %>%
   unique()
 
@@ -197,14 +197,15 @@ dat3 <- dat2 %>%
                         ifelse(TraitID==683, 'root_P', 
                         ifelse(TraitID==1080, 'SRL',
                         ifelse(TraitID==3106, 'plant_height_vegetative', 
-                        ifelse(TraitID==3107, 'plant_height_generative', 
+                        ifelse(TraitID==3107, 'plant_height_generative',
                         ifelse(TraitID==3116, 'SLA', 
                         ifelse(TraitID==3110, 'leaf_area',
                         TraitID)))))))))))))))))))))))))))))))))))))) %>%
-  filter(!is.na(StdValue))
+  filter(!is.na(StdValue)) %>% 
+  filter(CleanTraitName!='plant_height_generative') #removing this trait because it doesn't make sense when compared to plant height vegetative
 
 #testing consistent units for each trait and ranking traits by priority
-priority <- read.csv("TRYCoRREMerge/trait_priority.csv") %>%
+priority <- read.csv("OriginalData\\Traits\\TRY\\TRYCoRREMerge\\trait_priority.csv") %>%
   rename(TraitID=TRY.trait.ID)
 
 Traits_Units <- dat3 %>%
@@ -214,7 +215,7 @@ Traits_Units <- dat3 %>%
   select(-UnitName) %>%
   left_join(priority)
 
-# write.csv(Traits_Units, "TRYCoRREMerge/ContTraitUnits.csv", row.names = F)
+# write.csv(Traits_Units, "OriginalData\\Traits\\TRY\\TRYCoRREMerge\\ContTraitUnits.csv", row.names = F)
 
 
 #### Removing observations that do not meet our criteria ####
@@ -297,7 +298,8 @@ cont_traits3 <- cont_traits2 %>%
   mutate(drop=ifelse(CleanTraitName=="seed_number" & StdValue==0, 1,
               ifelse(CleanTraitName==1104 & StdValue==0, 1, 0))) %>%  #removing seed number where 0 (37 observations)
   filter(drop==0) %>% 
-  select(-drop)
+  select(-drop) %>% 
+  filter(StdValue>0) #removing negative and 0 values (39 observations removed)
 
 
 #### Problem Datasets -- duplicate entries ####
@@ -475,5 +477,5 @@ ttraits <- cont_traits4 %>%
   spread(CleanTraitName, StdValue, fill=NA)
   
 
-# write.csv(ttraits, "TRYCoRREMerge\\TRY_trait_data_continuous_March2023.csv", row.names = F)
-# write.csv(cont_traits4, "TRYCoRREMerge\\TRY_trait_data_continuous_long_March2023.csv", row.names = F)
+# write.csv(ttraits, "OriginalData\\Traits\\TRY\\TRYCoRREMerge\\TRY_trait_data_continuous_March2023.csv", row.names = F)
+# write.csv(cont_traits4, "OriginalData\\Traits\\TRY\\TRYCoRREMerge\\TRY_trait_data_continuous_long_March2023.csv", row.names = F)
