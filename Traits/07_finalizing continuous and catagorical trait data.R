@@ -47,7 +47,7 @@ mossKey <- read.csv("CleanedData\\Traits\\complete categorical traits\\sCoRRE ca
 # Read in imputed trait data and bind on species information
 imputedRaw <- read.csv("CleanedData\\Traits\\gap filled continuous traits\\imputed_traits_mice.csv") %>%
   dplyr::select(-X) %>% 
-  bind_cols(read.csv('OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_March2023b.csv')[,c('DatabaseID', 'DatasetID', 'ObservationID', 'family', 'genus', 'species_matched')]) %>%   
+  bind_cols(read.csv('OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_March2023c.csv')[,c('DatabaseID', 'DatasetID', 'ObservationID', 'family', 'genus', 'species_matched')]) %>%   
   left_join(mossKey) %>% 
   filter(moss!="moss") %>%
   dplyr::select(-moss) #removes 556 species observations
@@ -56,7 +56,7 @@ imputedLong <- imputedRaw %>%
   pivot_longer(names_to='trait', values_to='imputed_value', seed_dry_mass:X58)
 
 # Read original trait data and join with imputed data
-originalRaw <- read.csv('OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_March2023b.csv') %>%
+originalRaw <- read.csv('OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_March2023c.csv') %>%
   pivot_longer(names_to='trait', values_to='original_value', seed_dry_mass:X58) %>%
   na.omit()
 
@@ -124,7 +124,7 @@ ggplot(data=na.omit(allContinuous), aes(x=trait, y=imputed_value)) +
 cleanContinuous <- allContinuous %>% 
   #filtering out negative values for everything except leaf transpiration rate (where photosynthesis rate is negative, should actually be 0)
   mutate(drop=ifelse(trait!='leaf_transp_rate' & imputed_value<0, 1, 0)) %>% 
-  filter(drop==0) %>% #drops 11822 observations
+  filter(drop==0) %>% #drops no observations
   select(-drop)
 
 
