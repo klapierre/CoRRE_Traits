@@ -54,17 +54,20 @@ allTraits <- rbind(TRY, AusTraits, BIEN, TiP, CPTD2) %>%
   select(DatabaseID, DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue)
 
 # Are there any outlier datasets for each trait?
-ggplot(data=subset(allTraits, CleanTraitName %in% c('dark_resp_rate', 'J_max', 'LDMC', 'leaf_area', 'leaf_C', 'leaf_C.N',
+ggplot(data=subset(allTraits, CleanTraitName %in% c('dark_resp_rate', 'J_max', 'LDMC', 'leaf_area', 'leaf_C', 'leaf_C:N',
                                                     'leaf_density', 'leaf_dry_mass', 'leaf_K', 'leaf_longevity', 'leaf_N', 
-                                                    'leaf_N.P', 'leaf_P', 'leaf_thickness', 'leaf_transp_rate', 'leaf_width',
-                                                    'photosynthesis_rate', 'plant_height_vegetative', 'RGR', 'root.shoot', 
+                                                    'leaf_N:P', 'leaf_P', 'leaf_thickness', 'leaf_transp_rate', 'leaf_width',
+                                                    'photosynthesis_rate', 'plant_height_vegetative', 'RGR', 'root:shoot', 
                                                     'root_C', 'root_density', 'root_diameter', 'root_dry_mass', 'root_N', 
                                                     'root_P', 'rooting_depth', 'seed_dry_mass', 'seed_length', 'seed_number',
                                                     'seed_terminal_velocity', 'SLA', 'SRL', 'stem_spec_density',
                                                     'stomatal_conductance', 'Vc_max')),
        aes(x=DatabaseID, y=StdValue, color=DatabaseID)) +
   geom_boxplot() +
-  facet_wrap(~CleanTraitName, scales='free')
+  facet_wrap(~CleanTraitName, scales='free') +
+  theme_bw() +
+  theme(panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank())
 
 
 # How well correlated is BIEN SLA with the others? No overlap, so not relevant.
@@ -113,7 +116,7 @@ sppLength <- talltraits %>%
 multiTraitInd <- allTraits %>% 
   group_by(DatabaseID, DatasetID, ObservationID, species_matched) %>% 
   summarise(num_traits=length(CleanTraitName)) %>% 
-  ungroup() #%>% 
+  ungroup() # %>% 
   # filter(num_traits>1)
 
 ggplot(data=multiTraitInd, aes(x=num_traits)) +
