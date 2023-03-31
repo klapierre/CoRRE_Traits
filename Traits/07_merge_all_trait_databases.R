@@ -25,13 +25,12 @@ AusTraits <- read.csv('OriginalData\\Traits\\AusTraits_2022\\AusTraits_CoRRE_Mar
   select(DatabaseID, DatasetID, ObservationID, family, species_matched, genus, CleanTraitName, StdValue) %>% 
   filter(StdValue>0)
 
-
 # TRY
 TRY <- read.csv('OriginalData\\Traits\\TRY\\TRYCoRREMerge\\TRY_trait_data_continuous_long_March2023.csv') %>% 
   mutate(DatabaseID="TRY") %>% 
   filter(StdValue>0)
 
-# BIEN
+# BIEN - NOTE: photosynthetic rate, stomatal conductence, stem specific density were dropped in the BIEN cleaning file because they were out of line with the TRY trait values
 BIEN <- read.csv('OriginalData\\Traits\\BIEN\\BIEN_for_scorre_20230309.csv') %>% 
   left_join(names) %>%
   select(DatabaseID, DatasetID, ObservationID, family, species_matched, genus, CleanTraitName, StdValue) %>% 
@@ -39,11 +38,19 @@ BIEN <- read.csv('OriginalData\\Traits\\BIEN\\BIEN_for_scorre_20230309.csv') %>%
 
 # TiP leaf
 TiP <- read.csv('OriginalData\\Traits\\TiP_leaf\\TiP_leaf_March2023.csv') %>% 
+  separate(col=species_matched, into=c('genus', 'species'), sep=' ', remove=F) %>% 
+  select(DatabaseID, DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue) %>% 
   filter(StdValue>0)
-  
+
+# China Plant Trait Database 2
+CPTD2 <- read.csv('OriginalData\\Traits\\ChinaPlant2\\CPTD2_March2023.csv') %>% 
+  separate(col=species_matched, into=c('genus', 'species'), sep=' ', remove=F) %>% 
+  select(DatabaseID, DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue) %>% 
+  filter(StdValue>0)
+
 
 # Bind all together
-allTraits <- rbind(TRY, AusTraits, BIEN, TiP) %>% 
+allTraits <- rbind(TRY, AusTraits, BIEN, TiP, CPTD2) %>% 
   select(DatabaseID, DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue)
 
 # Are there any outlier datasets for each trait?
@@ -83,9 +90,9 @@ talltraits <- allTraits %>%
   pivot_wider(names_from=CleanTraitName, values_from=StdValue, values_fill=NA) %>% 
   ungroup()
 
-# write.csv(allTraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_March2023c_long.csv', row.names = F)
+# write.csv(allTraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_March2023d_long.csv', row.names = F)
 
-# write.csv(talltraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_March2023c.csv', row.names = F)
+# write.csv(talltraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_March2023d.csv', row.names = F)
 
 ##checking traits
 test <- allTraits %>% 
@@ -96,5 +103,18 @@ test <- allTraits %>%
 
 sum(test[,'n'])
 
-## all databases have repeats - 28,042 across all data
+## all databases have repeats - 27,000 (exactly) across all data
 ## only 2298 are the same values repeated 10 or more times and were designated as keepers from cleaning code
+
+sppLength <- talltraits %>% 
+  select(species_matched) %>% 
+  unique()
+
+multiTraitInd <- allTraits %>% 
+  group_by(DatabaseID, DatasetID, ObservationID, species_matched) %>% 
+  summarise(num_traits=length(CleanTraitName)) %>% 
+  ungroup() #%>% 
+  # filter(num_traits>1)
+
+ggplot(data=multiTraitInd, aes(x=num_traits)) +
+  geom_histogram(binwidth = 1)

@@ -18,7 +18,8 @@ tip <- read_xlsx('OriginalData\\Traits\\TiP_leaf\\The TiP-Leaf dataset.xlsx', sh
   filter(tree.non.tree != "tree") %>% 
   mutate(LCC=as.numeric(ifelse(LCC=='/', NA, LCC)),
          LNC=as.numeric(ifelse(LNC=='/', NA, LNC)),
-         LPC=as.numeric(ifelse(LPC=='/', NA, LPC))) %>% 
+         LPC=as.numeric(ifelse(LPC=='/', NA, LPC)),
+         SLA=SLA/10) %>% #unit conversion to TRY standards: cm2/g to mm2/mg 
   select(DatabaseID, DatasetID, ObservationID, species_matched, family, LT, DW, LDMC, LWC, LA, SLA, LCC, LNC, LPC) %>% 
   pivot_longer(LT:LPC, names_to='trait_name', values_to='StdValue')
 
@@ -31,4 +32,4 @@ tip$CleanTraitName <- recode(tip$trait_name,
                              'LNC'='leaf_N',
                              'LPC'='leaf_P')
 
-# write.csv(tip, 'OriginalData\\Traits\\TiP_leaf\\TiP_leaf_March2023.csv')
+# write.csv(tip, 'OriginalData\\Traits\\TiP_leaf\\TiP_leaf_March2023.csv', row.names=F)

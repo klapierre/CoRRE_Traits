@@ -1,68 +1,51 @@
+################################################################################
+##  ChinaTraits.R: Gathering data from the China Plant 2 Trait Database for all CoRRE species.
+##
+##  Authors: Meghan Avolio, Kimberly Komatsu
+################################################################################
+
 library(tidyverse)
 
-chinakey<-read.csv("E:\\Dropbox\\CoRRE_database\\Data\\OriginalData\\Traits\\ChinaPlant2\\Species translations.csv")%>% 
-  mutate(species_matched=paste(ACCEPTED.GENUS, ACCEPTED.SPECIES, sep = " "))
+setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data') #Kim
+setwd('E:\\Dropbox\\CoRRE_database\\Data') #Meghan
 
-correSpecies <- read.csv("E:\\Dropbox\\CoRRE_database\\Data\\CompiledData\\Species_lists\\FullList_Nov2021.csv")
+#species from China Plant Trait Database 2 that are in CoRRE database
+spList <- read.csv('OriginalData\\Traits\\ChinaPlant2\\Species translations.csv') %>% 
+  unite(col='species_matched', ACCEPTED.GENUS:ACCEPTED.SPECIES, sep=' ') %>% 
+  select(species_matched, Site.ID, SAMPLE.ID) %>% 
+  left_join(read.csv("CompiledData\\Species_lists\\species_families_trees_2021.csv")) %>% 
+  filter(tree.non.tree=='non-tree')
 
-overlap<-correSpecies %>% 
-  left_join(chinakey) %>% 
-  filter(!is.na(SPECIES.ID)) %>% 
-  select(species_matched, SPECIES.ID, SAMPLE.ID) %>% 
-  unique() %>% 
-  separate(species_matched, into=c("genus", "species", sep=" "), remove = F) %>% 
-  filter(species!="sp") %>% 
-  select(species_matched, SPECIES.ID, SAMPLE.ID)
 
-#read in traits
-chem<-read.csv("E:\\Dropbox\\CoRRE_database\\Data\\OriginalData\\Traits\\ChinaPlant2\\Chemical traits.csv") %>% 
-  right_join(overlap) %>% 
+#trait data
+chem <- read.csv("OriginalData\\Traits\\ChinaPlant2\\Chemical traits.csv") %>% 
   filter(flagged=="") %>% 
-  select(-LMA,-Narea, -Parea, -Karea, -d13C.12C, -d15N.14N, -flagged) %>% 
-  rename(leaf_area=Average.LA,
-         leaf_C=Cmass, 
+  mutate(leaf_area=Average.LA*1000000) %>% #unit conversion to TRY standards: m2 to mm2
+  mutate(LDMC=LDMC/1000) %>% #unit conversion to TRY standards: mg/g to g/g
+  select(-LMA,-Narea, -Parea, -Karea, -d13C.12C, -d15N.14N, -flagged, -Average.LA) %>% 
+  rename(leaf_C=Cmass, 
          leaf_N=Nmass,
          leaf_P=Pmass, 
          leaf_K=Kmass) %>% 
-  pivot_longer(leaf_area:leaf_K, names_to="CleanTraitName", value_to="StdValue")
+  pivot_longer(SLA:leaf_area, names_to="CleanTraitName", values_to="StdValue") %>% 
+  right_join(spList) %>% 
+  na.omit()
+
+photo <- read.csv("OriginalData\\Traits\\ChinaPlant2\\Photosynthetic traits.csv") %>% 
+  filter(flagged=="") %>% 
+  select(SAMPLE.ID, Vcmax, Jmax) %>% 
+  rename(Vc_max=Vcmax,
+         J_max=Jmax) %>% 
+  pivot_longer(Vc_max:J_max, names_to='CleanTraitName', values_to='StdValue') %>% 
+  right_join(spList) %>% 
+  na.omit()
+
+#bind together
+traits <- rbind(chem, photo) %>% 
+  mutate(DatabaseID='CPTD2') %>% 
+  rename(DatasetID=Site.ID,
+         ObservationID=SAMPLE.ID) %>% 
+  select(-tree.non.tree)
 
 
-morph<-read.csv("E:\\Dropbox\\CoRRE_database\\Data\\OriginalData\\Traits\\ChinaPlant2\\Morphometric traits.csv")
-photo<-read.csv("E:\\Dropbox\\CoRRE_database\\Data\\OriginalData\\Traits\\ChinaPlant2\\Photosynthetic traits.csv")
-
-#doesn't have seed number, stem specific density, rooting depth
-data <- extract_trait(austraits, c('leaf_area',
-                                   'leaf_C_per_dry_mass', 
-                                   'leaf_CN_ratio',
-                                   'leaf_dark_respiration_per_dry_mass',
-                                   'leaf_density',
-                                   'leaf_dry_mass', 
-                                   'leaf_dry_matter_content', 
-                                   'leaf_K_per_area',
-                                   'leaf_K_per_dry_mass',
-                                   'leaf_lifespan',
-                                   'leaf_mass_per_area', #need to inverse this
-                                   'leaf_N_per_dry_mass', 'leaf_N_per_area',
-                                   'leaf_NP_ratio',
-                                   'leaf_P_per_dry_mass', 'leaf_P_per_area',
-                                   'leaf_photosynthesis_Jmax_per_area',
-                                   'leaf_photosynthesis_Jmax_per_mass',
-                                   'leaf_photosynthesis_Vcmax_per_area',
-                                   'leaf_photosynthesis_Vcmax_per_mass',
-                                   'leaf_stomatal_conductance_per_area_ambient',
-                                   'leaf_thickness',
-                                   'leaf_transpiration',
-                                   'leaf_water_content_per_dry_mass',
-                                   'leaf_water_content_per_saturated_mass',
-                                   'leaf_width',
-                                   'plant_height', 
-                                   'root_C_per_dry_mass',
-                                   'root_diameter',
-                                   'root_N_per_dry_mass',
-                                   'root_P_per_dry_mass',
-                                   'root_shoot_ratio',
-                                   'root_specific_root_length', 
-                                   'seed_dry_mass',
-                                   'seed_length'
-                                   #, 'leaf_water_content_per_area', 'leaf_water_content_per_fresh_mass', 'leaf_water_content_per_saturated_mass'
-))
+# write.csv(traits, 'OriginalData\\Traits\\ChinaPlant2\\CPTD2_March2023.csv', row.names=F)

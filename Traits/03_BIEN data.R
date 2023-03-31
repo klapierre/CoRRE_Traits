@@ -27,9 +27,10 @@ continuous <- bienData %>%
                            'leaf carbon content per leaf nitrogen content', 'leaf dry mass', 'leaf dry mass per leaf fresh mass',
                            'leaf life span', 'leaf nitrogen content per leaf area', 'leaf nitrogen content per leaf dry mass',
                            'leaf phosphorus content per leaf area', 'leaf phosphorus content per leaf dry mass',
-                           # 'leaf photosynthetic rate per leaf area', 
-                           'leaf stomatal conductance for H2O per leaf area',
-                           'leaf stomatal conductance per leaf area', 'leaf thickness', 'seed length', 'seed mass', 'stem wood density')) %>% 
+                           # 'leaf photosynthetic rate per leaf area', 'stem wood density', 'leaf stomatal conductance for H2O per leaf area',
+                           # 'leaf stomatal conductance per leaf area', 'leaf photosynthetic rate per leaf area',
+                           # 'leaf photosynthetic rate per leaf dry mass'
+                           'leaf thickness', 'seed length', 'seed mass')) %>% 
   mutate(trait_value=as.numeric(trait_value)) %>% 
   # Standardize units to fit TRY
   mutate(clean_trait_value=ifelse(trait_name=='leaf dry mass per leaf fresh mass', trait_value/1000, #LDMC (BIEN mg/g   TRY g/g)
@@ -56,7 +57,7 @@ continuous <- bienData %>%
   ungroup() %>% 
   select(-id) %>% 
   unique() %>% 
-  pivot_longer(3:16, names_to = "CleanTraitName1", values_to = "StdValue") %>% 
+  pivot_longer(3:13, names_to = "CleanTraitName1", values_to = "StdValue") %>% 
   separate(CleanTraitName1, into = c("prefix", "CleanTraitName"), "__") %>% 
   select( -prefix, -n) %>% 
   na.omit() %>% 
@@ -83,12 +84,13 @@ continuous$CleanTraitName <- recode(continuous$CleanTraitName,
                                 'leaf phosphorus content per leaf area'='51',
                                 'leaf phosphorus content per leaf dry mass'='leaf_P',
                                 # 'leaf photosynthetic rate per leaf area'='photosynthesis_rate',
-                                'leaf stomatal conductance for H2O per leaf area'='stomatal_conductance',
-                                'leaf stomatal conductance per leaf area'='stomatal_conductance',
+                                # 'leaf stomatal conductance for H2O per leaf area'='stomatal_conductance',
+                                # 'leaf stomatal conductance per leaf area'='stomatal_conductance',
                                 'leaf thickness'='leaf_thickness',
                                 'seed length'='seed_length',
                                 'seed mass'='seed_dry_mass',
-                                'stem wood density'='stem_spec_density')
+                                # 'stem wood density'='stem_spec_density'
+                                )
 
 
 # Unify with other dataset columns
