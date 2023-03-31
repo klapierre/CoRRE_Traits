@@ -15,8 +15,9 @@ library(mice)
 
 #####
 #read original trait matrix for imputation:
-getwd()
-traits <- read.table("OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_March2023b.csv", row.names=NULL, sep=",", header=T)
+setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data')
+
+traits <- read.table("OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_March2023c.csv", row.names=NULL, sep=",", header=T)
 
 #remove trait values with > 4 SD:
 spp<-unique(traits$species_matched) #get vector with species names
@@ -88,7 +89,7 @@ fold<-c(rep(10:20, 8), 10, 11)
 repe<-90 #should be 90
 
 #gap-filling:
-for(i in 1:60) { #loop for each trait (column)
+for(i in 1:repe) { #loop for each trait (column)
   set.seed(123)
   GapFilling(as.matrix(trait.info), hierarchy.info,
              num.samples=smpl[i], num.folds.tuning=fold[i], burn=187,
