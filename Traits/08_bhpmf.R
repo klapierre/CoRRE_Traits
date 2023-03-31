@@ -17,7 +17,7 @@ library(mice)
 #read original trait matrix for imputation:
 setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data')
 
-traits <- read.table("OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_March2023c.csv", row.names=NULL, sep=",", header=T)
+traits <- read.table("OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_March2023d.csv", row.names=NULL, sep=",", header=T)
 
 #remove trait values with > 4 SD:
 spp<-unique(traits$species_matched) #get vector with species names
@@ -74,12 +74,12 @@ for(i in 1:ncol(trait.info)){
   trait.info[,i] <- x
 }
 #write.table(back_trans_pars, "AllTraits/back_trans_pars.csv")
-write.table(back_trans_pars, "CleanedData\\Traits\\gap filled continuous traits\\back_trans_pars.csv")
+write.table(back_trans_pars, "CleanedData\\Traits\\gap filled continuous traits\\20230331\\back_trans_pars.csv")
 
 #Split-out code here and load data here:
 
 #set-directory
-tmp.dir<-dirname("CleanedData\\Traits\\gap filled continuous traits\\tmp")
+tmp.dir<-dirname("CleanedData\\Traits\\gap filled continuous traits\\20230331\\tmp")
 
 #set parameters
 smpl<-911:1000
@@ -104,8 +104,8 @@ for(i in 1:repe) { #loop for each trait (column)
 mean.trait<-list()
 for(i in 1:repe) { #loop for each trait (column)
   print(i)
-  trt<-read.table(paste0("CleanedData\\Traits\\gap filled continuous traits\\mean_gap_filled_",i,".txt"), row.names=NULL, header=T)
-  std<-read.table(paste0("CleanedData\\Traits\\gap filled continuous traits\\std_gap_filled_",i,".txt"), row.names=NULL, header=T)
+  trt<-read.table(paste0("CleanedData\\Traits\\gap filled continuous traits\\20230331\\mean_gap_filled_",i,".txt"), row.names=NULL, header=T)
+  std<-read.table(paste0("CleanedData\\Traits\\gap filled continuous traits\\20230331\\std_gap_filled_",i,".txt"), row.names=NULL, header=T)
 
   #Return to NA those values with SD > 1:
   for(j in 1:ncol(trt)) {
@@ -132,7 +132,7 @@ for(j in 1:ncol(trait.info)) {
 }
 
 #return to original values:
-back<-read.table("CleanedData\\Traits\\gap filled continuous traits\\back_trans_pars.csv")
+back<-read.table("CleanedData\\Traits\\gap filled continuous traits\\20230331\\back_trans_pars.csv")
 
 o<-1 #to select the appropriate columns:
 for(i in 1:ncol(trait.info)){
@@ -157,13 +157,13 @@ for(i in 1:ncol(trait.info)){
 }
 
 #save output:
-write.table(trait.info, "CleanedData\\Traits\\gap filled continuous traits\\imputed_traits.csv")
+write.table(trait.info, "CleanedData\\Traits\\gap filled continuous traits\\20230331\\imputed_traits.csv")
 
 #Impute missing values with "mice":
 trait.info.mice<-complete(mice(trait.info, method="cart"))
 
 #save output:
-write.table(trait.info.mice, "CleanedData\\Traits\\gap filled continuous traits\\imputed_traits_mice.csv")
+write.table(trait.info.mice, "CleanedData\\Traits\\gap filled continuous traits\\20230331\\imputed_traits_mice.csv")
 
 #clean-up:
 rm(list = ls())
