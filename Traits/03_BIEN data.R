@@ -27,7 +27,8 @@ continuous <- bienData %>%
                            'leaf carbon content per leaf nitrogen content', 'leaf dry mass', 'leaf dry mass per leaf fresh mass',
                            'leaf life span', 'leaf nitrogen content per leaf area', 'leaf nitrogen content per leaf dry mass',
                            'leaf phosphorus content per leaf area', 'leaf phosphorus content per leaf dry mass',
-                           'leaf photosynthetic rate per leaf area', 'leaf stomatal conductance for H2O per leaf area',
+                           # 'leaf photosynthetic rate per leaf area', 
+                           'leaf stomatal conductance for H2O per leaf area',
                            'leaf stomatal conductance per leaf area', 'leaf thickness', 'seed length', 'seed mass', 'stem wood density')) %>% 
   mutate(trait_value=as.numeric(trait_value)) %>% 
   # Standardize units to fit TRY
@@ -81,7 +82,7 @@ continuous$CleanTraitName <- recode(continuous$CleanTraitName,
                                 'leaf nitrogen content per leaf dry mass'='leaf_N',
                                 'leaf phosphorus content per leaf area'='51',
                                 'leaf phosphorus content per leaf dry mass'='leaf_P',
-                                'leaf photosynthetic rate per leaf area'='photosynthesis_rate',
+                                # 'leaf photosynthetic rate per leaf area'='photosynthesis_rate',
                                 'leaf stomatal conductance for H2O per leaf area'='stomatal_conductance',
                                 'leaf stomatal conductance per leaf area'='stomatal_conductance',
                                 'leaf thickness'='leaf_thickness',

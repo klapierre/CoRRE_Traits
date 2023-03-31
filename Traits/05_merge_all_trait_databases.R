@@ -23,37 +23,39 @@ AusTraits <- read.csv('OriginalData\\Traits\\AusTraits_2022\\AusTraits_CoRRE_Mar
   separate(species_matched2, into=c('genus', 'species'))%>%
   mutate(DatabaseID='AusTraits')%>%
   select(DatabaseID, DatasetID, ObservationID, family, species_matched, genus, CleanTraitName, StdValue) %>% 
-  filter(StdValue!=0)
+  filter(StdValue>0)
 
 
 # TRY
 TRY <- read.csv('OriginalData\\Traits\\TRY\\TRYCoRREMerge\\TRY_trait_data_continuous_long_March2023.csv') %>% 
   mutate(DatabaseID="TRY") %>% 
-  filter(StdValue!=0)
+  filter(StdValue>0)
 
 # BIEN
 BIEN <- read.csv('OriginalData\\Traits\\BIEN\\BIEN_for_scorre_20230309.csv') %>% 
   left_join(names) %>%
-  select(DatabaseID, DatasetID, ObservationID, family, species_matched, genus, CleanTraitName, StdValue)
+  select(DatabaseID, DatasetID, ObservationID, family, species_matched, genus, CleanTraitName, StdValue) %>% 
+  filter(StdValue>0)
 
 # Bind all together
 allTraits <- rbind(TRY, AusTraits, BIEN) %>% 
   select(DatabaseID, DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue)
 
 # Are there any outlier datasets for each trait?
-ggplot(data=subset(allTraits, CleanTraitName %in% c('dark_resp_rate', 'LDMC', 'leaf_area', 'leaf_C', 'leaf_C.N', 'leaf_density',
-                                                    'leaf_dry_mass', 'leaf_K', 'leaf_longevity', 'leaf_N', 'leaf_N.P', 'leaf_P',
-                                                    'leaf_thickness', 'leaf_transp_rate', 'leaf_width', 'plant_height_generative',
-                                                    'plant_height_vegetative', 'RGR', 'root.shoot', 'root_C', 'root_density', 
-                                                    'root_diameter', 'root_dry_mass', 'root_N', 'root_P', 'rooting_depth', 
-                                                    'seed_dry_mass', 'seed_length', 'seed_number', 'seed_terminal_velocity', 'SLA', 
-                                                    'SRL', 'stem_spec_density', 'stomatal_conductance')),
+ggplot(data=subset(allTraits, CleanTraitName %in% c('dark_resp_rate', 'J_max', 'LDMC', 'leaf_area', 'leaf_C', 'leaf_C.N',
+                                                    'leaf_density', 'leaf_dry_mass', 'leaf_K', 'leaf_longevity', 'leaf_N', 
+                                                    'leaf_N.P', 'leaf_P', 'leaf_thickness', 'leaf_transp_rate', 'leaf_width',
+                                                    'photosynthesis_rate', 'plant_height_vegetative', 'RGR', 'root.shoot', 
+                                                    'root_C', 'root_density', 'root_diameter', 'root_dry_mass', 'root_N', 
+                                                    'root_P', 'rooting_depth', 'seed_dry_mass', 'seed_length', 'seed_number',
+                                                    'seed_terminal_velocity', 'SLA', 'SRL', 'stem_spec_density',
+                                                    'stomatal_conductance', 'Vc_max')),
        aes(x=DatabaseID, y=StdValue, color=DatabaseID)) +
   geom_boxplot() +
   facet_wrap(~CleanTraitName, scales='free')
 
 
-# How well correlated is BIEN SLA with the others? No overlap, so not relevent.
+# How well correlated is BIEN SLA with the others? No overlap, so not relevant.
 # test <- allTraits %>%
 #   group_by(DatabaseID, species_matched, CleanTraitName) %>%
 #   summarise(mean=mean(StdValue)) %>%
@@ -76,9 +78,9 @@ talltraits <- allTraits %>%
   pivot_wider(names_from=CleanTraitName, values_from=StdValue, values_fill=NA) %>% 
   ungroup()
 
-# write.csv(allTraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_March2023b_long.csv', row.names = F)
+# write.csv(allTraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_March2023c_long.csv', row.names = F)
 
-# write.csv(talltraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_March2023b.csv', row.names = F)
+# write.csv(talltraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_March2023c.csv', row.names = F)
 
 ##checking traits
 test <- allTraits %>% 
