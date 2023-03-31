@@ -37,8 +37,13 @@ BIEN <- read.csv('OriginalData\\Traits\\BIEN\\BIEN_for_scorre_20230309.csv') %>%
   select(DatabaseID, DatasetID, ObservationID, family, species_matched, genus, CleanTraitName, StdValue) %>% 
   filter(StdValue>0)
 
+# TiP leaf
+TiP <- read.csv('OriginalData\\Traits\\TiP_leaf\\TiP_leaf_March2023.csv') %>% 
+  filter(StdValue>0)
+  
+
 # Bind all together
-allTraits <- rbind(TRY, AusTraits, BIEN) %>% 
+allTraits <- rbind(TRY, AusTraits, BIEN, TiP) %>% 
   select(DatabaseID, DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue)
 
 # Are there any outlier datasets for each trait?

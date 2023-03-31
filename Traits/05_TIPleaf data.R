@@ -1,5 +1,5 @@
 ################################################################################
-##  gather BIEN data.R: Gathering BIEN trait data for CoRRE database plant species.
+##  TiPleaf data.R: Gathering TiP Leaf trait data for CoRRE database plant species.
 ##
 ##  Authors: Kimberly Komatsu
 ################################################################################
