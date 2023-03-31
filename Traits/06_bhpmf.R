@@ -88,7 +88,7 @@ fold<-c(rep(10:20, 8), 10, 11)
 repe<-90 #should be 90
 
 #gap-filling:
-for(i in 60:repe) { #loop for each trait (column)
+for(i in 1:60) { #loop for each trait (column)
   set.seed(123)
   GapFilling(as.matrix(trait.info), hierarchy.info,
              num.samples=smpl[i], num.folds.tuning=fold[i], burn=187,
