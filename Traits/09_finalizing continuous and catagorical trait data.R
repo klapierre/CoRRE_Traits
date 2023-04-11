@@ -45,9 +45,9 @@ mossKey <- read.csv("CleanedData\\Traits\\complete categorical traits\\sCoRRE ca
   dplyr::select(-leaf_type)
 
 # Read in imputed trait data and bind on species information
-imputedRaw <- read.csv("CleanedData\\Traits\\gap filled continuous traits\\imputed_traits_mice.csv") %>%
+imputedRaw <- read.csv("CleanedData\\Traits\\gap filled continuous traits\\20230331\\imputed_traits_mice.csv") %>%
   dplyr::select(-X) %>% 
-  bind_cols(read.csv('OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_March2023c.csv')[,c('DatabaseID', 'DatasetID', 'ObservationID', 'family', 'genus', 'species_matched')]) %>%   
+  bind_cols(read.csv('OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_March2023d.csv')[,c('DatabaseID', 'DatasetID', 'ObservationID', 'family', 'genus', 'species_matched')]) %>%   
   left_join(mossKey) %>% 
   filter(moss!="moss") %>%
   dplyr::select(-moss) #removes 556 species observations
@@ -56,7 +56,7 @@ imputedLong <- imputedRaw %>%
   pivot_longer(names_to='trait', values_to='imputed_value', seed_dry_mass:X58)
 
 # Read original trait data and join with imputed data
-originalRaw <- read.csv('OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_March2023c.csv') %>%
+originalRaw <- read.csv('OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_March2023d.csv') %>%
   pivot_longer(names_to='trait', values_to='original_value', seed_dry_mass:X58) %>%
   na.omit()
 
@@ -66,10 +66,10 @@ allContinuous <- imputedLong %>%
   left_join(originalRaw) %>% 
   filter(trait %in% c('dark_resp_rate', 'LDMC', 'leaf_area', 'leaf_C', 'leaf_C.N', 'leaf_density', 'leaf_dry_mass',
                       'leaf_K', 'leaf_longevity', 'leaf_N', 'leaf_N.P', 'leaf_P', 'leaf_thickness', 'leaf_transp_rate', 
-                      'leaf_width', 'photosynthesis_rate', 'plant_height_generative', 'plant_height_vegetative', 'RGR',
-                      'root.shoot', 'root_C', 'root_density', 'root_diameter', 'root_dry_mass', 'root_N', 'root_P',
-                      'rooting_depth', 'seed_dry_mass', 'seed_length', 'seed_number', 'seed_terminal_velocity', 'SLA',
-                      'SRL', 'stem_spec_density', 'stomatal_conductance')) # dropped J_max and Vc_max because they directly relate to photosynthesis
+                      'leaf_width', 'photosynthesis_rate', 'plant_height_vegetative', 'RGR', 'root.shoot', 'root_C', 
+                      'root_density', 'root_diameter', 'root_dry_mass', 'root_N', 'root_P', 'rooting_depth', 'seed_dry_mass', 
+                      'seed_length', 'seed_number', 'seed_terminal_velocity', 'SLA', 'SRL', 'stem_spec_density', 
+                      'stomatal_conductance')) # dropped J_max and Vc_max because they directly relate to photosynthesis
 
 # Calculate averages for each species
 meanContinuous <- allContinuous %>% 
@@ -119,12 +119,15 @@ ggplot(data=na.omit(allContinuous), aes(x=trait, y=imputed_value)) +
 #### Clean imputed continuous trait data ####
 ####Check these decisions with Meghan!
 
-#note: problematic trait is photosynthesis_rate. Things that look problematic but Kim thinks are real: leaf_area (some ferns and palms with huge leaves), plant_height_vegetative (vines that have big big heights like Vitus sp and virginia creeper), seed number (consistently high numbers for some species that probably do have lots of seeds)
+#Checked to ensure no negative values (confirmed that there are none)
+
+#Things that look problematic but Kim thinks are real: leaf_area (some ferns and palms with huge leaves), plant_height_vegetative (vines that have big big heights like Vitus sp and virginia creeper), seed number (consistently high numbers for some species that probably do have lots of seeds)
+
+#Things that are a problem: Some imputed seed number values are less than 1, which doesn't make sense.
 
 cleanContinuous <- allContinuous %>% 
-  #filtering out negative values for everything except leaf transpiration rate (where photosynthesis rate is negative, should actually be 0)
-  mutate(drop=ifelse(trait!='leaf_transp_rate' & imputed_value<0, 1, 0)) %>% 
-  filter(drop==0) %>% #drops no observations
+  mutate(drop=ifelse(trait=='seed_number' & imputed_value<1, 1, 0)) %>% 
+  filter(drop==0) %>% #drops 925 observations
   select(-drop)
 
 
