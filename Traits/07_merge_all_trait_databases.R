@@ -5,6 +5,7 @@
 ################################################################################
 
 library(tidyverse)
+library(ggbreak) 
 
 setwd('C:\\Users\\mavolio2\\Dropbox\\CoRRE_database\\Data') #meghan's
 setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data') #kim's
@@ -48,10 +49,16 @@ CPTD2 <- read.csv('OriginalData\\Traits\\ChinaPlant2\\CPTD2_March2023.csv') %>%
   select(DatabaseID, DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue) %>% 
   filter(StdValue>0)
 
+#find ferns and lycophytes
+growthForm <- read.csv("CleanedData\\Traits\\complete categorical traits\\sCoRRE categorical trait data_12142022.csv") %>% 
+  select(species_matched, growth_form)
 
 # Bind all together
 allTraits <- rbind(TRY, AusTraits, BIEN, TiP, CPTD2) %>% 
+  left_join(growthForm) %>% 
+  filter(!(growth_form %in% c('fern', 'lycophyte'))) %>% 
   select(DatabaseID, DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue)
+
 
 # Are there any outlier datasets for each trait?
 ggplot(data=subset(allTraits, CleanTraitName %in% c('dark_resp_rate', 'J_max', 'LDMC', 'leaf_area', 'leaf_C', 'leaf_C:N',
@@ -62,12 +69,19 @@ ggplot(data=subset(allTraits, CleanTraitName %in% c('dark_resp_rate', 'J_max', '
                                                     'root_P', 'rooting_depth', 'seed_dry_mass', 'seed_length', 'seed_number',
                                                     'seed_terminal_velocity', 'SLA', 'SRL', 'stem_spec_density',
                                                     'stomatal_conductance', 'Vc_max')),
-       aes(x=DatabaseID, y=StdValue, color=DatabaseID)) +
-  geom_boxplot() +
-  facet_wrap(~CleanTraitName, scales='free') +
+       aes(x=DatabaseID, y=StdValue)) +
+  geom_jitter(aes(color=DatabaseID)) +
+  geom_boxplot(color='black', alpha=0) +
+  facet_wrap(~CleanTraitName, scales='free', ncol=4) +
+  scale_x_discrete(breaks=c("AusTraits", "BIEN", "CPTD2", "TIPleaf", "TRY"),
+                   labels=c("A", "B", "C", "TIP", "TRY")) +
+  scale_color_manual(values=c('#4E3686', '#5DA4D9', '#80D87F', '#FED23F', '#EE724C')) +
   theme_bw() +
   theme(panel.grid.major=element_blank(),
-        panel.grid.minor=element_blank())
+        panel.grid.minor=element_blank(),
+        legend.position='top') 
+
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 1_input traits histograms.png', width=7.5, height=10, units='in', dpi=300, bg='white')
 
 
 # How well correlated is BIEN SLA with the others? No overlap, so not relevant.
@@ -93,9 +107,9 @@ talltraits <- allTraits %>%
   pivot_wider(names_from=CleanTraitName, values_from=StdValue, values_fill=NA) %>% 
   ungroup()
 
-# write.csv(allTraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_March2023d_long.csv', row.names = F)
+# write.csv(allTraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_April2023_long.csv', row.names = F)
 
-# write.csv(talltraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_March2023d.csv', row.names = F)
+# write.csv(talltraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_April2023.csv', row.names = F)
 
 ##checking traits
 test <- allTraits %>% 
@@ -106,7 +120,7 @@ test <- allTraits %>%
 
 sum(test[,'n'])
 
-## all databases have repeats - 27,000 (exactly) across all data
+## all databases have repeats - 26,909 across all data
 ## only 2298 are the same values repeated 10 or more times and were designated as keepers from cleaning code
 
 sppLength <- talltraits %>% 
@@ -116,8 +130,12 @@ sppLength <- talltraits %>%
 multiTraitInd <- allTraits %>% 
   group_by(DatabaseID, DatasetID, ObservationID, species_matched) %>% 
   summarise(num_traits=length(CleanTraitName)) %>% 
-  ungroup() # %>% 
+  ungroup() # %>%
   # filter(num_traits>1)
 
 ggplot(data=multiTraitInd, aes(x=num_traits)) +
-  geom_histogram(binwidth = 1)
+  geom_histogram(binwidth = 1) +
+  xlab('Number of Traits per Individual') + ylab('Number of Individuals') +
+  scale_y_break(c(20000, 59000), ticklabels=c(60000))
+
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 2_traits per individual histogram.png', width=8, height=8, units='in', dpi=300, bg='white')
