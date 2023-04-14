@@ -32,11 +32,12 @@ catagoricalTraits <- read.csv("CleanedData\\Traits\\complete categorical traits\
   mutate(clonal = replace(clonal, clonal=="uncertain", NA)) %>%
   mutate(mycorrhizal_type = replace(mycorrhizal_type, mycorrhizal_type=="uncertain", NA)) %>%
   mutate(lifespan = replace(lifespan, lifespan=="uncertain", NA)) %>%
-  filter(lifespan != "moss")
+  filter(lifespan != "moss") %>% 
+  select(-family)
 
 
 #### Continuous traits ####
-# NOTE: Continuous traits to include: LDMC, SLA, Vegetative_height, seed dry mass, seed number, rooting density, rooting depth. 
+# NOTE: Continuous traits to include: LDMC, SLA, Vegetative_height, seed dry mass, seed number, rooting density, rooting depth
 
 # Read species data to remove mosses
 mossKey <- read.csv("CleanedData\\Traits\\complete categorical traits\\sCoRRE categorical trait data_12142022.csv") %>%
@@ -117,14 +118,11 @@ ggplot(data=na.omit(allContinuous), aes(x=trait, y=imputed_value)) +
 
 
 #### Clean imputed continuous trait data ####
-####Check these decisions with Meghan!
+# Checked to ensure no negative values (confirmed that there are none)
 
-#Checked to ensure no negative values (confirmed that there are none)
+# Things that look problematic but Kim thinks are real: leaf_area (some palms with huge leaves), plant_height_vegetative (vines that have big big heights like Vitus sp and virginia creeper), seed number (consistently high numbers for some species that probably do have lots of seeds)
 
-#Things that look problematic but Kim thinks are real: leaf_area (some ferns and palms with huge leaves), plant_height_vegetative (vines that have big big heights like Vitus sp and virginia creeper), seed number (consistently high numbers for some species that probably do have lots of seeds)
-
-#Things that are a problem: Some imputed seed number values are less than 1, which doesn't make sense.
-
+# Things that are a problem: Some imputed seed number values are less than 1, which doesn't make sense.
 cleanContinuous <- allContinuous %>% 
   mutate(drop=ifelse(trait=='seed_number' & imputed_value<1, 1, 0)) %>% 
   filter(drop==0) %>% #drops 925 observations
@@ -137,10 +135,7 @@ ggplot(data=na.omit(cleanContinuous), aes(x=trait, y=imputed_value)) +
   facet_wrap(~trait, scales='free')
 
 
-##### TO DO #####
-# doesn't seem like there are any big outliers for each trait overall, but when comparing individual species means there are some
 # look up some values for species that we know and make sure they are right
-
 ggplot(data=subset(meanContinuous, species_matched %in% c('Ruellia humilis', 'Andropogon gerardii', 'Parthenocissus quinquefolia')),
        aes(x=species_matched, y=imputed_value_mean)) +
   geom_boxplot() +
@@ -149,11 +144,16 @@ ggplot(data=subset(meanContinuous, species_matched %in% c('Ruellia humilis', 'An
 
 
 ##### Combine continuous and categorical traits #####
-wideContinuous <- meanContinuous %>% 
-  select(-family, -original_value_mean, -imputed_value_sd, -original_value_sd) %>% 
-  pivot_wider(names_from=trait, values_from=imputed_value_mean, values_fill=NA)
+longCategorical <- catagoricalTraits %>%
+  pivot_longer(names_to="trait", values_to="imputed_value_mean", values_fill=NA) #put in the columns to pivot here
 
-traitsAll <- wideContinuous %>%
-  full_join(catagoricalTraits, by="species_matched")
+#calculate z-scores (error risk) for continuous traits and bind on categorical traits
+meanSD <- cleanContinuous %>% 
+  group_by(trait) %>% 
+  summarize(across(c('imputed_value_mean', .fns=list(mean=mean, sd=sd)))) %>% 
+  ungroup()
+
+traitsAll <- cleanContinuous %>%
+  rbind(catagoricalTraits) #check columns are the same
 
 # write.csv(traitsAll, 'CleanedData\\Traits\\CoRRE_allTraitData_March2023.csv')
