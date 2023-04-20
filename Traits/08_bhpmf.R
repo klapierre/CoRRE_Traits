@@ -13,8 +13,7 @@ library(plyr)
 library(abind)
 library(mice)
 
-#####
-#read original trait matrix for imputation:
+##### read original trait matrix for imputation #####
 setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data')
 
 traits <- read.table("OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_April2023.csv", row.names=NULL, sep=",", header=T)
@@ -55,7 +54,9 @@ trait.info <- as.data.frame(subset(traits, select = -c(family, genus, species_ma
 #check if both datasets are equal
 nrow(hierarchy.info) == nrow(trait.info)
 
-#z % log transform
+
+
+##### z % log transform #####
 back_trans_pars <- list()
 rm_col <- c()
 for(i in 1:ncol(trait.info)){
@@ -76,8 +77,10 @@ for(i in 1:ncol(trait.info)){
 #write.table(back_trans_pars, "AllTraits/back_trans_pars.csv")
 write.table(back_trans_pars, "CleanedData\\Traits\\gap filled continuous traits\\20230414\\back_trans_pars.csv")
 
-#Split-out code here and load data here:
 
+
+
+##### gap-filling #####
 #set-directory
 tmp.dir<-dirname("CleanedData\\Traits\\gap filled continuous traits\\20230414\\tmp")
 
@@ -88,19 +91,17 @@ fold<-c(rep(10:20, 8), 10, 11)
 #set number of iterations:
 repe<-90 #should be 90
 
-#gap-filling:
 for(i in 1:repe) { #loop for each trait (column)
   set.seed(123)
   GapFilling(as.matrix(trait.info), hierarchy.info,
              num.samples=smpl[i], num.folds.tuning=fold[i], burn=187,
              mean.gap.filled.output.path = paste0(tmp.dir,"/mean_gap_filled_",i,".txt"),
-             std.gap.filled.output.path= paste0(tmp.dir,"/std_gap_filled_",i,".txt"), 
+             std.gap.filled.output.path= paste0(tmp.dir,"/std_gap_filled_",i,".txt"),
              tmp.dir=tmp.dir, verbose=F)
 }
 
-####
-# Load imputed traits and clean-up table:
 
+##### load imputed traits and clean-up table #####
 mean.trait<-list()
 for(i in 1:repe) { #loop for each trait (column)
   print(i)
@@ -126,16 +127,18 @@ mean.trait <- abind(mean.trait, along=3)
 mean.trait <- apply(mean.trait, c(1,2), mean, na.rm=T)
 mean.trait[is.nan(mean.trait)]<-NA
 
-#replace missing values in the original table:
-for(j in 1:ncol(trait.info)) {
-  trait.info[,j]<-ifelse(is.na(trait.info[,j]),mean.trait[,j],trait.info[,j])
-}
-
-#return to original values:
-trait.info.original <- trait.info
-
+#data for back transforming output
 back<-read.table("CleanedData\\Traits\\gap filled continuous traits\\20230414\\back_trans_pars.csv")
 
+
+##### replace missing values in the original table #####
+trait.info.original <- trait.info
+
+for(j in 1:ncol(trait.info.original)) {
+  trait.info.original[,j]<-ifelse(is.na(trait.info.original[,j]),mean.trait[,j],trait.info.original[,j])
+}
+
+#with replacement of original values
 o<-1 #to select the appropriate columns:
 for(i in 1:ncol(trait.info.original)){
   
@@ -159,16 +162,48 @@ for(i in 1:ncol(trait.info.original)){
 }
 
 #save output:
-write.table(trait.info.original, "CleanedData\\Traits\\gap filled continuous traits\\20230414\\imputed_traits_originalReplacement.csv")
-write.table(trait.info, "CleanedData\\Traits\\gap filled continuous traits\\20230414\\imputed_traits.csv")
+write.csv(trait.info.original, "CleanedData\\Traits\\gap filled continuous traits\\20230414\\imputed_traits_originalReplacement.csv", row.names=F)
 
-#Impute missing values with "mice":
-trait.info.original.mice<-complete(mice(trait.info.original, method="cart"))
-trait.info.mice<-complete(mice(trait.info, method="cart"))
+
+#don't replace original values:
+trait.info.noreplacement <- as.data.frame(mean.trait)
+
+#with replacement of original values
+o<-1 #to select the appropriate columns:
+for(i in 1:ncol(trait.info.noreplacement)){
+  
+  #recover values:
+  min_x<-back[1,o]
+  mlogx<-back[1,o+1]
+  slogx<-back[1,o+2]
+  
+  #back transform:
+  x <- trait.info.noreplacement[,i] # goes through the columns
+  logx<- (x*slogx) + mlogx
+  b <- 10^logx
+  
+  #for negative values
+  if(min_x < 0.00000000001){
+    b <- b + min_x - 1 # make this optional if min x is neg
+  }
+  
+  trait.info.noreplacement[,i] <- b
+  o<-o+3
+}
+
+
+#save output
+write.csv(trait.info.noreplacement, "CleanedData\\Traits\\gap filled continuous traits\\20230414\\imputed_traits.csv", row.names=F)
+
+
+
+##### Impute missing values with "mice" #####
+trait.info.original.mice <- complete(mice(trait.info.original, method="cart"))
+trait.info.mice <- complete(mice(trait.info.noreplacement, method="cart"))
 
 #save output:
-write.table(trait.info.original.mice, "CleanedData\\Traits\\gap filled continuous traits\\20230414\\imputed_traits_originalReplacement_mice.csv")
-write.table(trait.info.mice, "CleanedData\\Traits\\gap filled continuous traits\\20230414\\imputed_traits_mice.csv")
+write.csv(trait.info.original.mice, "CleanedData\\Traits\\gap filled continuous traits\\20230414\\imputed_traits_originalReplacement_mice.csv", row.names=F)
+write.csv(trait.info.mice, "CleanedData\\Traits\\gap filled continuous traits\\20230414\\imputed_traits_mice.csv", row.names=F)
 
 #clean-up:
 # rm(list = ls())
