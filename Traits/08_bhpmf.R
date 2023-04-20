@@ -1,7 +1,7 @@
 ################################################################################
 ##  bhpmf.R: Continuous trait imputation.
 ##
-##  Authors: Franzisca Schrodt, Josep Padulles Cubino
+##  Authors: Franzisca Schrodt, Josep Padulles Cubino, Kimberly Komatsu
 ################################################################################
 
 # install development version from github
@@ -19,33 +19,33 @@ setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE
 traits <- read.table("OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_April2023.csv", row.names=NULL, sep=",", header=T)
 
 #remove trait values with > 4 SD:
-spp<-unique(traits$species_matched) #get vector with species names
+spp <- unique(traits$species_matched) #get vector with species names
 
 out<-NULL
 for(i in 1:length(spp)) { #loop for each species
   print(i/length(spp))
-  sub<-traits[traits$species_matched %in% spp[i],]
+  sub <- traits[traits$species_matched %in% spp[i],]
   for(j in 7:ncol(traits)) { #loop for each trait (column)
-    mean.sub<-mean(sub[,j], na.rm=T)
-    sd.sub<-sd(sub[,j], na.rm=T)
+    mean.sub <- mean(sub[,j], na.rm=T)
+    sd.sub <- sd(sub[,j], na.rm=T)
     
-    lim_up<-mean.sub+4*sd.sub
-    lim_dn<-mean.sub-4*sd.sub
+    lim_up <- mean.sub + 4*sd.sub
+    lim_dn <- mean.sub - 4*sd.sub
     
     sub[,j][sub[,j] > lim_up] <- NA
     sub[,j][sub[,j] < lim_dn] <- NA
   }
-  out<-rbind(out, sub)
+  out <- rbind(out, sub)
 }
 
 #create hierarchy file:
 hierarchy.info <- subset(traits, select = c(ObservationID, species_matched, genus, family))
-names(hierarchy.info)<-c("plant_id","species", "genus", "family")
-hierarchy.info$plant_id<-1:nrow(hierarchy.info)
+names(hierarchy.info) <- c("plant_id","species", "genus", "family")
+hierarchy.info$plant_id <- 1:nrow(hierarchy.info)
 
 #I have noticed that the some genera are assigned to different families. Need to be unified:
-hierarchy.info$family[hierarchy.info$genus=="Lancea"]<- "Mazaceae"
-hierarchy.info$family[hierarchy.info$genus=="Toxicoscordion"]<- "Melanthiaceae"
+hierarchy.info$family[hierarchy.info$genus=="Lancea"] <- "Mazaceae"
+hierarchy.info$family[hierarchy.info$genus=="Toxicoscordion"] <- "Melanthiaceae"
 
 #create trait info file:
 trait.info <- as.data.frame(subset(traits, select = -c(family, genus, species_matched, ObservationID,
@@ -82,22 +82,22 @@ write.table(back_trans_pars, "CleanedData\\Traits\\gap filled continuous traits\
 
 ##### gap-filling #####
 #set-directory
-tmp.dir<-dirname("CleanedData\\Traits\\gap filled continuous traits\\20230414\\tmp")
+tmp.dir <- dirname("CleanedData\\Traits\\gap filled continuous traits\\20230414\\tmp")
 
 #set parameters
-smpl<-911:1000
-fold<-c(rep(10:20, 8), 10, 11)
+smpl <- 911:1000
+fold <- c(rep(10:20, 8), 10, 11)
 
 #set number of iterations:
-repe<-90 #should be 90
+repe <- 90 #should be 90
 
 for(i in 1:repe) { #loop for each trait (column)
   set.seed(123)
   GapFilling(as.matrix(trait.info), hierarchy.info,
-             num.samples=smpl[i], num.folds.tuning=fold[i], burn=187,
+             num.samples = smpl[i], num.folds.tuning=fold[i], burn=187,
              mean.gap.filled.output.path = paste0(tmp.dir,"/mean_gap_filled_",i,".txt"),
-             std.gap.filled.output.path= paste0(tmp.dir,"/std_gap_filled_",i,".txt"),
-             tmp.dir=tmp.dir, verbose=F)
+             std.gap.filled.output.path = paste0(tmp.dir,"/std_gap_filled_",i,".txt"),
+             tmp.dir = tmp.dir, verbose=F)
 }
 
 
@@ -105,51 +105,51 @@ for(i in 1:repe) { #loop for each trait (column)
 mean.trait<-list()
 for(i in 1:repe) { #loop for each trait (column)
   print(i)
-  trt<-read.table(paste0("CleanedData\\Traits\\gap filled continuous traits\\20230414\\mean_gap_filled_",i,".txt"), row.names=NULL, header=T)
-  std<-read.table(paste0("CleanedData\\Traits\\gap filled continuous traits\\20230414\\std_gap_filled_",i,".txt"), row.names=NULL, header=T)
+  trt <- read.table(paste0("CleanedData\\Traits\\gap filled continuous traits\\20230414\\mean_gap_filled_",i,".txt"), row.names=NULL, header=T)
+  std <- read.table(paste0("CleanedData\\Traits\\gap filled continuous traits\\20230414\\std_gap_filled_",i,".txt"), row.names=NULL, header=T)
 
   #Return to NA those values with SD > 1:
   for(j in 1:ncol(trt)) {
-    trt[,j][std[,j]>1]<-NA
+    trt[,j][std[,j]>1] <- NA
   }
 
   #Return to NA values > 1.5*max observed trait:
   for(j in 1:ncol(trt)) {
-    maxt<-max(trait.info[,j], na.rm=T)
-    trt[,j][trt[,j]>(maxt*1.5)]<-NA
+    maxt <- max(trait.info[,j], na.rm=T)
+    trt[,j][trt[,j] > (maxt*1.5)] <- NA
   }
   
-  mean.trait[[i]]<-trt
+  mean.trait[[i]] <- trt
 }
 
 #get mean across them all:
 mean.trait <- abind(mean.trait, along=3)
 mean.trait <- apply(mean.trait, c(1,2), mean, na.rm=T)
-mean.trait[is.nan(mean.trait)]<-NA
+mean.trait[is.nan(mean.trait)] <- NA
 
 #data for back transforming output
-back<-read.table("CleanedData\\Traits\\gap filled continuous traits\\20230414\\back_trans_pars.csv")
+back <- read.table("CleanedData\\Traits\\gap filled continuous traits\\20230414\\back_trans_pars.csv")
 
 
 ##### replace missing values in the original table #####
 trait.info.original <- trait.info
 
 for(j in 1:ncol(trait.info.original)) {
-  trait.info.original[,j]<-ifelse(is.na(trait.info.original[,j]),mean.trait[,j],trait.info.original[,j])
+  trait.info.original[,j] <- ifelse(is.na(trait.info.original[,j]), mean.trait[,j], trait.info.original[,j])
 }
 
 #with replacement of original values
-o<-1 #to select the appropriate columns:
+o <- 1 #to select the appropriate columns:
 for(i in 1:ncol(trait.info.original)){
   
   #recover values:
-  min_x<-back[1,o]
-  mlogx<-back[1,o+1]
-  slogx<-back[1,o+2]
+  min_x <- back[1,o]
+  mlogx <- back[1,o+1]
+  slogx <- back[1,o+2]
   
   #back transform:
   x <- trait.info.original[,i] # goes through the columns
-  logx<- (x*slogx) + mlogx
+  logx <- (x*slogx) + mlogx
   b <- 10^logx
   
   #for negative values
@@ -158,7 +158,7 @@ for(i in 1:ncol(trait.info.original)){
   }
   
   trait.info.original[,i] <- b
-  o<-o+3
+  o <- o+3
 }
 
 #save output:
@@ -169,17 +169,17 @@ write.csv(trait.info.original, "CleanedData\\Traits\\gap filled continuous trait
 trait.info.noreplacement <- as.data.frame(mean.trait)
 
 #with replacement of original values
-o<-1 #to select the appropriate columns:
+o <- 1 #to select the appropriate columns:
 for(i in 1:ncol(trait.info.noreplacement)){
   
   #recover values:
-  min_x<-back[1,o]
-  mlogx<-back[1,o+1]
-  slogx<-back[1,o+2]
+  min_x <- back[1,o]
+  mlogx <- back[1,o+1]
+  slogx <- back[1,o+2]
   
   #back transform:
   x <- trait.info.noreplacement[,i] # goes through the columns
-  logx<- (x*slogx) + mlogx
+  logx <- (x*slogx) + mlogx
   b <- 10^logx
   
   #for negative values
@@ -188,7 +188,7 @@ for(i in 1:ncol(trait.info.noreplacement)){
   }
   
   trait.info.noreplacement[,i] <- b
-  o<-o+3
+  o <- o+3
 }
 
 
