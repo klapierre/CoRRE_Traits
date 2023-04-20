@@ -46,18 +46,17 @@ mossKey <- read.csv("CleanedData\\Traits\\complete categorical traits\\sCoRRE ca
   dplyr::select(-leaf_type)
 
 # Read in imputed trait data and bind on species information
-imputedRaw <- read.csv("CleanedData\\Traits\\gap filled continuous traits\\20230331\\imputed_traits_mice.csv") %>%
-  dplyr::select(-X) %>% 
-  bind_cols(read.csv('OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_March2023d.csv')[,c('DatabaseID', 'DatasetID', 'ObservationID', 'family', 'genus', 'species_matched')]) %>%   
+imputedRaw <- read.csv("CleanedData\\Traits\\gap filled continuous traits\\20230414\\imputed_traits.csv") %>%
+  bind_cols(read.csv('OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_April2023.csv')[,c('DatabaseID', 'DatasetID', 'ObservationID', 'family', 'genus', 'species_matched')]) %>%   
   left_join(mossKey) %>% 
   filter(moss!="moss") %>%
-  dplyr::select(-moss) #removes 556 species observations
+  dplyr::select(-moss) #removes 6 species observations
 
 imputedLong <- imputedRaw %>% 
   pivot_longer(names_to='trait', values_to='imputed_value', seed_dry_mass:X58)
 
 # Read original trait data and join with imputed data
-originalRaw <- read.csv('OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_March2023d.csv') %>%
+originalRaw <- read.csv('OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_April2023.csv') %>%
   pivot_longer(names_to='trait', values_to='original_value', seed_dry_mass:X58) %>%
   na.omit()
 
@@ -83,29 +82,29 @@ meanContinuous <- allContinuous %>%
 speciesCount <- meanContinuous %>% 
   group_by(family) %>% 
   summarize(num_species=length(family)) %>% 
-  ungroup()
+  ungroup() #113 families
 
 
 # Compare imputed to original continuous trait data
-ggplot(data=na.omit(meanContinuous), aes(x=original_value_mean, y=imputed_value_mean)) +
+ggplot(data=na.omit(subset(allContinuous, trait=='SLA' & imputed_value<10)), aes(x=original_value, y=imputed_value)) +
   geom_point() +
   geom_abline(slope=1) +
   facet_wrap(~trait, scales='free')
 
 # Only grasses -- 11620 species
-ggplot(data=na.omit(subset(meanContinuous, family=='Poaceae')), aes(x=original_value_mean, y=imputed_value_mean)) +
+ggplot(data=na.omit(subset(allContinuous, family=='Poaceae')), aes(x=original_value, y=imputed_value)) +
   geom_point() +
   geom_abline(slope=1) +
   facet_wrap(~trait, scales='free')
 
 # Only asters -- 11480
-ggplot(data=na.omit(subset(meanContinuous, family=='Asteraceae')), aes(x=original_value_mean, y=imputed_value_mean)) +
+ggplot(data=na.omit(subset(allContinuous, family=='Asteraceae')), aes(x=original_value, y=imputed_value)) +
   geom_point() +
   geom_abline(slope=1) +
   facet_wrap(~trait, scales='free')
 
 # Only legumes -- 4620
-ggplot(data=na.omit(subset(meanContinuous, family=='Fabaceae')), aes(x=original_value_mean, y=imputed_value_mean)) +
+ggplot(data=na.omit(subset(allContinuous, family=='Fabaceae')), aes(x=original_value, y=imputed_value)) +
   geom_point() +
   geom_abline(slope=1) +
   facet_wrap(~trait, scales='free')
