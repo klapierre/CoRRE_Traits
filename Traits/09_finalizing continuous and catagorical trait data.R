@@ -46,7 +46,7 @@ mossKey <- read.csv("CleanedData\\Traits\\complete categorical traits\\sCoRRE ca
   dplyr::select(-leaf_type)
 
 # Read in imputed trait data and bind on species information
-imputedRaw <- read.csv("CleanedData\\Traits\\gap filled continuous traits\\20230414\\imputed_traits.csv") %>%
+imputedRaw <- read.csv("CleanedData\\Traits\\gap filled continuous traits\\20230414\\imputed_traits_mice.csv") %>%
   bind_cols(read.csv('OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_April2023.csv')[,c('DatabaseID', 'DatasetID', 'ObservationID', 'family', 'genus', 'species_matched')]) %>%   
   left_join(mossKey) %>% 
   filter(moss!="moss") %>%
@@ -86,7 +86,7 @@ speciesCount <- meanContinuous %>%
 
 
 # Compare imputed to original continuous trait data
-ggplot(data=na.omit(subset(allContinuous, trait=='SLA' & imputed_value<10)), aes(x=original_value, y=imputed_value)) +
+ggplot(data=na.omit(allContinuous), aes(x=original_value, y=imputed_value)) +
   geom_point() +
   geom_abline(slope=1) +
   facet_wrap(~trait, scales='free')
@@ -121,11 +121,20 @@ ggplot(data=na.omit(allContinuous), aes(x=trait, y=imputed_value)) +
 
 # Things that look problematic but Kim thinks are real: leaf_area (some palms with huge leaves), plant_height_vegetative (vines that have big big heights like Vitus sp and virginia creeper), seed number (consistently high numbers for some species that probably do have lots of seeds)
 
+meanSD <- allContinuous %>% 
+  group_by(trait) %>% 
+  summarize(across('imputed_value', .fns=list(mean=mean, sd=sd))) %>% 
+  ungroup()
+
 # Things that are a problem: Some imputed seed number values are less than 1, which doesn't make sense.
 cleanContinuous <- allContinuous %>% 
   mutate(drop=ifelse(trait=='seed_number' & imputed_value<1, 1, 0)) %>% 
-  filter(drop==0) %>% #drops 925 observations
-  select(-drop)
+  filter(drop==0) %>% #drops 805 observations
+  select(-drop) %>% 
+  #calculate z-scores (error risk) for continuous traits 
+  left_join(meanSD) %>% 
+  mutate(error_risk=(imputed_value-imputed_value_mean)/imputed_value_sd) %>% 
+  filter(error_risk<4) #drops 25318 observations
 
 
 # Look at boxplots for each trait
@@ -133,10 +142,16 @@ ggplot(data=na.omit(cleanContinuous), aes(x=trait, y=imputed_value)) +
   geom_boxplot() +
   facet_wrap(~trait, scales='free')
 
+# Compare cleaned imputed and original data
+ggplot(data=na.omit(cleanContinuous), aes(x=original_value, y=imputed_value)) +
+  geom_point() +
+  geom_abline(slope=1) +
+  facet_wrap(~trait, scales='free')
+
 
 # look up some values for species that we know and make sure they are right
-ggplot(data=subset(meanContinuous, species_matched %in% c('Ruellia humilis', 'Andropogon gerardii', 'Parthenocissus quinquefolia')),
-       aes(x=species_matched, y=imputed_value_mean)) +
+ggplot(data=subset(cleanContinuous, species_matched %in% c('Ruellia humilis', 'Andropogon gerardii', 'Parthenocissus quinquefolia')),
+       aes(x=species_matched, y=imputed_value)) +
   geom_boxplot() +
   theme(axis.text.x=element_text(angle=40, vjust=0.5, size=3)) +
   facet_wrap(~trait, scales='free')
@@ -144,15 +159,15 @@ ggplot(data=subset(meanContinuous, species_matched %in% c('Ruellia humilis', 'An
 
 ##### Combine continuous and categorical traits #####
 longCategorical <- catagoricalTraits %>%
-  pivot_longer(names_to="trait", values_to="imputed_value_mean", values_fill=NA) #put in the columns to pivot here
+  pivot_longer(growth_form:n_fixation, names_to="trait", values_to="trait_value")
 
-#calculate z-scores (error risk) for continuous traits and bind on categorical traits
-meanSD <- cleanContinuous %>% 
-  group_by(trait) %>% 
-  summarize(across(c('imputed_value_mean', .fns=list(mean=mean, sd=sd)))) %>% 
+meanCleanContinuous <- cleanContinuous %>% 
+  group_by(species_matched, trait) %>% 
+  summarize(trait_value=mean(imputed_value)) %>% 
   ungroup()
 
-traitsAll <- cleanContinuous %>%
-  rbind(catagoricalTraits) #check columns are the same
+traitsAll <- meanCleanContinuous %>%
+  rbind(longCategorical) %>% 
+  pivot_wider(names_from=trait, values_from=trait_value, values_fill=NA)
 
-# write.csv(traitsAll, 'CleanedData\\Traits\\CoRRE_allTraitData_March2023.csv')
+# write.csv(traitsAll, 'CleanedData\\Traits\\CoRRE_allTraitData_April2023.csv')
