@@ -139,3 +139,21 @@ ggplot(data=multiTraitInd, aes(x=num_traits)) +
   scale_y_break(c(20000, 59000), ticklabels=c(60000))
 
 # ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 2_traits per individual histogram.png', width=8, height=8, units='in', dpi=300, bg='white')
+
+##Trying to figure out which families have very little observed data going into the gap filling methods
+
+traitmeasured <- allTraits %>% 
+  mutate(present=1) %>% 
+  group_by(DatabaseID, DatasetID, ObservationID, family, genus, species_matched) %>%
+  pivot_wider(names_from=CleanTraitName, names_prefix="X", values_from=present, values_fill=0) %>% 
+  ungroup()
+
+familycomplete<-traitmeasured %>% 
+  group_by(family) %>% 
+  summarize(across(Xseed_dry_mass:X58, mean)) %>% 
+  pivot_longer(Xseed_dry_mass:X58, names_to="trait", values_to = "value") %>% 
+  mutate(traitpresent=ifelse(value>0, 1, 0)) %>% 
+  group_by(family) %>% 
+  summarise(ntraits=sum(traitpresent)) %>% 
+  mutate(percenttraits=(ntraits/60))
+  
