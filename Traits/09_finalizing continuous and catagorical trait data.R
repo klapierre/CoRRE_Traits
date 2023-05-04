@@ -81,7 +81,7 @@ imputedRaw <- read.csv("CleanedData\\Traits\\gap filled continuous traits\\20230
   filter(moss!="moss") %>%
   dplyr::select(-moss) #removes 6 species observations
 
-imputedLongReplace <- imputedRawReplace %>% 
+imputedLong <- imputedRaw %>% 
   pivot_longer(names_to='trait', values_to='imputed_value', seed_dry_mass:X58)
 
 # Join original trait data with imputed data. Only keep traits of interest.
@@ -234,7 +234,7 @@ cleanContinuousFamilyRisk <- cleanContinuous %>%
 
 
 # Look at boxplots for each trait
-ggplot(data=subset(cleanContinuous, family %in% c('Asteraceae', 'Frankeniaceae', 'Fabaceae', 'Poaceae', 'Amaranthaceae')), aes(x=family, y=imputed_value)) +
+ggplot(data=subset(cleanContinuous, family %in% c('Asteraceae', 'Frankeniaceae', 'Fabaceae', 'Poaceae', 'Amaranthaceae')), aes(x=family, y=imputed_value))
 
 cleanContinousReplace <- cleanContinuous %>% 
   select(species_matched, trait, original_value, imputed_value) %>% 
@@ -282,8 +282,8 @@ longCategorical <- catagoricalTraits %>%
 meanCleanContinuous <- cleanContinuous %>% 
   group_by(species_matched, trait) %>% 
   summarize(trait_value=mean(imputed_value)) %>% 
-  ungroup() %>% 
-  pivot_wider(names_from=trait, values_from=trait_value) 
+  ungroup() #%>% 
+  # pivot_wider(names_from=trait, values_from=trait_value) 
 
 
 pairs(meanCleanContinuous[,16:35])
