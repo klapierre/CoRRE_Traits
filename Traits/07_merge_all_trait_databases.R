@@ -156,4 +156,5 @@ familycomplete<-traitmeasured %>%
   group_by(family) %>% 
   summarise(ntraits=sum(traitpresent)) %>% 
   mutate(percenttraits=(ntraits/60))
-  
+
+write.csv(familycomplete, "CompiledData\\TraitCompletnessbyFamily.csv", row.names = F)  
