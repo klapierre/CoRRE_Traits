@@ -37,7 +37,6 @@ catagoricalTraits <- read.csv("CleanedData\\Traits\\complete categorical traits\
 
 
 #### Continuous traits ####
-# NOTE: Continuous traits to include: LDMC, SLA, Vegetative_height, seed dry mass, seed number, rooting density, rooting depth
 
 # Read species data to remove mosses
 mossKey <- read.csv("CleanedData\\Traits\\complete categorical traits\\sCoRRE categorical trait data_12142022.csv") %>%
@@ -46,35 +45,7 @@ mossKey <- read.csv("CleanedData\\Traits\\complete categorical traits\\sCoRRE ca
   dplyr::select(-leaf_type)
 
 # Read in imputed trait data and bind on species information
-imputedRawReplace <- read.csv("CleanedData\\Traits\\gap filled continuous traits\\20230414\\imputed_traits_originalReplacement_mice.csv") %>%
-  bind_cols(read.csv('OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_April2023.csv')[,c('DatabaseID', 'DatasetID', 'ObservationID', 'family', 'genus', 'species_matched')]) %>%   
-  left_join(mossKey) %>% 
-  filter(moss!="moss") %>%
-  dplyr::select(-moss) #removes 6 species observations
-
-imputedLongReplace <- imputedRawReplace %>% 
-  pivot_longer(names_to='trait', values_to='imputed_value', seed_dry_mass:X58)
-
-# Read original trait data and join with imputed data
-originalRaw <- read.csv('OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_April2023.csv') %>%
-  pivot_longer(names_to='trait', values_to='original_value', seed_dry_mass:X58) %>%
-  na.omit()
-
-
-# Join original trait data with imputed data. Only keep traits of interest.
-allContinuousReplace <- imputedLongReplace %>% 
-  left_join(originalRaw) %>% 
-  filter(trait %in% c('dark_resp_rate', 'LDMC', 'leaf_area', 'leaf_C', 'leaf_C.N', 'leaf_density', 'leaf_dry_mass',
-                      'leaf_K', 'leaf_longevity', 'leaf_N', 'leaf_N.P', 'leaf_P', 'leaf_thickness', 'leaf_transp_rate', 
-                      'leaf_width', 'photosynthesis_rate', 'plant_height_vegetative', 'RGR', 'root.shoot', 'root_C', 
-                      'root_density', 'root_diameter', 'root_dry_mass', 'root_N', 'root_P', 'rooting_depth', 'seed_dry_mass', 
-                      'seed_length', 'seed_number', 'seed_terminal_velocity', 'SLA', 'SRL', 'stem_spec_density', 
-                      'stomatal_conductance')) %>% # dropped J_max and Vc_max because they directly relate to photosynthesis
-  rename(imputed_value_replace=imputed_value)
-
-
-
-# Read in imputed trait data and bind on species information
+## this is trait data without replacement (all imputed)
 imputedRaw <- read.csv("CleanedData\\Traits\\gap filled continuous traits\\20230414\\imputed_traits_mice.csv") %>%
   bind_cols(read.csv('OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_April2023.csv')[,c('DatabaseID', 'DatasetID', 'ObservationID', 'family', 'genus', 'species_matched')]) %>%   
   left_join(mossKey) %>% 
@@ -84,28 +55,11 @@ imputedRaw <- read.csv("CleanedData\\Traits\\gap filled continuous traits\\20230
 imputedLong <- imputedRaw %>% 
   pivot_longer(names_to='trait', values_to='imputed_value', seed_dry_mass:X58)
 
-# Join original trait data with imputed data. Only keep traits of interest.
-allContinuousReplace <- imputedLongReplace %>% 
-  left_join(originalRaw) %>% 
-  filter(trait %in% c('dark_resp_rate', 'LDMC', 'leaf_area', 'leaf_C', 'leaf_C.N', 'leaf_density', 'leaf_dry_mass',
-                      'leaf_K', 'leaf_longevity', 'leaf_N', 'leaf_N.P', 'leaf_P', 'leaf_thickness', 'leaf_transp_rate', 
-                      'leaf_width', 'photosynthesis_rate', 'plant_height_vegetative', 'RGR', 'root.shoot', 'root_C', 
-                      'root_density', 'root_diameter', 'root_dry_mass', 'root_N', 'root_P', 'rooting_depth', 'seed_dry_mass', 
-                      'seed_length', 'seed_number', 'seed_terminal_velocity', 'SLA', 'SRL', 'stem_spec_density', 
-                      'stomatal_conductance')) %>% # dropped J_max and Vc_max because they directly relate to photosynthesis
-  rename(imputed_value_replace=imputed_value)
+# Read original trait data and join with imputed data
+originalRaw <- read.csv('OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_April2023.csv') %>%
+  pivot_longer(names_to='trait', values_to='original_value', seed_dry_mass:X58) %>%
+  na.omit()
 
-
-
-# Read in imputed trait data and bind on species information
-imputedRaw <- read.csv("CleanedData\\Traits\\gap filled continuous traits\\20230414\\imputed_traits_originalReplacement_mice.csv") %>%
-  bind_cols(read.csv('OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_April2023.csv')[,c('DatabaseID', 'DatasetID', 'ObservationID', 'family', 'genus', 'species_matched')]) %>%   
-  left_join(mossKey) %>% 
-  filter(moss!="moss") %>%
-  dplyr::select(-moss) #removes 6 species observations
-
-imputedLong <- imputedRaw %>% 
-  pivot_longer(names_to='trait', values_to='imputed_value', seed_dry_mass:X58)
 
 # Join original trait data with imputed data. Only keep traits of interest.
 allContinuous <- imputedLong %>% 
@@ -118,23 +72,9 @@ allContinuous <- imputedLong %>%
                       'stomatal_conductance')) # dropped J_max and Vc_max because they directly relate to photosynthesis
 
 
-
-allTogether <- allContinuous %>% 
-  left_join(allContinuous) %>% 
-  pivot_longer(cols=c('imputed_value', 'imputed_value_replace', 'original_value'), names_to='replace', values_to='trait_value')
-
-
-# allContinuousWide <- allContinuous %>% 
-#   select(-original_value) %>% 
-#   pivot_wider(names_from=trait, values_from=imputed_value)
-  # left_join(allContinuousReplace) %>% 
-  # pivot_longer(cols=c('imputed_value', 'imputed_value_replace', 'original_value'), names_to='replace', values_to='trait_value')
-
-
 allContinuousWide <- allContinuous %>% 
   select(-original_value) %>% 
   pivot_wider(names_from=trait, values_from=imputed_value)
-
 
 
 # Calculate averages for each species
@@ -155,7 +95,7 @@ speciesCount <- meanContinuous %>%
 ggplot(data=na.omit(meanContinuous), aes(x=original_value_mean, y=imputed_value_mean)) +
   geom_point() +
   geom_abline(slope=1) +
-  facet_wrap(~trait, scales='free')
+  facet_wrap(~trait, scales='free', ncol=9)
 
 # Only grasses -- 11620 species
 ggplot(data=na.omit(subset(allContinuous, family=='Poaceae')), aes(x=original_value, y=imputed_value)) +
@@ -176,14 +116,22 @@ ggplot(data=na.omit(subset(allContinuous, family=='Fabaceae')), aes(x=original_v
   facet_wrap(~trait, scales='free')
 
 
-# Look at boxplots for each trait
-ggplot(data=allTogether, aes(x=replace, y=trait_value)) +
-  geom_boxplot() +
-  facet_wrap(~trait, scales='free')
+# Compare raw imputed and original data
+ggplot(data=na.omit(allContinuous), aes(x=original_value, y=imputed_value)) +
+  geom_point() +
+  geom_abline(slope=1) +
+  facet_wrap(~trait, scales='free', ncol=9)
 
-ggplot(data=allTogether, aes(x=replace, y=trait_value)) +
+
+allTogether <- allContinuous %>% 
+  pivot_longer(imputed_value:original_value, names_to='data_type', values_to='trait_value') %>% 
+  # mutate(data_type=ifelse(data_type=='original_value', DatabaseID, data_type)) %>% 
+  na.omit()
+
+# Look at boxplots for each trait
+ggplot(data=allTogether, aes(x=data_type, y=trait_value)) +
   geom_boxplot() +
-  facet_wrap(~trait, scales='free')
+  facet_wrap(~trait, scales='free', ncol=9)
 
 
 #### Clean imputed continuous trait data ####
@@ -199,20 +147,37 @@ meanSD <- allContinuous %>%
 # Things that are a problem: Some imputed seed number values are less than 1, which doesn't make sense.
 cleanContinuous <- allContinuous %>% 
   mutate(drop=ifelse(trait=='seed_number' & imputed_value<1, 1, 0)) %>% 
-  filter(drop==0) %>% #drops 805 observations
+  filter(drop==0) %>% #drops 803 observations
   select(-drop) %>% 
   #calculate z-scores (error risk) for continuous traits 
   left_join(meanSD) %>% 
   mutate(error_risk_overall=(imputed_value-imputed_value_mean)/imputed_value_sd) %>% 
-  filter(error_risk_overall<4) #drops 25318 observations
+  filter(error_risk_overall<4) #drops an additional 25194 observations
 
 cleanContinousWide <- cleanContinuous %>% 
-  pivot_longer(cols=c('original_value', 'imputed_value'), names_to='replace', values_to='trait_value')
+  pivot_longer(cols=c('original_value', 'imputed_value'), names_to='data_type', values_to='trait_value') %>% 
+  mutate(data_type2=ifelse(data_type=='original_value', DatabaseID, data_type)) %>% 
+  na.omit()
 
 # Look at boxplots for each trait
-ggplot(data=subset(cleanContinousWide, species_matched=='Andropogon gerardii'), aes(x=replace, y=trait_value)) +
+ggplot(data=cleanContinousWide, aes(x=as.factor(data_type2), y=trait_value)) +
+  # geom_jitter(aes(color=data_type)) +
+  geom_boxplot(aes(color=data_type)) +
+  facet_wrap(~trait, scales='free_y', ncol=4) +
+  scale_x_discrete(breaks=c("AusTraits", "BIEN", "CPTD2", "TIPleaf", "TRY", "imputed_value"),
+                   limits=c("AusTraits", "BIEN", "CPTD2", "TIPleaf", "TRY", "imputed_value"),
+                   labels=c("A", "B", "C", "TIP", "TRY", "imp.")) +
+  scale_color_manual(values=c('#4E3686', '#5DA4D9', '#80D87F', '#FED23F', '#EE724C', 'darkgrey')) +
+  theme_bw() +
+  theme(panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        legend.position='top') 
+
+
+# Look at boxplots for each trait
+ggplot(data=subset(cleanContinousWide, species_matched=='Andropogon gerardii'), aes(x=data_type, y=trait_value)) +
   geom_boxplot() +
-  facet_wrap(~trait, scales='free')
+  facet_wrap(~trait, scales='free', ncol=9)
 
 meanSDFamily <- cleanContinuous %>% 
   group_by(trait, family) %>% 
@@ -234,27 +199,12 @@ cleanContinuousFamilyRisk <- cleanContinuous %>%
 
 
 # Look at boxplots for each trait
-ggplot(data=subset(cleanContinuous, family %in% c('Asteraceae', 'Frankeniaceae', 'Fabaceae', 'Poaceae', 'Amaranthaceae')), aes(x=family, y=imputed_value))
-
-cleanContinousReplace <- cleanContinuous %>% 
-  select(species_matched, trait, original_value, imputed_value) %>% 
-  pivot_longer(cols=c('original_value', 'imputed_value'), names_to='replace', values_to='trait_value')
-
-
-ggplot(data=subset(cleanContinousReplace, species_matched=='Andropogon_gerardii'), aes(x=replace, y=trait_value)) +
+ggplot(data=subset(cleanContinuousFamilyRisk, family %in% c('Asteraceae', 'Frankeniaceae', 'Cactaceae', 'Malpighiaceae', 'Liliaceae')), aes(x=family, y=imputed_value)) +
   geom_boxplot() +
-  facet_wrap(~trait, scales='free')
-
-
-# Look at boxplots for each trait
-ggplot(data=subset(cleanContinuous, family %in% c('Asteraceae', 'Liliaceae', 'Fabaceae', 'Poaceae', 'Amaranthaceae')), aes(x=family, y=imputed_value)) +
-  geom_boxplot() +
-  facet_wrap(~trait, scales='free')
-
-# Look at boxplots for each trait
-ggplot(data=subset(cleanContinuous, family %in% c('Asteraceae', 'Liliaceae', 'Fabaceae', 'Poaceae', 'Amaranthaceae')), aes(x=family, y=original_value)) +
-  geom_boxplot() +
-  facet_wrap(~trait, scales='free')
+  facet_wrap(~trait, scales='free', ncol=9) +
+  scale_x_discrete(breaks=c("Asteraceae", "Frankeniaceae", "Cactaceae", "Malpighiaceae", "Liliaceae"),
+                   limits=c("Asteraceae", "Frankeniaceae", "Cactaceae", "Malpighiaceae", "Liliaceae"),
+                   labels=c("A", "F", "C", "M", "L")) 
 
 
 
@@ -262,9 +212,7 @@ ggplot(data=subset(cleanContinuous, family %in% c('Asteraceae', 'Liliaceae', 'Fa
 ggplot(data=na.omit(cleanContinuous), aes(x=original_value, y=imputed_value)) +
   geom_point() +
   geom_abline(slope=1) +
-  facet_wrap(~trait, scales='free')
-
-
+  facet_wrap(~trait, scales='free', ncol=9)
 
 
 # look up some values for species that we know and make sure they are right
@@ -272,7 +220,10 @@ ggplot(data=subset(cleanContinuous, species_matched %in% c('Ruellia humilis', 'A
        aes(x=species_matched, y=imputed_value)) +
   geom_boxplot() +
   theme(axis.text.x=element_text(angle=40, vjust=0.5, size=3)) +
-  facet_wrap(~trait, scales='free')
+  facet_wrap(~trait, scales='free', ncol=9) +
+  scale_x_discrete(breaks=c("Andropogon gerardii", "Parthenocissus quinquefolia", "Ruellia humilis"),
+                   limits=c("Andropogon gerardii", "Parthenocissus quinquefolia", "Ruellia humilis"),
+                   labels=c("Ag", "Pq", "Rh")) 
 
 
 ##### Combine continuous and categorical traits #####
