@@ -219,7 +219,6 @@ ggplot(data=na.omit(cleanContinuous), aes(x=original_value, y=imputed_value)) +
 ggplot(data=subset(cleanContinuous, species_matched %in% c('Ruellia humilis', 'Andropogon gerardii', 'Parthenocissus quinquefolia')),
        aes(x=species_matched, y=imputed_value)) +
   geom_boxplot() +
-  theme(axis.text.x=element_text(angle=40, vjust=0.5, size=3)) +
   facet_wrap(~trait, scales='free', ncol=9) +
   scale_x_discrete(breaks=c("Andropogon gerardii", "Parthenocissus quinquefolia", "Ruellia humilis"),
                    limits=c("Andropogon gerardii", "Parthenocissus quinquefolia", "Ruellia humilis"),
