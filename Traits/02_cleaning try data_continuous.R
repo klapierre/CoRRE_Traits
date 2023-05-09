@@ -12,6 +12,7 @@
 library(tidyverse)
 library(data.table)
 library(Taxonstand)
+library(WorldFlora)
 
 theme_set(theme_bw(12))
 
@@ -30,12 +31,13 @@ dat <- fread("OriginalData\\Traits\\TRY\\TRYCoRREMerge/TRY_Traits_Download_Feb15
 #get list of species names
 TRYsplist<-dat %>% 
   select(AccSpeciesName) %>% 
-  unique()
+  unique() %>% 
+  extract("AccSpeciesName", c("genus", "species"), "([[:alpha:] ]+) ([[:alpha:] ]+)")
 
 #link to family
-WFO.file<-read.delim("CompiledData/Species_lists/WFO_Backbone/classification.txt") %>% 
-  rename()
+WFO.file<-read.delim("CompiledData/Species_lists/WFO_Backbone/classification.txt")
 
+familyinfo<-WFO.match
 
 # generate list of units for ALL TRY traits
 units <- dat %>%
