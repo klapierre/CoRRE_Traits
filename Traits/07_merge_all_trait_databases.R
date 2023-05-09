@@ -59,15 +59,46 @@ allTraits <- rbind(TRY, AusTraits, BIEN, TiP, CPTD2) %>%
   filter(!(growth_form %in% c('fern', 'lycophyte'))) %>% 
   select(DatabaseID, DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue)
 
+label <- allTraits %>% 
+  group_by(CleanTraitName, DatabaseID) %>% 
+  summarise(length=length(StdValue)) %>% 
+  ungroup() %>% 
+  group_by(CleanTraitName) %>% 
+  mutate(length2=sum(length)) %>% 
+  ungroup() %>% 
+  # filter(CleanTraitName %in% c('dark_resp_rate', 'J_max', 'LDMC', 'leaf_area', 'leaf_C', 'leaf_C:N',
+                               #                                                     'leaf_density', 'leaf_dry_mass', 'leaf_K', 'leaf_longevity', 'leaf_N',
+                               #                                                     'leaf_N:P', 'leaf_P', 'leaf_thickness', 'leaf_transp_rate', 'leaf_width',
+                               #                                                     'photosynthesis_rate', 'plant_height_vegetative', 'RGR', 'root:shoot',
+                               #                                                     'root_C', 'root_density', 'root_diameter', 'root_dry_mass', 'root_N',
+                               #                                                     'root_P', 'rooting_depth', 'seed_dry_mass', 'seed_length', 'seed_number',
+                               #                                                     'seed_terminal_velocity', 'SLA', 'SRL', 'stem_spec_density',
+                               # 'stomatal_conductance', 'Vc_max')) %>% 
+  pivot_longer(cols=length:length2, names_to='name', values_to='length') %>% 
+  mutate(DatabaseID=ifelse(name=='length2', 'total', DatabaseID)) %>% 
+  unique()
+
+ggplot(data=label, aes(x=DatabaseID, y=length, label=length, fill=DatabaseID)) +
+  geom_bar(stat='identity', position=position_dodge()) +
+  geom_text() +
+  geom_hline(yintercept=23068) +
+  geom_hline(yintercept=11534, color='red') +
+  facet_wrap(~CleanTraitName, ncol=10) +
+  scale_x_discrete(breaks=c("AusTraits", "BIEN", "CPTD2", "TIPleaf", "TRY", "total"),
+                   limits=c("AusTraits", "BIEN", "CPTD2", "TIPleaf", "TRY", "total"),
+                   labels=c("A", "B", "C", "TIP", "TRY", 'tot')) +
+  scale_fill_manual(values=c('#4E3686', '#5DA4D9', '#80D87F', '#FED23F', '#EE724C', 'darkgrey')) +
+  theme(legend.position='none')
+
 
 # Are there any outlier datasets for each trait?
 ggplot(data=subset(allTraits, CleanTraitName %in% c('dark_resp_rate', 'J_max', 'LDMC', 'leaf_area', 'leaf_C', 'leaf_C:N',
-                                                    'leaf_density', 'leaf_dry_mass', 'leaf_K', 'leaf_longevity', 'leaf_N', 
-                                                    'leaf_N:P', 'leaf_P', 'leaf_thickness', 'leaf_transp_rate', 'leaf_width',
-                                                    'photosynthesis_rate', 'plant_height_vegetative', 'RGR', 'root:shoot', 
-                                                    'root_C', 'root_density', 'root_diameter', 'root_dry_mass', 'root_N', 
-                                                    'root_P', 'rooting_depth', 'seed_dry_mass', 'seed_length', 'seed_number',
-                                                    'seed_terminal_velocity', 'SLA', 'SRL', 'stem_spec_density',
+#                                                     'leaf_density', 'leaf_dry_mass', 'leaf_K', 'leaf_longevity', 'leaf_N', 
+#                                                     'leaf_N:P', 'leaf_P', 'leaf_thickness', 'leaf_transp_rate', 'leaf_width',
+#                                                     'photosynthesis_rate', 'plant_height_vegetative', 'RGR', 'root:shoot', 
+#                                                     'root_C', 'root_density', 'root_diameter', 'root_dry_mass', 'root_N', 
+#                                                     'root_P', 'rooting_depth', 'seed_dry_mass', 'seed_length', 'seed_number',
+#                                                     'seed_terminal_velocity', 'SLA', 'SRL', 'stem_spec_density',
                                                     'stomatal_conductance', 'Vc_max')),
        aes(x=DatabaseID, y=StdValue)) +
   geom_jitter(aes(color=DatabaseID)) +
