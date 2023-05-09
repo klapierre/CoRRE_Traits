@@ -27,6 +27,16 @@ setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE
 # TRY data
 dat <- fread("OriginalData\\Traits\\TRY\\TRYCoRREMerge/TRY_Traits_Download_Feb15_2021.txt",sep = "\t",data.table = FALSE,stringsAsFactors = FALSE,strip.white = TRUE)
 
+#get list of species names
+TRYsplist<-dat %>% 
+  select(AccSpeciesName) %>% 
+  unique()
+
+#link to family
+WFO.file<-read.delim("CompiledData/Species_lists/WFO_Backbone/classification.txt") %>% 
+  rename()
+
+
 # generate list of units for ALL TRY traits
 units <- dat %>%
   select(OriglName, OrigUnitStr, TraitName, UnitName)%>%
