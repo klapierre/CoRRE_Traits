@@ -29,13 +29,15 @@ setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE
 # TRY data
 dat <- fread("OriginalData\\Traits\\TRY\\TRYCoRREMerge/TRY_Traits_Download_Feb15_2021.txt",sep = "\t",data.table = FALSE,stringsAsFactors = FALSE,strip.white = TRUE)
 
-trylist<-read.csv("OriginalData\\Traits\\TRY\\TRYCoRREMerge/TryAccSpecies_2023.csv")
-
-#get list of species names
-TRYsplist<-trylist 
-  # extract("AccSpeciesName", c("genus", "species"), "([[:alpha:] ]+) ([[:alpha:] ]+)")
-
-TRYsplist$family <- tax_name(TRYsplist$AccSpeciesName, get = 'family', db='both')$family
+# trylist<-read.csv("OriginalData\\Traits\\TRY\\TRYCoRREMerge/TryAccSpecies_2023.csv")  %>% 
+#   extract("AccSpeciesName", c("genus", "species"), "([[:alpha:] ]+) ([[:alpha:] ]+)") %>% 
+#   filter(species!='sp') %>% 
+#   mutate(AccSpeciesName=paste(genus, species, sep=' '))
+#   
+# #get list of species names
+# TRYsplist<-trylist
+# 
+# TRYsplist$family <- tax_name(trylist$AccSpeciesName, get = 'family', db='itis')$family
 
 # #link to family
 # WFO.file<-read.delim("CompiledData/Species_lists/WFO_Backbone/classification.txt")
