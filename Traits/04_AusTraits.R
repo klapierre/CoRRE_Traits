@@ -5,8 +5,9 @@
 ################################################################################
 
 #kim's
-setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data')
-
+setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\Original data\\Traits')
+#meghan's
+setwd('C:\\Users\\mavolio2\\Dropbox\\CoRRE_database\\Data\\OriginalData\\Traits')
 
 # remotes::install_github("traitecoevo/austraits",
 #                         dependencies = TRUE, upgrade = "ask",
@@ -16,7 +17,7 @@ setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE
 library(austraits)
 library(tidyverse)
 
-austraits <- load_austraits(version = "4.1.0", path = "data/austraits")
+austraits <- load_austraits(version = "4.1.0", path = "austraits")
 
 traits <- summarise_austraits(austraits, "trait_name")
 
