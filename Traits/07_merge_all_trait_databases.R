@@ -27,7 +27,7 @@ AusTraits <- read.csv('OriginalData\\Traits\\AusTraits_2022\\AusTraits_CoRRE_Mar
   filter(StdValue>0)
 
 # TRY
-TRY <- read.csv('OriginalData\\Traits\\TRY\\TRYCoRREMerge\\TRY_trait_data_continuous_long_March2023.csv') %>% 
+TRY <- read.csv('OriginalData\\Traits\\TRY\\TRY_trait_data_continuous_long_March2023.csv') %>% 
   mutate(DatabaseID="TRY") %>% 
   filter(StdValue>0)
 
