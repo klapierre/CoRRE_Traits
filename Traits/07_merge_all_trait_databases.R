@@ -207,7 +207,7 @@ ggplot(data=multiTraitInd, aes(x=num_traits)) +
 
 ##Trying to figure out which families have very little observed data going into the gap filling methods
 
-traitmeasured <- allTraits %>% 
+traitmeasured <- allTraits_sub %>% 
   mutate(present=1) %>% 
   group_by(DatabaseID, DatasetID, ObservationID, family, genus, species_matched) %>%
   pivot_wider(names_from=CleanTraitName, names_prefix="X", values_from=present, values_fill=0) %>% 
@@ -215,11 +215,11 @@ traitmeasured <- allTraits %>%
 
 familycomplete<-traitmeasured %>% 
   group_by(family) %>% 
-  summarize(across(Xseed_dry_mass:X58, mean)) %>% 
-  pivot_longer(Xseed_dry_mass:X58, names_to="trait", values_to = "value") %>% 
+  summarize(across(Xseed_dry_mass:X3114, mean)) %>% 
+  pivot_longer(Xseed_dry_mass:X3114, names_to="trait", values_to = "value") %>% 
   mutate(traitpresent=ifelse(value>0, 1, 0)) %>% 
   group_by(family) %>% 
   summarise(ntraits=sum(traitpresent)) %>% 
-  mutate(percenttraits=(ntraits/60))
+  mutate(percenttraits=(ntraits/12))
 
 write.csv(familycomplete, "CompiledData\\TraitCompletnessbyFamily.csv", row.names = F)  

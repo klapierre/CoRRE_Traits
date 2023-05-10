@@ -1,6 +1,6 @@
 ################################################################################
 ##  cleaning try data_continuous.R: Removing outliers and repeats from TRY Plant Database continous data
-##  for CoRRE database plant species.
+##  for CoRRE database plant species. Updated to include GEx and fewer species May2023
 ##
 ##  Authors: Meghan Avolio, Kimberly Komatsu
 ################################################################################
