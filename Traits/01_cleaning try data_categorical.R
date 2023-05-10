@@ -12,6 +12,8 @@ theme_set(theme_bw(12))
 
 ###NOTE: Code was originally done for Nov2019 TRY pull. In Feb 2021, we added more species and modified the code. When we changed the code (generally the second pull was much lower and some trait values were not found), the lines from the original code that no longer work are pasted below the updated code.
 
+#this does not include anything for GEx. 
+
 #kim's
 setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\OriginalData\\Traits\\TRY')
 
