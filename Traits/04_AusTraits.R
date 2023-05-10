@@ -5,7 +5,7 @@
 ################################################################################
 
 #kim's
-setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\Original data\\Traits')
+setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\')
 #meghan's
 setwd('C:\\Users\\mavolio2\\Dropbox\\CoRRE_database\\Data\\OriginalData\\Traits')
 
