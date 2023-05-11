@@ -10,7 +10,7 @@ library(vegan)
 library(tidyverse)
 
 
-setwd("C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\")
+setwd("C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\")
 setwd("C:\\Users\\wilco\\OneDrive - UNCG\\Working groups\\sDiv\\CoRRE data\\") ## wilcox personal laptop
 
 ###getting relative richness
@@ -86,7 +86,7 @@ controlANPP<-ANPP%>%
   summarize(anpp=mean(anpp))%>%
   ungroup()
 
-noControlANPP <- read.csv("C:\\Users\\lapie\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\CleanedData\\ANPP_noControls.csv")%>%
+noControlANPP <- read.csv("Data\\CleanedData\\ANPP_noControls.csv")%>%
   filter(site_code!='maerc')%>%
   select(site_code, project_name, community_type, anpp)
 
@@ -100,18 +100,18 @@ allANPP <- rbind(noControlANPP, controlANPP)
 ### FOR NOW, I AM JUST REMOVING THESE DATA...
 
 ### Read in and clean datasets
-corre2try <- read.csv("corre2trykey_2021.csv") %>% # key to merge genus_species column to cat trait data
+corre2try <- read.csv("Data\\OriginalData\\Traits\\TRY\\corre2trykey_2021.csv") %>% # key to merge genus_species column to cat trait data
   dplyr::select(genus_species, species_matched) %>%
   unique(.)
   #species_df <- read.csv("CoRRE_TRY_species_list.csv")
 
-exp_info_df <- read.csv("ExperimentInfo.csv")
+exp_info_df <- read.csv("Data\\CompiledData\\ExperimentInfo.csv")
 
-unkn_sp_lifespan <- read.csv("species with no cat traits.csv") %>%
+unkn_sp_lifespan <- read.csv("Data\\CleanedData\\Traits\\complete categorical traits\\species with no cat traits.csv") %>%
   rename(species_matched=genus_species)
 
 # Read in trait data and combine with manually entered lifespan data (for problem species)
-trait_cat_df <- read.csv("trait data\\sCoRRE categorical trait data_12142022.csv") %>%
+trait_cat_df <- read.csv("Data\\CleanedData\\Traits\\complete categorical traits\\sCoRRE categorical trait data_12142022.csv") %>%
   dplyr::select(species_matched, lifespan) %>%
   bind_rows(unkn_sp_lifespan) %>%
   mutate(lifespan=replace(lifespan, lifespan=="moss","perennial")) %>%
@@ -119,7 +119,7 @@ trait_cat_df <- read.csv("trait data\\sCoRRE categorical trait data_12142022.csv
   filter(species_matched!="")
   
 ### join genus_species names with species_matched for future joining with trait data
-relcov_df <- read.csv("RelativeCover.csv") %>%
+relcov_df <- read.csv("Data\\CompiledData\\RelativeCover.csv") %>%
   left_join(corre2try, by="genus_species") %>%
   filter(genus_species != "")
 
@@ -152,7 +152,7 @@ perc_annual <- relcov_trait_df %>%
   pivot_wider(names_from=lifespan, values_from=lifespan_cover) %>%
   replace(is.na(.), 0) %>%
   mutate(annual_relcov = annual/(annual+perennial+biennial+uncertain+FungusLichen)) %>%
-  dplyr::select(site_code, project_name, community_type, uncertain, annual_relcov)
+  dplyr::select(site_code, project_name, community_type, annual_relcov) 
 
 ### Take a quick look
 # hist(perc_annual$annual_relcov)
@@ -167,7 +167,4 @@ siteBiotic <- expRichness%>%
   full_join(allANPP) %>%
   full_join(perc_annual)
   
-# write.csv(siteBiotic, "Data\\CompiledData\\siteBiotic.csv")
-
-
-
+# write.csv(siteBiotic, "Data\\CompiledData\\siteBiotic.csv", row.names=F)
