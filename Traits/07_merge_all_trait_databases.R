@@ -27,7 +27,7 @@ AusTraits <- read.csv('OriginalData\\Traits\\AusTraits_2022\\AusTraits_CoRRE_Mar
   filter(StdValue>0)
 
 # TRY
-TRY <- read.csv('OriginalData\\Traits\\TRY\\TRYCoRREMerge\\TRY_trait_data_continuous_long_March2023.csv') %>% 
+TRY <- read.csv('OriginalData\\Traits\\TRY\\TRY_trait_data_continuous_long_March2023.csv') %>% 
   mutate(DatabaseID="TRY") %>% 
   filter(StdValue>0)
 
@@ -59,15 +59,80 @@ allTraits <- rbind(TRY, AusTraits, BIEN, TiP, CPTD2) %>%
   filter(!(growth_form %in% c('fern', 'lycophyte'))) %>% 
   select(DatabaseID, DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue)
 
+allTraits_wide<-allTraits %>% 
+  pivot_wider(names_from = CleanTraitName, values_from = StdValue, values_fill =NA)
+
+ntraits<-length(unique(allTraits$CleanTraitName))
+miss<-sum(is.na(allTraits_wide))
+total<-nrow(allTraits_wide)*ntraits
+miss/total*100
+
+spnum<-length(unique(allTraits_wide$species_matched))
+
+#originally were missing 96% of data for 1876 species
+
+#drop traits that are related to physiology, water content, and different ways of measuring SLA and Leaf area and root nutrients
+#Final option is SLA, LDMC, LA, seed dry mass and plant veg, SRL, and leaf N
+allTraits_sub<-allTraits %>% 
+  filter(!(CleanTraitName %in% c(106, "Vc_max", "J_max", "dark_resp_rate", 3120, 3122, 3121, "leaf_transp_rate", 185, "photosynthesis_rate", "stomatal_conductance", 185, 270, 40)),#phy water content
+           !(CleanTraitName %in% c(3108, 3109, 3111, 3112, 3113)),#other ways of measuring SLA, LA
+           !(CleanTraitName %in% c(475, "root_C", "root_N", "root_P", 1781)), #root traits
+ !(CleanTraitName %in% c("leaf_K", 52, "seed_terminal_velocity", "leaf_longevity", "stem_spec_density", 614, 1104, 57, 58, 51, "leaf_N:P", "leaf_P", 51, "leaf_density", "leaf_thickness", "RGR", "leaf_width", "seed_length", "leaf_C:N", "seed_number", "leaf_C", 570)),#traits with low coverage
+ !(CleanTraitName %in% c("root_density", "root_diameter", 'rooting_depth', "root:shoot", "root_dry_mass")))
+
+
+#make wide to sum NA
+allTraits_sub_wide<-allTraits_sub %>% 
+  pivot_wider(names_from = CleanTraitName, values_from = StdValue, values_fill =NA)
+
+ntraits<-length(unique(allTraits_sub$CleanTraitName))
+miss<-sum(is.na(allTraits_sub_wide))
+total<-nrow(allTraits_sub_wide)*ntraits
+miss/total*100
+
+spnum<-length(unique(allTraits_sub_wide$species_matched))
+####with out subset we are now missing 87% of data for 1852 species
+
+label <- allTraits %>% 
+  group_by(CleanTraitName, DatabaseID) %>% 
+  summarise(length=length(StdValue)) %>% 
+  ungroup() %>% 
+  group_by(CleanTraitName) %>% 
+  mutate(length2=sum(length)) %>% 
+  ungroup() %>% 
+  # filter(CleanTraitName %in% c('dark_resp_rate', 'J_max', 'LDMC', 'leaf_area', 'leaf_C', 'leaf_C:N',
+                               #                                                     'leaf_density', 'leaf_dry_mass', 'leaf_K', 'leaf_longevity', 'leaf_N',
+                               #                                                     'leaf_N:P', 'leaf_P', 'leaf_thickness', 'leaf_transp_rate', 'leaf_width',
+                               #                                                     'photosynthesis_rate', 'plant_height_vegetative', 'RGR', 'root:shoot',
+                               #                                                     'root_C', 'root_density', 'root_diameter', 'root_dry_mass', 'root_N',
+                               #                                                     'root_P', 'rooting_depth', 'seed_dry_mass', 'seed_length', 'seed_number',
+                               #                                                     'seed_terminal_velocity', 'SLA', 'SRL', 'stem_spec_density',
+                               # 'stomatal_conductance', 'Vc_max')) %>% 
+  pivot_longer(cols=length:length2, names_to='name', values_to='length') %>% 
+  mutate(DatabaseID=ifelse(name=='length2', 'total', DatabaseID)) %>% 
+  unique()
+
+ggplot(data=label, aes(x=DatabaseID, y=length, label=length, fill=DatabaseID)) +
+  geom_bar(stat='identity', position=position_dodge()) +
+  geom_text() +
+  geom_hline(yintercept=23068) +
+  geom_hline(yintercept=11534, color='red') +
+  facet_wrap(~CleanTraitName, ncol=10) +
+  scale_x_discrete(breaks=c("AusTraits", "BIEN", "CPTD2", "TIPleaf", "TRY", "total"),
+                   limits=c("AusTraits", "BIEN", "CPTD2", "TIPleaf", "TRY", "total"),
+                   labels=c("A", "B", "C", "TIP", "TRY", 'tot')) +
+  scale_fill_manual(values=c('#4E3686', '#5DA4D9', '#80D87F', '#FED23F', '#EE724C', 'darkgrey')) +
+  theme(legend.position='none')
+
 
 # Are there any outlier datasets for each trait?
 ggplot(data=subset(allTraits, CleanTraitName %in% c('dark_resp_rate', 'J_max', 'LDMC', 'leaf_area', 'leaf_C', 'leaf_C:N',
-                                                    'leaf_density', 'leaf_dry_mass', 'leaf_K', 'leaf_longevity', 'leaf_N', 
-                                                    'leaf_N:P', 'leaf_P', 'leaf_thickness', 'leaf_transp_rate', 'leaf_width',
-                                                    'photosynthesis_rate', 'plant_height_vegetative', 'RGR', 'root:shoot', 
-                                                    'root_C', 'root_density', 'root_diameter', 'root_dry_mass', 'root_N', 
-                                                    'root_P', 'rooting_depth', 'seed_dry_mass', 'seed_length', 'seed_number',
-                                                    'seed_terminal_velocity', 'SLA', 'SRL', 'stem_spec_density',
+#                                                     'leaf_density', 'leaf_dry_mass', 'leaf_K', 'leaf_longevity', 'leaf_N', 
+#                                                     'leaf_N:P', 'leaf_P', 'leaf_thickness', 'leaf_transp_rate', 'leaf_width',
+#                                                     'photosynthesis_rate', 'plant_height_vegetative', 'RGR', 'root:shoot', 
+#                                                     'root_C', 'root_density', 'root_diameter', 'root_dry_mass', 'root_N', 
+#                                                     'root_P', 'rooting_depth', 'seed_dry_mass', 'seed_length', 'seed_number',
+#                                                     'seed_terminal_velocity', 'SLA', 'SRL', 'stem_spec_density',
                                                     'stomatal_conductance', 'Vc_max')),
        aes(x=DatabaseID, y=StdValue)) +
   geom_jitter(aes(color=DatabaseID)) +
@@ -102,14 +167,14 @@ ggplot(data=subset(allTraits, CleanTraitName %in% c('dark_resp_rate', 'J_max', '
 
 
 # Transpose to wide format for gap filling.
-talltraits <- allTraits %>% 
+talltraits <- allTraits_sub %>% 
   group_by(DatabaseID, DatasetID, ObservationID, family, genus, species_matched) %>%
   pivot_wider(names_from=CleanTraitName, values_from=StdValue, values_fill=NA) %>% 
   ungroup()
 
-# write.csv(allTraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_April2023_long.csv', row.names = F)
+# write.csv(allTraits_sub, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_May2023_long.csv', row.names = F)
 
-# write.csv(talltraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_April2023.csv', row.names = F)
+# write.csv(talltraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_May2023.csv', row.names = F)
 
 ##checking traits
 test <- allTraits %>% 
@@ -142,7 +207,7 @@ ggplot(data=multiTraitInd, aes(x=num_traits)) +
 
 ##Trying to figure out which families have very little observed data going into the gap filling methods
 
-traitmeasured <- allTraits %>% 
+traitmeasured <- allTraits_sub %>% 
   mutate(present=1) %>% 
   group_by(DatabaseID, DatasetID, ObservationID, family, genus, species_matched) %>%
   pivot_wider(names_from=CleanTraitName, names_prefix="X", values_from=present, values_fill=0) %>% 
@@ -150,11 +215,11 @@ traitmeasured <- allTraits %>%
 
 familycomplete<-traitmeasured %>% 
   group_by(family) %>% 
-  summarize(across(Xseed_dry_mass:X58, mean)) %>% 
-  pivot_longer(Xseed_dry_mass:X58, names_to="trait", values_to = "value") %>% 
+  summarize(across(Xseed_dry_mass:X3114, mean)) %>% 
+  pivot_longer(Xseed_dry_mass:X3114, names_to="trait", values_to = "value") %>% 
   mutate(traitpresent=ifelse(value>0, 1, 0)) %>% 
   group_by(family) %>% 
   summarise(ntraits=sum(traitpresent)) %>% 
-  mutate(percenttraits=(ntraits/60))
+  mutate(percenttraits=(ntraits/12))
 
 write.csv(familycomplete, "CompiledData\\TraitCompletnessbyFamily.csv", row.names = F)  

@@ -44,6 +44,16 @@ mossKey <- read.csv("CleanedData\\Traits\\complete categorical traits\\sCoRRE ca
   mutate(moss = ifelse(leaf_type=="moss", "moss","non-moss")) %>%
   dplyr::select(-leaf_type)
 
+#pre-MICE data
+imputedRawPreMICE <- read.csv("CleanedData\\Traits\\gap filled continuous traits\\20230414\\imputed_traits.csv") %>%
+  bind_cols(read.csv('OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_April2023.csv')[,c('DatabaseID', 'DatasetID', 'ObservationID', 'family', 'genus', 'species_matched')]) %>%   
+  left_join(mossKey) %>% 
+  filter(moss!="moss") %>%
+  dplyr::select(-moss) #removes 6 species observations
+
+imputedLongPreMICE <- imputedRawPreMICE %>% 
+  pivot_longer(names_to='trait', values_to='imputed_value', seed_dry_mass:X58)
+
 # Read in imputed trait data and bind on species information
 ## this is trait data without replacement (all imputed)
 imputedRaw <- read.csv("CleanedData\\Traits\\gap filled continuous traits\\20230414\\imputed_traits_mice.csv") %>%

@@ -1,6 +1,6 @@
 ################################################################################
 ##  cleaning try data_continuous.R: Removing outliers and repeats from TRY Plant Database continous data
-##  for CoRRE database plant species.
+##  for CoRRE database plant species. Updated to include GEx and fewer species May2023
 ##
 ##  Authors: Meghan Avolio, Kimberly Komatsu
 ################################################################################
@@ -11,7 +11,9 @@
 #### Setting up script ####
 library(tidyverse)
 library(data.table)
-library(Taxonstand)
+# library(Taxonstand)
+# library(WorldFlora)
+library(taxize)
 
 theme_set(theme_bw(12))
 
@@ -25,7 +27,22 @@ setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE
 
 #### Reading in data ####
 # TRY data
-dat <- fread("OriginalData\\Traits\\TRY\\TRYCoRREMerge/TRY_Traits_Download_Feb15_2021.txt",sep = "\t",data.table = FALSE,stringsAsFactors = FALSE,strip.white = TRUE)
+dat <- fread("OriginalData\\Traits\\TRY\\TRY_Traits_Download_Feb15_2021.txt",sep = "\t",data.table = FALSE,stringsAsFactors = FALSE,strip.white = TRUE)
+
+# trylist<-read.csv("OriginalData\\Traits\\TRY\\TryAccSpecies_2023.csv")  %>% 
+#   extract("AccSpeciesName", c("genus", "species"), "([[:alpha:] ]+) ([[:alpha:] ]+)") %>% 
+#   filter(species!='sp') %>% 
+#   mutate(AccSpeciesName=paste(genus, species, sep=' '))
+#   
+# #get list of species names
+# TRYsplist<-trylist
+# 
+# TRYsplist$family <- tax_name(trylist$AccSpeciesName, get = 'family', db='itis')$family
+
+# #link to family
+# WFO.file<-read.delim("CompiledData/Species_lists/WFO_Backbone/classification.txt")
+# 
+# familyinfo<-WFO.family(taxon=TRYsplist$genus, WFO.data = WFO.file)
 
 # generate list of units for ALL TRY traits
 units <- dat %>%
@@ -36,7 +53,7 @@ units <- dat %>%
 
 #### Merging CoRRE with TRY ####
 # Read in cleaned CoRRE species names that link with TRY
-key <- read.csv("OriginalData\\Traits\\TRY\\TRYCoRREMerge\\corre2trykey_2021.csv") %>%
+key <- read.csv("OriginalData\\Traits\\TRY\\corre2trykey_2021.csv") %>%
   select(species_matched, AccSpeciesID, AccSpeciesName) %>%
   unique()
 
@@ -205,7 +222,7 @@ dat3 <- dat2 %>%
   filter(CleanTraitName!='plant_height_generative') #removing this trait because it doesn't make sense when compared to plant height vegetative
 
 #testing consistent units for each trait and ranking traits by priority
-priority <- read.csv("OriginalData\\Traits\\TRY\\TRYCoRREMerge\\trait_priority.csv") %>%
+priority <- read.csv("OriginalData\\Traits\\TRY\\trait_priority.csv") %>%
   rename(TraitID=TRY.trait.ID)
 
 Traits_Units <- dat3 %>%
@@ -477,5 +494,5 @@ ttraits <- cont_traits4 %>%
   spread(CleanTraitName, StdValue, fill=NA)
   
 
-# write.csv(ttraits, "OriginalData\\Traits\\TRY\\TRYCoRREMerge\\TRY_trait_data_continuous_March2023.csv", row.names = F)
-# write.csv(cont_traits4, "OriginalData\\Traits\\TRY\\TRYCoRREMerge\\TRY_trait_data_continuous_long_March2023.csv", row.names = F)
+# write.csv(ttraits, "OriginalData\\Traits\\TRY\\TRY_trait_data_continuous_March2023.csv", row.names = F)
+# write.csv(cont_traits4, "OriginalData\\Traits\\TRY\\TRY_trait_data_continuous_long_March2023.csv", row.names = F)

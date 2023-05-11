@@ -1,5 +1,6 @@
 ### IDENTIFYING N FIXERS IN CORRE-TRY DATABASE ####
 ### Ben Taylor 12/10/2019 ###
+###this does not include anything for GEx###
 
 ################################################################################
 ### Read in data sheets and get them into shape ################################
