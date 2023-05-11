@@ -12,11 +12,24 @@ setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE
 
 
 # Import CoRRE species names
-correSpecies <- read.csv("CompiledData\\Species_lists\\FullList_Nov2021.csv") %>%  #species names are standardized 
-  select(genus_species, species_matched) %>% 
+correSpecies <- read.csv("CompiledData\\Species_lists\\FullList_Nov2021.csv") %>%  #species names are standardized
+  left_join(read.csv("CompiledData\\Species_lists\\species_families_trees_2021.csv")) %>% 
+  filter(tree.non.tree != "tree") %>% #Remove trees
+  separate(species_matched, into=c('genus', 'species', 'subspp'), sep=' ') %>% 
+  filter(species!='sp.') %>% 
+  unite(col='species_matched', genus:species, sep=' ', remove=T) %>% 
+  select(species_matched) %>% 
   unique()
 
-sp.vector <- unique(correSpecies$species_matched)
+# Import GEx species names
+GExSpecies <- read.csv('OriginalData\\Traits\\GEx_species_family_May2023.csv') %>% 
+  select(species_matched) %>% 
+  unique()
+
+allSpecies <- rbind(correSpecies, GExSpecies) %>% 
+  unique()
+
+sp.vector <- unique(allSpecies$species_matched)
 
 # Get BIEN data
 bienData <- BIEN_trait_species(species=sp.vector)
@@ -44,9 +57,6 @@ continuous <- bienData %>%
   filter(method!='laboratory/greenhouse/garden experiment',
          trait_value!=0) %>% 
   rename(species_matched=scrubbed_species_binomial) %>% 
-  #Remove trees
-  left_join(read.csv("CompiledData\\Species_lists\\species_families_trees_2021.csv")) %>% 
-  filter(tree.non.tree != "tree") %>% 
   # Problem: A few datasets have lots of repeated data for some traits*species.
   # Solution: For each species, find if there is repeated data for all traits collected on an individual. 
   # Where this occurs, keep the lowest ObservationID.
@@ -109,7 +119,7 @@ continuousClean <- continuous %>%
 
 
 
-# write.csv(continuousClean, "OriginalData\\Traits\\BIEN\\BIEN_for_scorre_20230309.csv", row.names=F)
+# write.csv(continuousClean, "OriginalData\\Traits\\BIEN\\BIEN_for_scorre_20230511.csv", row.names=F)
 
 
 
@@ -143,12 +153,3 @@ continuousClean <- continuous %>%
 # 
 # 
 # #write.csv(final_categorical,"BIEN_categorical_traits_2-20-20.csv")
-
-
-
-
-
-
-
-
-
