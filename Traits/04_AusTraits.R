@@ -69,19 +69,36 @@ traitData <- data$traits %>%
                   ifelse(trait_name=='root_specific_root_length', (StdValue*100), StdValue)),
          trait_name=ifelse(trait_name=='leaf_mass_per_area', 'specific_leaf_area', trait_name))
 
-names <- read.csv('CompiledData\\Species_lists\\FullList_Nov2021.csv') %>%
-  select(-X) %>%
-  filter(remove==0) %>%
-  select(species_matched) %>%
-  unique() %>%
-  mutate(corre='y')
 
+# Import CoRRE species names
+correSpecies <- read.csv("CompiledData\\Species_lists\\FullList_Nov2021.csv") %>%  #species names are standardized
+  left_join(read.csv("CompiledData\\Species_lists\\species_families_trees_2021.csv")) %>% 
+  filter(tree.non.tree != "tree") %>% #Remove trees
+  separate(species_matched, into=c('genus', 'species', 'subspp'), sep=' ') %>% 
+  filter(species!='sp.') %>% 
+  unite(col='species_matched', genus:species, sep=' ', remove=T) %>% 
+  select(species_matched) %>% 
+  unique()
+
+# Import GEx species names
+GExSpecies <- read.csv('OriginalData\\Traits\\GEx_species_family_May2023.csv') %>% 
+  select(species_matched) %>% 
+  unique()
+
+
+# Combine species lists
+allSpecies <- rbind(correSpecies, GExSpecies) %>% 
+  unique() %>% 
+  mutate(keep='y')
+
+# Gather trait data for only our species
 traitDataCoRRE <- traitData %>%
-  left_join(names) %>%
-  filter(corre=='y') %>%
+  left_join(allSpecies) %>%
+  filter(keep=='y') %>%
   group_by(DatabaseID, DatasetID, ObservationID, species_matched, trait_name) %>% 
   summarize(StdValue=max(StdValue)) %>% 
   ungroup()
+
 
 traitDataCoRRE$CleanTraitName <- recode(traitDataCoRRE$trait_name, 
                                         'leaf_C_per_dry_mass'='leaf_C', 
@@ -117,4 +134,4 @@ spp <- traitDataCoRRE %>%
   select(species_matched) %>%
   unique()
 
-# write.csv(traitDataCoRRE, 'OriginalData\\Traits\\AusTraits_2022\\AusTraits_CoRRE_March2023.csv')
+# write.csv(traitDataCoRRE, 'OriginalData\\Traits\\AusTraits_2022\\AusTraits_CoRRE_May2023.csv')

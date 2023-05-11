@@ -44,42 +44,28 @@ mossKey <- read.csv("CleanedData\\Traits\\complete categorical traits\\sCoRRE ca
   mutate(moss = ifelse(leaf_type=="moss", "moss","non-moss")) %>%
   dplyr::select(-leaf_type)
 
-#pre-MICE data
-imputedRawPreMICE <- read.csv("CleanedData\\Traits\\gap filled continuous traits\\20230414\\imputed_traits.csv") %>%
-  bind_cols(read.csv('OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_April2023.csv')[,c('DatabaseID', 'DatasetID', 'ObservationID', 'family', 'genus', 'species_matched')]) %>%   
-  left_join(mossKey) %>% 
-  filter(moss!="moss") %>%
-  dplyr::select(-moss) #removes 6 species observations
-
-imputedLongPreMICE <- imputedRawPreMICE %>% 
-  pivot_longer(names_to='trait', values_to='imputed_value', seed_dry_mass:X58)
 
 # Read in imputed trait data and bind on species information
 ## this is trait data without replacement (all imputed)
-imputedRaw <- read.csv("CleanedData\\Traits\\gap filled continuous traits\\20230414\\imputed_traits_mice.csv") %>%
-  bind_cols(read.csv('OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_April2023.csv')[,c('DatabaseID', 'DatasetID', 'ObservationID', 'family', 'genus', 'species_matched')]) %>%   
+imputedRaw <- read.csv("CleanedData\\Traits\\gap filled continuous traits\\20230510\\imputed_traits_mice.csv") %>%
+  bind_cols(read.csv('OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_May2023.csv')[,c('DatabaseID', 'DatasetID', 'ObservationID', 'family', 'genus', 'species_matched')]) %>%   
   left_join(mossKey) %>% 
   filter(moss!="moss") %>%
   dplyr::select(-moss) #removes 6 species observations
 
 imputedLong <- imputedRaw %>% 
-  pivot_longer(names_to='trait', values_to='imputed_value', seed_dry_mass:X58)
+  pivot_longer(names_to='trait', values_to='imputed_value', seed_dry_mass:X3114)
 
 # Read original trait data and join with imputed data
-originalRaw <- read.csv('OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_April2023.csv') %>%
-  pivot_longer(names_to='trait', values_to='original_value', seed_dry_mass:X58) %>%
+originalRaw <- read.csv('OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_May2023.csv') %>%
+  pivot_longer(names_to='trait', values_to='original_value', seed_dry_mass:X3114) %>%
   na.omit()
 
 
 # Join original trait data with imputed data. Only keep traits of interest.
 allContinuous <- imputedLong %>% 
   left_join(originalRaw) %>% 
-  filter(trait %in% c('dark_resp_rate', 'LDMC', 'leaf_area', 'leaf_C', 'leaf_C.N', 'leaf_density', 'leaf_dry_mass',
-                      'leaf_K', 'leaf_longevity', 'leaf_N', 'leaf_N.P', 'leaf_P', 'leaf_thickness', 'leaf_transp_rate', 
-                      'leaf_width', 'photosynthesis_rate', 'plant_height_vegetative', 'RGR', 'root.shoot', 'root_C', 
-                      'root_density', 'root_diameter', 'root_dry_mass', 'root_N', 'root_P', 'rooting_depth', 'seed_dry_mass', 
-                      'seed_length', 'seed_number', 'seed_terminal_velocity', 'SLA', 'SRL', 'stem_spec_density', 
-                      'stomatal_conductance')) # dropped J_max and Vc_max because they directly relate to photosynthesis
+  filter(trait %in% c('LDMC', 'leaf_area', 'leaf_dry_mass', 'leaf_N', 'plant_height_vegetative', 'seed_dry_mass', 'SLA', 'SRL'))
 
 
 allContinuousWide <- allContinuous %>% 
@@ -98,14 +84,14 @@ meanContinuous <- allContinuous %>%
 speciesCount <- meanContinuous %>% 
   group_by(family) %>% 
   summarize(num_species=length(family)) %>% 
-  ungroup() #113 families
+  ungroup() #112 families
 
 
 # Compare imputed to original continuous trait data
 ggplot(data=na.omit(meanContinuous), aes(x=original_value_mean, y=imputed_value_mean)) +
   geom_point() +
   geom_abline(slope=1) +
-  facet_wrap(~trait, scales='free', ncol=9)
+  facet_wrap(~trait, scales='free')
 
 # Only grasses -- 11620 species
 ggplot(data=na.omit(subset(allContinuous, family=='Poaceae')), aes(x=original_value, y=imputed_value)) +
@@ -130,7 +116,7 @@ ggplot(data=na.omit(subset(allContinuous, family=='Fabaceae')), aes(x=original_v
 ggplot(data=na.omit(allContinuous), aes(x=original_value, y=imputed_value)) +
   geom_point() +
   geom_abline(slope=1) +
-  facet_wrap(~trait, scales='free', ncol=9)
+  facet_wrap(~trait, scales='free')
 
 
 allTogether <- allContinuous %>% 
@@ -141,7 +127,7 @@ allTogether <- allContinuous %>%
 # Look at boxplots for each trait
 ggplot(data=allTogether, aes(x=data_type, y=trait_value)) +
   geom_boxplot() +
-  facet_wrap(~trait, scales='free', ncol=9)
+  facet_wrap(~trait, scales='free')
 
 
 #### Clean imputed continuous trait data ####
@@ -154,15 +140,21 @@ meanSD <- allContinuous %>%
   summarize(across('imputed_value', .fns=list(mean=mean, sd=sd))) %>% 
   ungroup()
 
-# Things that are a problem: Some imputed seed number values are less than 1, which doesn't make sense.
+meanSDSpecies <- cleanContinuous %>% 
+  group_by(trait, species_matched) %>% 
+  summarize(across('imputed_value', .fns=list(species_mean=mean, species_sd=sd, species_length=length))) %>% 
+  ungroup()
+
+
 cleanContinuous <- allContinuous %>% 
-  mutate(drop=ifelse(trait=='seed_number' & imputed_value<1, 1, 0)) %>% 
-  filter(drop==0) %>% #drops 803 observations
-  select(-drop) %>% 
   #calculate z-scores (error risk) for continuous traits 
   left_join(meanSD) %>% 
+  left_join(meanSDSpecies) %>% 
   mutate(error_risk_overall=(imputed_value-imputed_value_mean)/imputed_value_sd) %>% 
-  filter(error_risk_overall<4) #drops an additional 25194 observations
+  mutate(error_risk_species=(imputed_value-imputed_value_species_mean)/imputed_value_species_sd) %>% 
+  filter(error_risk_overall<4) %>%  #drops 4369 observations (0.5% of data)
+  filter(error_risk_species<4 & error_risk_species>(-4)) #drops an additional 7626 observations (0.9% of data), all of which were from species with at least 20 observations for the given trait value being dropped
+
 
 cleanContinousWide <- cleanContinuous %>% 
   pivot_longer(cols=c('original_value', 'imputed_value'), names_to='data_type', values_to='trait_value') %>% 
@@ -172,8 +164,8 @@ cleanContinousWide <- cleanContinuous %>%
 # Look at boxplots for each trait
 ggplot(data=cleanContinousWide, aes(x=as.factor(data_type2), y=trait_value)) +
   # geom_jitter(aes(color=data_type)) +
-  geom_boxplot(aes(color=data_type)) +
-  facet_wrap(~trait, scales='free_y', ncol=4) +
+  geom_boxplot(aes(color=data_type2)) +
+  facet_wrap(~trait, scales='free_y') +
   scale_x_discrete(breaks=c("AusTraits", "BIEN", "CPTD2", "TIPleaf", "TRY", "imputed_value"),
                    limits=c("AusTraits", "BIEN", "CPTD2", "TIPleaf", "TRY", "imputed_value"),
                    labels=c("A", "B", "C", "TIP", "TRY", "imp.")) +
@@ -185,33 +177,19 @@ ggplot(data=cleanContinousWide, aes(x=as.factor(data_type2), y=trait_value)) +
 
 
 # Look at boxplots for each trait
+ggplot(data=subset(cleanContinousWide, species_matched %in% c('Helianthus maximiliani', 'Potentilla anserina', 'Clintonia borealis')), aes(x=species_matched, y=trait_value)) +
+  geom_boxplot(aes(color=data_type)) +
+  facet_wrap(~trait, scales='free')
+
 ggplot(data=subset(cleanContinousWide, species_matched=='Andropogon gerardii'), aes(x=data_type, y=trait_value)) +
   geom_boxplot() +
-  facet_wrap(~trait, scales='free', ncol=9)
-
-meanSDFamily <- cleanContinuous %>% 
-  group_by(trait, family) %>% 
-  summarize(across('imputed_value', .fns=list(family_mean=mean, family_sd=sd))) %>% 
-  ungroup()
-
-cleanContinuousFamilyRisk <- cleanContinuous %>% 
-  left_join(meanSDFamily) %>% 
-  mutate(error_risk_family=(imputed_value-imputed_value_family_mean)/imputed_value_family_sd)
-
-
-# cleanContinousReplace <- cleanContinuous %>% 
-#   select(species_matched, trait, original_value, imputed_value) %>% 
-#   pivot_longer(cols=c('original_value', 'imputed_value'), names_to='replace', values_to='trait_value')
-
-# ggplot(data=subset(cleanContinousReplace, species_matched=='Andropogon_gerardii'), aes(x=replace, y=trait_value)) +
-#   geom_boxplot() +
-#   facet_wrap(~trait, scales='free')
+  facet_wrap(~trait, scales='free')
 
 
 # Look at boxplots for each trait
 ggplot(data=subset(cleanContinuousFamilyRisk, family %in% c('Asteraceae', 'Frankeniaceae', 'Cactaceae', 'Malpighiaceae', 'Liliaceae')), aes(x=family, y=imputed_value)) +
   geom_boxplot() +
-  facet_wrap(~trait, scales='free', ncol=9) +
+  facet_wrap(~trait, scales='free') +
   scale_x_discrete(breaks=c("Asteraceae", "Frankeniaceae", "Cactaceae", "Malpighiaceae", "Liliaceae"),
                    limits=c("Asteraceae", "Frankeniaceae", "Cactaceae", "Malpighiaceae", "Liliaceae"),
                    labels=c("A", "F", "C", "M", "L")) 
@@ -222,36 +200,84 @@ ggplot(data=subset(cleanContinuousFamilyRisk, family %in% c('Asteraceae', 'Frank
 ggplot(data=na.omit(cleanContinuous), aes(x=original_value, y=imputed_value)) +
   geom_point() +
   geom_abline(slope=1) +
-  facet_wrap(~trait, scales='free', ncol=9)
+  facet_wrap(~trait, scales='free')
 
 
 # look up some values for species that we know and make sure they are right
 ggplot(data=subset(cleanContinuous, species_matched %in% c('Ruellia humilis', 'Andropogon gerardii', 'Parthenocissus quinquefolia')),
        aes(x=species_matched, y=imputed_value)) +
   geom_boxplot() +
-  facet_wrap(~trait, scales='free', ncol=9) +
+  facet_wrap(~trait, scales='free') +
   scale_x_discrete(breaks=c("Andropogon gerardii", "Parthenocissus quinquefolia", "Ruellia humilis"),
                    limits=c("Andropogon gerardii", "Parthenocissus quinquefolia", "Ruellia humilis"),
                    labels=c("Ag", "Pq", "Rh")) 
 
 
-##### Combine continuous and categorical traits #####
-longCategorical <- catagoricalTraits %>%
-  pivot_longer(growth_form:n_fixation, names_to="trait", values_to="trait_value")
-
+##### Mean values for each species #####
 meanCleanContinuous <- cleanContinuous %>% 
-  group_by(species_matched, trait) %>% 
+  group_by(family, genus, species_matched, trait) %>% 
   summarize(trait_value=mean(imputed_value)) %>% 
-  ungroup() #%>% 
-  # pivot_wider(names_from=trait, values_from=trait_value) 
+  ungroup()
+
+meanSD <- meanCleanContinuous %>% 
+  group_by(trait) %>% 
+  summarize(across('trait_value', .fns=list(mean=mean, sd=sd))) %>% 
+  ungroup()
+
+meanSDFamily <- meanCleanContinuous %>% 
+  group_by(trait, family) %>% 
+  summarize(across('trait_value', .fns=list(family_mean=mean, family_sd=sd, family_length=length))) %>% 
+  ungroup()
+
+meanSDGenus <- meanCleanContinuous %>% 
+  group_by(trait, genus) %>% 
+  summarize(across('trait_value', .fns=list(genus_mean=mean, genus_sd=sd, genus_length=length))) %>% 
+  ungroup()
+
+meanCleanContinuousErrorRisk <- meanCleanContinuous %>% 
+  left_join(meanSD) %>% 
+  left_join(meanSDFamily) %>% 
+  left_join(meanSDGenus) %>% 
+  mutate(error_risk_overall=(trait_value-trait_value_mean)/trait_value_sd, 
+         error_risk_family=ifelse(trait_value_family_length>2, (trait_value-trait_value_family_mean)/trait_value_family_sd, NA),
+         error_risk_genus=ifelse(trait_value_genus_length>2, (trait_value-trait_value_genus_mean)/trait_value_genus_sd, NA)) %>% 
+  select(family, genus, species_matched, trait, trait_value, error_risk_overall, error_risk_family, error_risk_genus) %>% 
+  left_join(meanContinuous) %>% 
+  select(-imputed_value_mean, imputed_value_sd, original_value_sd)
+
+ggplot(data=na.omit(meanCleanContinuousErrorRisk), aes(x=original_value_mean, y=trait_value)) +
+  geom_point() +
+  geom_abline(slope=1) +
+  facet_wrap(~trait, scales='free')
+
+meanCleanContinuousWide <- meanCleanContinuousErrorRisk %>% 
+  pivot_longer(cols=c('original_value_mean', 'trait_value'))
+
+ggplot(data=na.omit(meanCleanContinuousWide), aes(x=name, y=value)) +
+  geom_boxplot() +
+  facet_wrap(~trait, scales='free')
 
 
-pairs(meanCleanContinuous[,16:35])
+##### Combine continuous and categorical traits #####
+sppNames <- read.csv('CompiledData\\Species_lists\\species_families_trees_2021.csv') %>% 
+  separate(species_matched, into=c('genus', 'species'), sep=' ', remove=F) %>% 
+  select(family, genus, species_matched)
 
-test <- meanCleanContinuous[!complete.cases(meanCleanContinuous), ]
+longCategorical <- catagoricalTraits %>%
+  pivot_longer(growth_form:n_fixation, names_to="trait", values_to="trait_value") %>% 
+  mutate(error_risk_overall=NA,
+         error_risk_family=NA,
+         error_risk_genus=NA) %>% 
+  left_join(sppNames)
+  
+traitsAll <- meanCleanContinuousErrorRisk %>%
+  select(-original_value_sd, -original_value_mean, -imputed_value_sd) %>% 
+  rbind(longCategorical)
 
-traitsAll <- meanCleanContinuous %>%
-  rbind(longCategorical) %>% 
-  pivot_wider(names_from=trait, values_from=trait_value, values_fill=NA)
+# write.csv(traitsAll, 'CleanedData\\Traits\\CoRRE_allTraitData_May2023.csv')
 
-# write.csv(traitsAll, 'CleanedData\\Traits\\CoRRE_allTraitData_April2023.csv')
+traitsWide <- traitsAll %>% 
+  select(-error_risk_overall, -error_risk_family, -error_risk_genus) %>% 
+  pivot_wider(names_from=trait, values_from=trait_value)
+
+# write.csv(traitsWide, 'CleanedData\\Traits\\CoRRE_allTraitData_wide_May2023.csv')
