@@ -14,12 +14,27 @@ setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE
 #### Read in data ####
 
 # Cleaned species names
-names <- read.csv("CompiledData\\Species_lists\\species_families_trees_2021.csv")
+# Import CoRRE species names
+correSpecies <- read.csv("CompiledData\\Species_lists\\FullList_Nov2021.csv") %>%  #species names are standardized
+  left_join(read.csv("CompiledData\\Species_lists\\species_families_trees_2021.csv")) %>% 
+  filter(tree.non.tree != "tree") %>% #Remove trees
+  separate(species_matched, into=c('genus', 'species', 'subspp'), sep=' ') %>% 
+  filter(species!='sp.') %>% 
+  unite(col='species_matched', genus:species, sep=' ', remove=T) %>% 
+  select(family, species_matched) %>% 
+  unique()
+
+# Import GEx species names
+GExSpecies <- read.csv('OriginalData\\Traits\\GEx_species_family_May2023.csv') %>% 
+  select(family, species_matched) %>% 
+  unique()
+
+names <- rbind(correSpecies, GExSpecies) %>% 
+  unique()
 
 # AusTraits
-AusTraits <- read.csv('OriginalData\\Traits\\AusTraits_2022\\AusTraits_CoRRE_March2023.csv') %>%
+AusTraits <- read.csv('OriginalData\\Traits\\AusTraits_2022\\AusTraits_CoRRE_May2023.csv') %>%
   left_join(names) %>%
-  filter(tree.non.tree=="non-tree") %>% 
   mutate(species_matched2=species_matched)%>%
   separate(species_matched2, into=c('genus', 'species'))%>%
   mutate(DatabaseID='AusTraits')%>%
@@ -32,19 +47,20 @@ TRY <- read.csv('OriginalData\\Traits\\TRY\\TRY_trait_data_continuous_long_March
   filter(StdValue>0)
 
 # BIEN - NOTE: photosynthetic rate, stomatal conductence, stem specific density were dropped in the BIEN cleaning file because they were out of line with the TRY trait values
-BIEN <- read.csv('OriginalData\\Traits\\BIEN\\BIEN_for_scorre_20230309.csv') %>% 
+BIEN <- read.csv('OriginalData\\Traits\\BIEN\\BIEN_for_scorre_20230511.csv') %>% 
   left_join(names) %>%
   select(DatabaseID, DatasetID, ObservationID, family, species_matched, genus, CleanTraitName, StdValue) %>% 
   filter(StdValue>0)
 
 # TiP leaf
-TiP <- read.csv('OriginalData\\Traits\\TiP_leaf\\TiP_leaf_March2023.csv') %>% 
+TiP <- read.csv('OriginalData\\Traits\\TiP_leaf\\TiP_leaf_May2023.csv') %>% 
   separate(col=species_matched, into=c('genus', 'species'), sep=' ', remove=F) %>% 
+  left_join(names) %>% 
   select(DatabaseID, DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue) %>% 
   filter(StdValue>0)
 
 # China Plant Trait Database 2
-CPTD2 <- read.csv('OriginalData\\Traits\\ChinaPlant2\\CPTD2_March2023.csv') %>% 
+CPTD2 <- read.csv('OriginalData\\Traits\\ChinaPlant2\\CPTD2_May2023.csv') %>% 
   separate(col=species_matched, into=c('genus', 'species'), sep=' ', remove=F) %>% 
   select(DatabaseID, DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue) %>% 
   filter(StdValue>0)
