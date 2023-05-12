@@ -81,7 +81,8 @@ correSpecies <- read.csv("CompiledData\\Species_lists\\FullList_Nov2021.csv") %>
   unique()
 
 # Import GEx species names
-GExSpecies <- read.csv('OriginalData\\Traits\\GEx_species_family_May2023.csv') %>% 
+GExSpecies <- read.csv('OriginalData\\Traits\\GEx_species_tree_complete.csv') %>% 
+  filter(tree.non.tree=='non-tree') %>% 
   select(species_matched) %>% 
   unique()
 

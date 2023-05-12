@@ -21,7 +21,8 @@ correSpecies <- read.csv("CompiledData\\Species_lists\\FullList_Nov2021.csv") %>
   unique()
 
 # Import GEx species names
-GExSpecies <- read.csv('OriginalData\\Traits\\GEx_species_family_May2023.csv') %>% 
+GExSpecies <- read.csv('OriginalData\\Traits\\GEx_species_tree_complete.csv') %>% 
+  filter(tree.non.tree=='non-tree') %>% 
   select(family, species_matched) %>% 
   unique()
 
@@ -34,7 +35,8 @@ allSpecies <- rbind(correSpecies, GExSpecies) %>%
 # Import trait data and subset to our species of interest
 tip <- read_xlsx('OriginalData\\Traits\\TiP_leaf\\The TiP-Leaf dataset.xlsx', sheet='plant traits') %>% 
   rename(species_matched=Species) %>%
-  mutate(ObservationID=paste(Site, species_matched, sep='::')) %>% 
+  filter(species_matched!='/') %>% 
+  mutate(ObservationID=row_number()) %>% 
   mutate(DatasetID='1', DatabaseID='TIPleaf') %>% 
   left_join(allSpecies) %>% 
   mutate(LCC=as.numeric(ifelse(LCC=='/', NA, LCC)),
@@ -42,12 +44,12 @@ tip <- read_xlsx('OriginalData\\Traits\\TiP_leaf\\The TiP-Leaf dataset.xlsx', sh
          LPC=as.numeric(ifelse(LPC=='/', NA, LPC)),
          SLA=SLA/10) %>% #unit conversion to TRY standards: cm2/g to mm2/mg 
   select(DatabaseID, DatasetID, ObservationID, species_matched, LT, DW, LDMC, LA, SLA, LCC, LNC, LPC) %>% 
-  pivot_longer(LT:LPC, names_to='trait_name', values_to='StdValue')
+  pivot_longer(LT:LPC, names_to='trait_name', values_to='StdValue') %>% 
+  unique()
 
 tip$CleanTraitName <- recode(tip$trait_name, 
                              'LT'='leaf_thickness',
                              'DW'='leaf_dry_mass',
-                             # 'LWC'='water_content',
                              'LA'='leaf_area',
                              'LCC'='leaf_C',
                              'LNC'='leaf_N',
