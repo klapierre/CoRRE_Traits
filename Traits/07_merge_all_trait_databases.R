@@ -42,7 +42,7 @@ AusTraits <- read.csv('OriginalData\\Traits\\AusTraits_2022\\AusTraits_CoRRE_May
   filter(StdValue>0)
 
 # TRY
-TRY <- read.csv('OriginalData\\Traits\\TRY\\TRY_trait_data_continuous_long_March2023.csv') %>% 
+TRY <- read.csv('OriginalData\\Traits\\TRY\\old files\\TRY_trait_data_continuous_long_March2023.csv') %>% 
   mutate(DatabaseID="TRY") %>% 
   filter(StdValue>0)
 
@@ -88,13 +88,13 @@ spnum<-length(unique(allTraits_wide$species_matched))
 #originally were missing 96% of data for 1876 species
 
 #drop traits that are related to physiology, water content, and different ways of measuring SLA and Leaf area and root nutrients
-#Final option is SLA, LDMC, LA, seed dry mass and plant veg, SRL, and leaf N
+#Final option is SLA (3115, 3116), LDMC, LA (3108:3114), leaf mass, seed dry mass and plant veg, SRL (614), and leaf N ()
 allTraits_sub<-allTraits %>% 
   filter(!(CleanTraitName %in% c(106, "Vc_max", "J_max", "dark_resp_rate", 3120, 3122, 3121, "leaf_transp_rate", 185, "photosynthesis_rate", "stomatal_conductance", 185, 270, 40)),#phy water content
            !(CleanTraitName %in% c(3108, 3109, 3111, 3112, 3113)),#other ways of measuring SLA, LA
            !(CleanTraitName %in% c(475, "root_C", "root_N", "root_P", 1781)), #root traits
- !(CleanTraitName %in% c("leaf_K", 52, "seed_terminal_velocity", "leaf_longevity", "stem_spec_density", 614, 1104, 57, 58, 51, "leaf_N:P", "leaf_P", 51, "leaf_density", "leaf_thickness", "RGR", "leaf_width", "seed_length", "leaf_C:N", "seed_number", "leaf_C", 570)),#traits with low coverage
- !(CleanTraitName %in% c("root_density", "root_diameter", 'rooting_depth', "root:shoot", "root_dry_mass")))
+ !(CleanTraitName %in% c("leaf_K", 52, "seed_terminal_velocity", "leaf_longevity", "stem_spec_density", 1104, 57, 58, 51, "leaf_N:P", "leaf_P", 51, "leaf_density", "leaf_thickness", "RGR", "leaf_width", "seed_length", "leaf_C:N", "seed_number", "leaf_C", 570)),#traits with low coverage
+ !(CleanTraitName %in% c("root_density", "root_diameter", 'rooting_depth', "root:shoot", "root_dry_mass")))#rest of root traits
 
 
 #make wide to sum NA

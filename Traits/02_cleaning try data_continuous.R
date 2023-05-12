@@ -13,7 +13,7 @@ library(tidyverse)
 library(data.table)
 # library(Taxonstand)
 # library(WorldFlora)
-library(taxize)
+# library(taxize)
 
 theme_set(theme_bw(12))
 
@@ -27,7 +27,7 @@ setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE
 
 #### Reading in data ####
 # TRY data
-dat <- fread("OriginalData\\Traits\\TRY\\TRY_Traits_Download_Feb15_2021.txt",sep = "\t",data.table = FALSE,stringsAsFactors = FALSE,strip.white = TRUE)
+dat <- fread("OriginalData\\Traits\\TRY\\TRY_Traits_Downloaded_April2023.txt",sep = "\t",data.table = FALSE,stringsAsFactors = FALSE,strip.white = TRUE)
 
 # trylist<-read.csv("OriginalData\\Traits\\TRY\\TryAccSpecies_2023.csv")  %>% 
 #   extract("AccSpeciesName", c("genus", "species"), "([[:alpha:] ]+) ([[:alpha:] ]+)") %>% 
@@ -53,8 +53,32 @@ units <- dat %>%
 
 #### Merging CoRRE with TRY ####
 # Read in cleaned CoRRE species names that link with TRY
-key <- read.csv("OriginalData\\Traits\\TRY\\corre2trykey_2021.csv") %>%
+corre_key <- read.csv("OriginalData\\Traits\\TRY\\corre2trykey_2021.csv") %>%
   select(species_matched, AccSpeciesID, AccSpeciesName) %>%
+  unique()
+
+corresp<-corre_key %>% 
+  select(species_matched) %>% 
+  unique() %>% 
+  mutate(corre=1)
+
+#get list to merge gex with try
+gex <- read.csv("OriginalData\\Traits\\GEx_species_family_May2023.csv")
+
+gexlist<-gex %>% 
+  select(species_matched) %>% 
+  mutate(AccSpeciesName=species_matched)
+  
+trysp<-dat %>% 
+  select(AccSpeciesID, AccSpeciesName) %>% 
+  unique()
+
+gex_key<-gexlist %>% 
+  right_join(trysp) %>% 
+  na.omit()
+
+key<-corre_key %>% 
+  bind_rows(gex_key) %>% 
   unique()
 
 # Merge CoRRE species names with TRY data
@@ -74,7 +98,7 @@ dat2 <- dat %>%
 #   summarize(n=length(TraitID))
 
 # Subsetting out traits we want and replacing the numbers with names
-#if origlname or unit is blank but there are no duplicates we are keepping it.
+#if origlname or unit is blank but there are no duplicates we are keeping it.
 dat3 <- dat2 %>%
   filter(TraitID %in% c(4, 6, 9, 12, 13, 14, 15, 26, 27, 40, 41, 44, 45, 46, 47, 48, 50, 51, 52, 53, 55, 56, 57, 58, 66, 77, 80, 82, 83, 84, 106, 111, 138, 145, 146, 185, 186, 269, 270, 363, 475, 570, 614, 683, 1080, 1104, 1781, 3106, 3107, 3108, 3109, 3110, 3111, 3112, 3113, 3114, 3115, 3116, 3117, 3121, 3122)) %>%
   mutate(remove=ifelse(TraitID==48 & UnitName=='', 1, 
@@ -222,15 +246,15 @@ dat3 <- dat2 %>%
   filter(CleanTraitName!='plant_height_generative') #removing this trait because it doesn't make sense when compared to plant height vegetative
 
 #testing consistent units for each trait and ranking traits by priority
-priority <- read.csv("OriginalData\\Traits\\TRY\\trait_priority.csv") %>%
-  rename(TraitID=TRY.trait.ID)
+# priority <- read.csv("OriginalData\\Traits\\TRY\\trait_priority.csv") %>%
+#   rename(TraitID=TRY.trait.ID)
 
-Traits_Units <- dat3 %>%
-  select(TraitID, TraitName, CleanTraitName, UnitName) %>%
-  unique() %>%
-  mutate(Units=ifelse(CleanTraitName==3121, "g(W)/g(DM)", ifelse(CleanTraitName==3122, "g(W)/g(DM)", UnitName))) %>%
-  select(-UnitName) %>%
-  left_join(priority)
+# Traits_Units <- dat3 %>%
+#   select(TraitID, TraitName, CleanTraitName, UnitName) %>%
+#   unique() %>%
+#   mutate(Units=ifelse(CleanTraitName==3121, "g(W)/g(DM)", ifelse(CleanTraitName==3122, "g(W)/g(DM)", UnitName))) %>%
+#   select(-UnitName) %>%
+#   left_join(priority)
 
 # write.csv(Traits_Units, "OriginalData\\Traits\\TRY\\TRYCoRREMerge\\ContTraitUnits.csv", row.names = F)
 
@@ -252,8 +276,22 @@ healthy <- dat3 %>% #merge to drop observations on dead plants
   select(-drop)
 
 # Removing trees that are not seedlings -- based on data identified specifically as either mature or seedling
-treesp <- read.csv("CompiledData/Species_lists/species_families_trees_2021.csv") %>%
+corre_treesp <- read.csv("CompiledData/Species_lists/species_families_trees_2021.csv") %>%
   mutate(AccSpeciesName=species_matched) #read in which species are trees
+
+gex_treesp<-read.csv("C:/Users/mavolio2/Dropbox/CoRRE_database/Data/OriginalData/Traits/GEx_species_tree_complete.csv") %>% 
+  filter(tree.non.tree %in% c("tree", "non.tree","non-tree")) %>% 
+  select(species_matched, family, tree.non.tree) %>% 
+  separate(species_matched, into = c("genus", "species", "other"), sep=" ") %>% 
+  filter(species!="NA") %>% 
+  mutate(species_matched=paste(genus, species, sep=" ")) %>% 
+  select(species_matched, family, tree.non.tree) %>% 
+  left_join(gexlist) %>% 
+  unique()
+  
+treesp<-corre_treesp %>% 
+  bind_rows(gex_treesp) %>% 
+  unique()
 
 tree <- dat %>% #get list of tree observations that were made on seedlings
   select(DatasetID, DataID, ObsDataID, AccSpeciesID, AccSpeciesName, TraitID, OriglName, TraitName, OrigValueStr, OrigUnitStr, StdValue, UnitName, ErrorRisk) %>%
@@ -264,6 +302,7 @@ tree <- dat %>% #get list of tree observations that were made on seedlings
   select(ObsDataID, drop) %>%
   unique()
 
+#####Stoppin here!
 nontree <- dat3 %>% #merge to drop tree observations that are not seedlings
   left_join(tree) %>% 
   mutate(drop=ifelse(is.na(drop), 0, drop)) %>% 
@@ -274,10 +313,9 @@ nontree <- dat3 %>% #merge to drop tree observations that are not seedlings
 setting <- dat %>% #get list of observations that were not in natural settings
   select(DatasetID, DataID, ObsDataID, AccSpeciesID, AccSpeciesName, TraitID, OriglName, TraitName, OrigValueStr, OrigUnitStr, StdValue, UnitName, ErrorRisk) %>%
   filter(DataID==327) %>%
-  mutate(drop=ifelse(OrigValueStr %in% c("Botanical garden", "botanical garden (Bergius Botanical Garden, Stockholm, Sweden)", "Botanical gardens, greenhouses and other atypical habitats", "Chamber", "climate chamber", "Climate chamber", "Climate Chamber", "Climate chamber, non-limiting conditions, (cf. dataset reference)", "climate chambers", "Common Garden", "Controlled climate chamber", "controlled environment room", "drought treatment", "FACE", "FE", "C", "Field Experiment", "FW", "G", "GH", "Glasshouse", "Greehouse", "Green house", "greenhouse", "Greenhouse", "Greenhouse, grrowth container", "groth chamber", "growth-chamber", "growth chamber", "Growth chamber", "Growth Chamber", "growth chambers", "Growth chambers", "Growth exp", "hydroponic", "Irrigation", "Irrigation and N fertilisation (100 kg/ha)", "LAU_Ploughed/mown", "LAU_Ploughed/mown and fertilized", "mesocosm", "mini-ecosystem", "N", "natural environment, high warming +4C, preccipitation ambient", "natural environment, high warming +4C, preccipitation ambient -50%", "natural environment, high warming +4C, preccipitation ambient +50%", "natural environment, low warming +1.5C, preccipitation ambient", "natural environment, low warming +1.5C, preccipitation ambient -50%", "natural environment, low warming +1.5C, preccipitation ambient +50%", "natural environment, medium warming +2.5C, preccipitation ambient", "natural environment, medium warming +2.5C, preccipitation ambient -50%", "natural environment, medium warming +2.5C, preccipitation ambient +50%", "natural environment, no warming, preccipitation ambient -50%", "natural environment, no warming, preccipitation ambient +50%", "natural grassland, experimental nutrient NP addition", "nutrient addition experiment", "Open Top", "open-top chamber", "Open top chambers", "OTC", "plantation", "PM", "pot", "Pot-grown", "Pots outside", "pots, outside in natural environment", "shade houses", "university campus", "Uzbekistan: Irrigated desert land", "VER_permanent extensively mown meadow", "VER_permanent meadow mown and fertilized", "VER_permanent meadows mown and fertilized", "water stress experiment", "water treatment"), 1, 0)) %>%
+  mutate(drop=ifelse(OrigValueStr %in% c("Canadian High Arctic Research Station", "Control Plot", "field","Field", "Field (CG)", "Field (NE)", "field experiment", "Field Experiment", "Field plants", "forest stand", "Forest trees", "Forest understorey", "Fully open overstory 90 days, seedling", "Fully open overstory, seedling","Fully sunlit - Natural environment","High desert", "in situ", "In situ", "La Selva Biological Station", "meadows (M) and pastures (P) on south east to south west exposed slopes", "Montane meadow", "Mosses in forest", "nat env", "natural", "Natural", "natural-environment", "natural env", "natural envireonment", "natural enviroment", "Natural Enviroment", "natural environment", "Natural environment", "Natural Environment", "natural environment, high regional N and S deposition","natural environment, no warming, preccipitation ambient", "natural environment, sun exposed", "Natural Envrionment", "Natural Forest", "natural forest environment", "natural vegetation", "Natural Vegetation", "Natural Vegetation", "natural vegetation, but not top canopy", "natural wetland environment", "natural wetlands (field conditions)", "Natural/C", "natural_environment", "none", "None", "North facing slope", "Shade - Natural environment","South facing slope", "Trees in field"), 0, 1)) %>%
   select(ObsDataID, drop) %>%
   unique()
-
 natural <- dat3 %>% #merge to drop observations in non-natural settings
   left_join(setting) %>% 
   mutate(drop=ifelse(is.na(drop), 0, drop)) %>% 
@@ -293,7 +331,7 @@ splist <- key %>%
 
 cont_traits <- dat3 %>%
   left_join(splist, by="species_matched") %>%
-  mutate(remove=ifelse(tree.non.tree=="non-tree", 0, 1)) %>%
+  mutate(remove=ifelse(tree.non.tree=="non-tree"|tree.non.tree=="non.tree", 0, 1)) %>%
   filter(remove==0) %>%
   select(-tree.non.tree, -AccSpeciesName.y, -remove) %>%
   rename(AccSpeciesName=AccSpeciesName.x) #drops 145152 observations
@@ -310,13 +348,13 @@ cont_traits2 <- cont_traits %>%
 cont_traits3 <- cont_traits2 %>%
   select(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue, ErrorRisk) %>%
   mutate(ErrorRisk2=ifelse(is.na(ErrorRisk), 0, ErrorRisk)) %>%
-  filter(ErrorRisk2<3) %>% #removes all observations that are greater than 3 sd from full database mean: drops 27744 observations
+  filter(ErrorRisk2<3) %>% #removes all observations that are greater than 3 sd from full database mean: drops X observations
   select(-ErrorRisk, -ErrorRisk2) %>% 
   mutate(drop=ifelse(CleanTraitName=="seed_number" & StdValue==0, 1,
-              ifelse(CleanTraitName==1104 & StdValue==0, 1, 0))) %>%  #removing seed number where 0 (37 observations)
+              ifelse(CleanTraitName==1104 & StdValue==0, 1, 0))) %>%  #removing seed number where 0 (X observations)
   filter(drop==0) %>% 
   select(-drop) %>% 
-  filter(StdValue>0) #removing negative and 0 values (39 observations removed)
+  filter(StdValue>0) #removing negative and 0 values (X)
 
 
 #### Problem Datasets -- duplicate entries ####
@@ -431,19 +469,76 @@ d400 <- cont_traits3 %>%
   filter(DatasetID==400) %>% 
   pivot_wider(names_from=CleanTraitName, values_from=StdValue)
 
-# Problem: Rooting depth was recorded as the exact same value across many species. Solution: Drop rooting depth data from this dataset.
+# Problem: Rooting depth was recorded as the exact same value across many species. Solution: Drop rooting depth data from this dataset. Also trait 614 (measure of SRL) three values for a few observations. Solution 2: just average across traits
 d339 <- cont_traits3 %>% 
   filter(DatasetID==339) %>% 
-  mutate(CleanTraitName=ifelse(CleanTraitName=="root:shoot", "rootshoot", CleanTraitName)) %>% 
-  pivot_wider(names_from=CleanTraitName, values_from = StdValue, names_prefix = "d__") %>% 
-  group_by(species_matched, d__475, d__614, d__1781, d__SRL, d__rootshoot, d__rooting_depth, d__root_N, d__root_P, d__root_C, d__root_diameter, d__root_dry_mass, d__root_density) %>% 
-  mutate(n=length(species_matched), obid2=min(ObservationID)) %>% 
-  ungroup() 
+  group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName) %>% 
+  summarize(StdValue=mean(StdValue))
+  
+# Problem: Plant vegetative height is measured 5x for for each plant (maybe temporal observations). Solution: keep the maximum height. Also only has one value for roots
+d201<-cont_traits3 %>% 
+  filter(DatasetID==201) %>% 
+  group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName) %>% 
+  summarize(StdValue=max(StdValue))
 
+# Problem: Dark respiration rate is measured 3-4x for for each plant (maybe temporal observations). Solution: keep the max Has only one value for all other traits
+d96<-cont_traits3 %>% 
+  filter(DatasetID==96) %>% 
+  group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName) %>% 
+  summarize(StdValue=max(StdValue))
+
+# Problem: trait 1104 (seed number / inflor) is measured 3x for for each plant. Solution: keep the mean
+d355<-cont_traits3 %>% 
+  filter(DatasetID==355) %>% 
+  group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName) %>% 
+  summarize(StdValue=mean(StdValue))
+
+# Problem: for some individuals plant height is measured 2x (maybe over time). Solution. Take the max of all traits as all other traits only in there 1x.
+d45<-cont_traits3 %>% 
+  filter(DatasetID==45) %>% 
+  group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName) %>% 
+  summarize(StdValue=max(StdValue))
+
+# Problem: for some individuals there are 2 measurements of 185 (related to VCmax). Solution. Take the mean of all traits as all other traits only in there 1x.
+d87<-cont_traits3 %>% 
+  filter(DatasetID==87) %>% 
+  group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName) %>% 
+  summarize(StdValue=mean(StdValue))
+
+# Problem: for some individuals there are 2 measurements of plant height (maybe measured over time). Solution. Take the max of all traits as all other traits only in there 1x.
+d299<-cont_traits3 %>% 
+  filter(DatasetID==299) %>% 
+  group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName) %>% 
+  summarize(StdValue=max(StdValue))
+
+# Problem: there are 2 measurements of leaf dry mass for all plants. Solution. Take the mean of all traits as all other traits only in there 1x.
+d477<-cont_traits3 %>% 
+  filter(DatasetID==477) %>% 
+  group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName) %>% 
+  summarize(StdValue=mean(StdValue))
+
+# Problem: there are 2 measurements of plant height for some plants. Solution. Take the max of all traits as all other traits only in there 1x.
+d520<-cont_traits3 %>% 
+  filter(DatasetID==520) %>% 
+  group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName) %>% 
+  summarize(StdValue=max(StdValue))
+
+# Problem: there are 2 measurements of plant height for some plants. Solution. Take the max of all traits as all other traits only in there 1x.
+d655<-cont_traits3 %>% 
+  filter(DatasetID==655) %>% 
+  group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName) %>% 
+  summarize(StdValue=max(StdValue))
+
+# Problem: there are 2 measurements of plant height for some plants. Solution. Take the max of all traits as all other traits only in there 1x.
+d468<-cont_traits3 %>% 
+  filter(DatasetID==468) %>% 
+  group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName) %>% 
+  summarize(StdValue=max(StdValue))
 
 # Dropping problem datasets and appending clean versions.
 cont_traits4 <- cont_traits3 %>%
-  filter(DatasetID!=453 & DatasetID!=415 & DatasetID!=25 & DatasetID!=226 & DatasetID!=359 & DatasetID!=102 & DatasetID!=353 & DatasetID!=327 & DatasetID!=1 & DatasetID!=412 & DatasetID!=20) %>%
+  filter(DatasetID!=453 & DatasetID!=415 & DatasetID!=25 & DatasetID!=226 & DatasetID!=359 & DatasetID!=102 & DatasetID!=353 & DatasetID!=327 & DatasetID!=1 & DatasetID!=412 & DatasetID!=20 & DatasetID!=201 & DatasetID!=96 & DatasetID!=339 & DatasetID!=355 & DatasetID!=45 & DatasetID!=87 & DatasetID!=299 & DatasetID!=477 & DatasetID!=520 & DatasetID!=655) %>%
+  bind_rows(d339) %>% 
   mutate(remove=ifelse(DatasetID==428 & CleanTraitName=="plant_height_vegetative", 1, 
                 ifelse(DatasetID==428 & CleanTraitName=="root_P", 1, 
                 ifelse(DatasetID==339 & CleanTraitName=="rooting_depth", 1, 0)))) %>%
@@ -456,6 +551,15 @@ cont_traits4 <- cont_traits3 %>%
   bind_rows(d226) %>% 
   bind_rows(d353) %>% 
   bind_rows(d1) %>% 
+  bind_rows(d201) %>% 
+  bind_rows(d96) %>% 
+  bind_rows(d355) %>% 
+  bind_rows(d45) %>% 
+  bind_rows(d87) %>% 
+  bind_rows(d299) %>%
+  bind_rows(d477) %>% 
+  bind_rows(d520) %>% 
+  bind_rows(d655) %>% 
   full_join(d412, multiple='all') %>% 
   mutate(DatasetID=ifelse(is.na(DatasetID), did, DatasetID),
          ObservationID=ifelse(is.na(ObservationID), obid2, ObservationID)) %>% 
@@ -475,19 +579,15 @@ cont_traits5 <- cont_traits4 %>%
   summarise(n=sum(present)) %>% 
   ungroup()
 
-# # Finding problem data (repeats).
-# # Remaining data with repeats were determined to either be real data (see above) or below the threshold to investigate (<3 repeats).
-# repeats <- cont_traits4 %>% 
-#   group_by(species_matched, CleanTraitName, StdValue) %>% 
-#   summarize(n=length(StdValue)) %>% 
-#   ungroup() %>% 
-#   filter(n>1)
-# 
-# # Troubleshooting the problems.
-# probtraits <- subset(cont_traits5, n>1) %>%
-#   select(CleanTraitName, n) %>%
-#   unique()
-#   #spread(CleanTraitName, StdValue)
+# Finding problem data (repeats).
+# Remaining data with repeats were determined to either be real data (see above) or below the threshold to investigate (<3 repeats).
+repeats <- cont_traits4 %>%
+  #filter(DatasetID!=468) %>% 
+  group_by(species_matched, CleanTraitName, StdValue) %>%
+  summarize(n=length(StdValue)) %>%
+  ungroup() %>%
+  filter(n>1)
+
 
 ttraits <- cont_traits4 %>%
   group_by(DatasetID, ObservationID, family, genus, species_matched) %>%
