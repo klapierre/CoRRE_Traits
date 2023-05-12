@@ -42,7 +42,7 @@ AusTraits <- read.csv('OriginalData\\Traits\\AusTraits_2022\\AusTraits_CoRRE_May
   filter(StdValue>0)
 
 # TRY
-TRY <- read.csv('OriginalData\\Traits\\TRY\\old files\\TRY_trait_data_continuous_long_March2023.csv') %>% 
+TRY <- read.csv('OriginalData\\Traits\\TRY\\TRY_trait_data_continuous_long_May2023.csv') %>% 
   mutate(DatabaseID="TRY") %>% 
   filter(StdValue>0)
 
@@ -75,7 +75,7 @@ allTraits <- rbind(TRY, AusTraits, BIEN, TiP, CPTD2) %>%
   filter(!(growth_form %in% c('fern', 'lycophyte'))) %>% 
   select(DatabaseID, DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue)
 
-allTraits_wide<-allTraits %>% 
+allTraits_wide <- allTraits %>% 
   pivot_wider(names_from = CleanTraitName, values_from = StdValue, values_fill =NA)
 
 ntraits <- length(unique(allTraits$CleanTraitName))
@@ -84,12 +84,12 @@ total <- nrow(allTraits_wide)*ntraits
 miss/total*100
 
 spnum <- length(unique(allTraits_wide$species_matched))
-#originally were missing 96% of data for 1876 species in CoRRE
+#originally were missing 96.57% of data for all species
 
 # Drop traits that are related to physiology, water content, different ways of measuring SLA and leaf area, and root nutrients
-#Final option is SLA (3115, 3117), LDMC, LA (3108:3114), leaf mass, seed dry mass and plant veg, SRL (614), and leaf N
+#Final option is SLA (3115, 3117), LDMC, LA (3108:3114), leaf mass, seed dry mass and plant veg, SRL (614), and leaf N [14 traits total to impute 7 traits]
 allTraits_sub <- allTraits %>% 
-  filter(CleanTraitName %in% c('SLA', 3115, 3117, 'LDMC', 'leaf_area', 3108:3114, 'leaf_dry_mass', 'seed_dry_mass', 'plant_height_vegetative', 'SRL', 614, 'leaf_N'))
+  filter(CleanTraitName %in% c('SLA', 3115, 3117, 'LDMC', 'leaf_area', 3109, 3114, 'leaf_dry_mass', 'seed_dry_mass', 'plant_height_vegetative', 'SRL', 614, 'leaf_N'))
   
   # filter(!(CleanTraitName %in% c(106, "Vc_max", "J_max", "dark_resp_rate", 3120, 3122, 3121, "leaf_transp_rate", 185, "photosynthesis_rate", "stomatal_conductance", 185, 270, 40)), #phy water content
   #        !(CleanTraitName %in% c(3108, 3109, 3111, 3112, 3113)), #other ways of measuring SLA, LA
@@ -108,7 +108,7 @@ total <- nrow(allTraits_sub_wide)*ntraits
 miss/total*100
 
 spnum <- length(unique(allTraits_sub_wide$species_matched)) 
-####with out subset we are now missing 87% of data for 1852 species
+####with out subset we are now missing 88.07% of data for 3589 species
 
 label <- allTraits_sub %>% 
   group_by(CleanTraitName, DatabaseID) %>% 
@@ -150,23 +150,6 @@ ggplot(data=allTraits_sub, aes(x=DatabaseID, y=StdValue)) +
 # ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 1_input traits histograms.png', width=7.5, height=10, units='in', dpi=300, bg='white')
 
 
-# How well correlated is BIEN SLA with the others? No overlap, so not relevant.
-# test <- allTraits %>%
-#   group_by(DatabaseID, species_matched, CleanTraitName) %>%
-#   summarise(mean=mean(StdValue)) %>%
-#   ungroup() %>%
-#   pivot_wider(names_from=DatabaseID, values_from=mean)
-# 
-# ggplot(data=subset(test, !is.na(TRY) & !is.na(BIEN) & CleanTraitName=='SLA'), aes(x=TRY, y=BIEN)) +
-#   geom_point() +
-#   geom_abline(slope=1)
-# 
-# test2 <- subset(test, !is.na(TRY) & !is.na(BIEN) & CleanTraitName=='SLA')
-# 
-# cor.test(test2$TRY, test2$BIEN)
-# cor.test(test2$TRY, test2$AusTraits)
-
-
 # Transpose to wide format for gap filling.
 talltraits <- allTraits_sub %>% 
   group_by(DatabaseID, DatasetID, ObservationID, family, genus, species_matched) %>%
@@ -178,16 +161,16 @@ talltraits <- allTraits_sub %>%
 # write.csv(talltraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_May2023.csv', row.names = F)
 
 ##checking traits
-test <- allTraits %>% 
+test <- allTraits_sub %>% 
   group_by(species_matched, CleanTraitName, StdValue, DatabaseID) %>% 
   summarize(n=length(StdValue)) %>% 
   ungroup() %>% 
-  filter(n>10)
+  filter(n>9)
 
 sum(test[,'n'])
 
-## all databases have repeats - 26,909 across all data
-## only 2298 are the same values repeated 10 or more times and were designated as keepers from cleaning code
+## all databases have repeats - 119,140 across all data
+## 12,758 are the same values repeated 10 or more times and were designated as keepers from cleaning code
 
 sppLength <- talltraits %>% 
   select(species_matched) %>% 
@@ -202,7 +185,7 @@ multiTraitInd <- allTraits %>%
 ggplot(data=multiTraitInd, aes(x=num_traits)) +
   geom_histogram(binwidth = 1) +
   xlab('Number of Traits per Individual') + ylab('Number of Individuals') +
-  scale_y_break(c(20000, 59000), ticklabels=c(60000))
+  scale_y_break(c(20000, 149000), ticklabels=c(150000, 155000))
 
 # ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 2_traits per individual histogram.png', width=8, height=8, units='in', dpi=300, bg='white')
 
@@ -214,7 +197,7 @@ traitmeasured <- allTraits_sub %>%
   pivot_wider(names_from=CleanTraitName, names_prefix="X", values_from=present, values_fill=0) %>% 
   ungroup()
 
-familycomplete<-traitmeasured %>% 
+familycomplete <- traitmeasured %>% 
   group_by(family) %>% 
   summarize(across(Xseed_dry_mass:X3114, mean)) %>% 
   pivot_longer(Xseed_dry_mass:X3114, names_to="trait", values_to = "value") %>% 
@@ -223,4 +206,4 @@ familycomplete<-traitmeasured %>%
   summarise(ntraits=sum(traitpresent)) %>% 
   mutate(percenttraits=(ntraits/12))
 
-write.csv(familycomplete, "CompiledData\\TraitCompletnessbyFamily.csv", row.names = F)  
+# write.csv(familycomplete, "CompiledData\\TraitCompletnessbyFamily.csv", row.names = F)  
