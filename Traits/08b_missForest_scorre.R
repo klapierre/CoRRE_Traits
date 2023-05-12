@@ -1,14 +1,14 @@
-
 # Load packages:
 library(ape)
 library(PVR)
 library(dplyr)
 
 # Set directory:
-my.wd<-"/Users/padulles/Documents/PD_MasarykU/sCoRRE/sCoRre/"
+my.wd<-"/Users/padulles/Documents/PD_MasarykU/sCoRRE/sCoRre/" #padu
+setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data') #kim
 
 # Load traits:
-traits <- read.table(paste(my.wd, "github/scorre/TRYAusBIEN_continuous_May2023.csv", sep=""), row.names=NULL, sep=",", header=T)
+traits <- read.table("github/scorre/TRYAusBIEN_continuous_May2023.csv", row.names=NULL, sep=",", header=T)
 traits <- traits[,c(6:18)] #select columns
 traits$species_matched<-gsub(" ", "_", traits$species_matched) #change species names:
 
