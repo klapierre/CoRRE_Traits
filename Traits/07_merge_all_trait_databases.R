@@ -25,7 +25,7 @@ correSpecies <- read.csv("CompiledData\\Species_lists\\FullList_Nov2021.csv") %>
   unique()
 
 # Import GEx species names
-GExSpecies <- read.csv('OriginalData\\Traits\\GEx_species_family_May2023.csv') %>% 
+GExSpecies <- read.csv('OriginalData\\Traits\\GEx_species_tree_complete.csv') %>% 
   select(family, species_matched) %>% 
   unique()
 
@@ -78,52 +78,45 @@ allTraits <- rbind(TRY, AusTraits, BIEN, TiP, CPTD2) %>%
 allTraits_wide<-allTraits %>% 
   pivot_wider(names_from = CleanTraitName, values_from = StdValue, values_fill =NA)
 
-ntraits<-length(unique(allTraits$CleanTraitName))
-miss<-sum(is.na(allTraits_wide))
-total<-nrow(allTraits_wide)*ntraits
+ntraits <- length(unique(allTraits$CleanTraitName))
+miss <- sum(is.na(allTraits_wide))
+total <- nrow(allTraits_wide)*ntraits
 miss/total*100
 
-spnum<-length(unique(allTraits_wide$species_matched))
+spnum <- length(unique(allTraits_wide$species_matched))
+#originally were missing 96% of data for 1876 species in CoRRE
 
-#originally were missing 96% of data for 1876 species
-
-#drop traits that are related to physiology, water content, and different ways of measuring SLA and Leaf area and root nutrients
-#Final option is SLA (3115, 3116), LDMC, LA (3108:3114), leaf mass, seed dry mass and plant veg, SRL (614), and leaf N ()
-allTraits_sub<-allTraits %>% 
-  filter(!(CleanTraitName %in% c(106, "Vc_max", "J_max", "dark_resp_rate", 3120, 3122, 3121, "leaf_transp_rate", 185, "photosynthesis_rate", "stomatal_conductance", 185, 270, 40)),#phy water content
-           !(CleanTraitName %in% c(3108, 3109, 3111, 3112, 3113)),#other ways of measuring SLA, LA
-           !(CleanTraitName %in% c(475, "root_C", "root_N", "root_P", 1781)), #root traits
- !(CleanTraitName %in% c("leaf_K", 52, "seed_terminal_velocity", "leaf_longevity", "stem_spec_density", 1104, 57, 58, 51, "leaf_N:P", "leaf_P", 51, "leaf_density", "leaf_thickness", "RGR", "leaf_width", "seed_length", "leaf_C:N", "seed_number", "leaf_C", 570)),#traits with low coverage
- !(CleanTraitName %in% c("root_density", "root_diameter", 'rooting_depth', "root:shoot", "root_dry_mass")))#rest of root traits
+# Drop traits that are related to physiology, water content, different ways of measuring SLA and leaf area, and root nutrients
+#Final option is SLA (3115, 3117), LDMC, LA (3108:3114), leaf mass, seed dry mass and plant veg, SRL (614), and leaf N
+allTraits_sub <- allTraits %>% 
+  filter(CleanTraitName %in% c('SLA', 3115, 3117, 'LDMC', 'leaf_area', 3108:3114, 'leaf_dry_mass', 'seed_dry_mass', 'plant_height_vegetative', 'SRL', 614, 'leaf_N'))
+  
+  # filter(!(CleanTraitName %in% c(106, "Vc_max", "J_max", "dark_resp_rate", 3120, 3122, 3121, "leaf_transp_rate", 185, "photosynthesis_rate", "stomatal_conductance", 185, 270, 40)), #phy water content
+  #        !(CleanTraitName %in% c(3108, 3109, 3111, 3112, 3113)), #other ways of measuring SLA, LA
+  #        !(CleanTraitName %in% c(475, "root_C", "root_N", "root_P", 1781)), #root traits
+  #        !(CleanTraitName %in% c("leaf_K", 52, "seed_terminal_velocity", "leaf_longevity", "stem_spec_density", 1104, 57, 58, 51, "leaf_N:P", "leaf_P", 51, "leaf_density", "leaf_thickness", "RGR", "leaf_width", "seed_length", "leaf_C:N", "seed_number", "leaf_C", 570)), #traits with low coverage
+  #        !(CleanTraitName %in% c("root_density", "root_diameter", 'rooting_depth', "root:shoot", "root_dry_mass"))) #rest of root traits
 
 
 #make wide to sum NA
-allTraits_sub_wide<-allTraits_sub %>% 
+allTraits_sub_wide <- allTraits_sub %>% 
   pivot_wider(names_from = CleanTraitName, values_from = StdValue, values_fill =NA)
 
-ntraits<-length(unique(allTraits_sub$CleanTraitName))
-miss<-sum(is.na(allTraits_sub_wide))
-total<-nrow(allTraits_sub_wide)*ntraits
+ntraits <- length(unique(allTraits_sub$CleanTraitName))
+miss <- sum(is.na(allTraits_sub_wide))
+total <- nrow(allTraits_sub_wide)*ntraits
 miss/total*100
 
-spnum<-length(unique(allTraits_sub_wide$species_matched))
+spnum <- length(unique(allTraits_sub_wide$species_matched)) 
 ####with out subset we are now missing 87% of data for 1852 species
 
-label <- allTraits %>% 
+label <- allTraits_sub %>% 
   group_by(CleanTraitName, DatabaseID) %>% 
   summarise(length=length(StdValue)) %>% 
   ungroup() %>% 
   group_by(CleanTraitName) %>% 
   mutate(length2=sum(length)) %>% 
   ungroup() %>% 
-  # filter(CleanTraitName %in% c('dark_resp_rate', 'J_max', 'LDMC', 'leaf_area', 'leaf_C', 'leaf_C:N',
-                               #                                                     'leaf_density', 'leaf_dry_mass', 'leaf_K', 'leaf_longevity', 'leaf_N',
-                               #                                                     'leaf_N:P', 'leaf_P', 'leaf_thickness', 'leaf_transp_rate', 'leaf_width',
-                               #                                                     'photosynthesis_rate', 'plant_height_vegetative', 'RGR', 'root:shoot',
-                               #                                                     'root_C', 'root_density', 'root_diameter', 'root_dry_mass', 'root_N',
-                               #                                                     'root_P', 'rooting_depth', 'seed_dry_mass', 'seed_length', 'seed_number',
-                               #                                                     'seed_terminal_velocity', 'SLA', 'SRL', 'stem_spec_density',
-                               # 'stomatal_conductance', 'Vc_max')) %>% 
   pivot_longer(cols=length:length2, names_to='name', values_to='length') %>% 
   mutate(DatabaseID=ifelse(name=='length2', 'total', DatabaseID)) %>% 
   unique()
@@ -142,18 +135,10 @@ ggplot(data=label, aes(x=DatabaseID, y=length, label=length, fill=DatabaseID)) +
 
 
 # Are there any outlier datasets for each trait?
-ggplot(data=subset(allTraits, CleanTraitName %in% c('dark_resp_rate', 'J_max', 'LDMC', 'leaf_area', 'leaf_C', 'leaf_C:N',
-#                                                     'leaf_density', 'leaf_dry_mass', 'leaf_K', 'leaf_longevity', 'leaf_N', 
-#                                                     'leaf_N:P', 'leaf_P', 'leaf_thickness', 'leaf_transp_rate', 'leaf_width',
-#                                                     'photosynthesis_rate', 'plant_height_vegetative', 'RGR', 'root:shoot', 
-#                                                     'root_C', 'root_density', 'root_diameter', 'root_dry_mass', 'root_N', 
-#                                                     'root_P', 'rooting_depth', 'seed_dry_mass', 'seed_length', 'seed_number',
-#                                                     'seed_terminal_velocity', 'SLA', 'SRL', 'stem_spec_density',
-                                                    'stomatal_conductance', 'Vc_max')),
-       aes(x=DatabaseID, y=StdValue)) +
+ggplot(data=allTraits_sub, aes(x=DatabaseID, y=StdValue)) +
   geom_jitter(aes(color=DatabaseID)) +
   geom_boxplot(color='black', alpha=0) +
-  facet_wrap(~CleanTraitName, scales='free', ncol=4) +
+  facet_wrap(~CleanTraitName, scales='free_y', ncol=4) +
   scale_x_discrete(breaks=c("AusTraits", "BIEN", "CPTD2", "TIPleaf", "TRY"),
                    labels=c("A", "B", "C", "TIP", "TRY")) +
   scale_color_manual(values=c('#4E3686', '#5DA4D9', '#80D87F', '#FED23F', '#EE724C')) +
