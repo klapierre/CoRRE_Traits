@@ -98,7 +98,11 @@ traitDataCoRRE <- traitData %>%
   filter(keep=='y') %>%
   group_by(DatabaseID, DatasetID, ObservationID, species_matched, trait_name) %>% 
   summarize(StdValue=max(StdValue)) %>% 
-  ungroup()
+  ungroup() %>% 
+  mutate(drop=ifelse(trait_name=='plant_height' & StdValue>40, 1,
+              ifelse(trait_name=='seed_dry_mass' & StdValue>600, 1, 0))) %>% 
+  filter(drop==0) %>% 
+  select(-drop)
 
 
 traitDataCoRRE$CleanTraitName <- recode(traitDataCoRRE$trait_name, 
