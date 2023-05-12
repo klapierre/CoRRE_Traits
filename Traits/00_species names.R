@@ -16,7 +16,7 @@ gexOriginal <- read.csv('OriginalData\\Traits\\GEx_species_family.csv') %>%
 gex <- read.csv('OriginalData\\Traits\\GEx_species_tree_complete.csv') %>% 
   mutate(database='GEx') %>% 
   left_join(gexOriginal) %>% 
-  filter(tree.non.tree %in% c('non.tree', 'non-tree')) %>% 
+  filter(tree.non.tree %in% c('non-tree')) %>% 
   select(database, family, genus_species, species_matched) %>% 
   na.omit() %>% 
   separate(species_matched, into=c('genus', 'species', 'subspp'), sep=' ') %>% 
