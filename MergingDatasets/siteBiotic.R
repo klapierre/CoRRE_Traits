@@ -154,6 +154,7 @@ perc_annual <- relcov_trait_df %>%
   mutate(annual_relcov = annual/(annual+perennial+biennial+uncertain+FungusLichen)) %>%
   dplyr::select(site_code, project_name, community_type, annual_relcov) 
 
+# test 
 ### Take a quick look
 # hist(perc_annual$annual_relcov)
 # hist(perc_annual$uncertain)
