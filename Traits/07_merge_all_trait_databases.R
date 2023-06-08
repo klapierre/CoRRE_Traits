@@ -30,7 +30,10 @@ GExSpecies <- read.csv('OriginalData\\Traits\\GEx_species_tree_complete.csv') %>
   unique()
 
 names <- rbind(correSpecies, GExSpecies) %>% 
-  unique()
+  unique() %>% 
+  mutate(drop=ifelse(species_matched=='Dianella longifolia'&family=='Xanthorrhoeaceae', 1, 0)) %>% 
+  filter(drop==1) %>% 
+  select(-drop)
 
 # AusTraits
 AusTraits <- read.csv('OriginalData\\Traits\\AusTraits_2022\\AusTraits_CoRRE_May2023.csv') %>%
@@ -84,19 +87,12 @@ total <- nrow(allTraits_wide)*ntraits
 miss/total*100
 
 spnum <- length(unique(allTraits_wide$species_matched))
-#originally were missing 96.57% of data for all species
+#originally were missing 96.8% of data for all species
 
 # Drop traits that are related to physiology, water content, different ways of measuring SLA and leaf area, and root nutrients
 #Final option is SLA (3115, 3117), LDMC, LA (3108:3114), leaf mass, seed dry mass and plant veg, SRL (614), and leaf N [14 traits total to impute 7 traits]
 allTraits_sub <- allTraits %>% 
   filter(CleanTraitName %in% c('SLA', 3115, 3117, 'LDMC', 'leaf_area', 3109, 3114, 'leaf_dry_mass', 'seed_dry_mass', 'plant_height_vegetative', 'SRL', 614, 'leaf_N'))
-  
-  # filter(!(CleanTraitName %in% c(106, "Vc_max", "J_max", "dark_resp_rate", 3120, 3122, 3121, "leaf_transp_rate", 185, "photosynthesis_rate", "stomatal_conductance", 185, 270, 40)), #phy water content
-  #        !(CleanTraitName %in% c(3108, 3109, 3111, 3112, 3113)), #other ways of measuring SLA, LA
-  #        !(CleanTraitName %in% c(475, "root_C", "root_N", "root_P", 1781)), #root traits
-  #        !(CleanTraitName %in% c("leaf_K", 52, "seed_terminal_velocity", "leaf_longevity", "stem_spec_density", 1104, 57, 58, 51, "leaf_N:P", "leaf_P", 51, "leaf_density", "leaf_thickness", "RGR", "leaf_width", "seed_length", "leaf_C:N", "seed_number", "leaf_C", 570)), #traits with low coverage
-  #        !(CleanTraitName %in% c("root_density", "root_diameter", 'rooting_depth', "root:shoot", "root_dry_mass"))) #rest of root traits
-
 
 #make wide to sum NA
 allTraits_sub_wide <- allTraits_sub %>% 
@@ -108,7 +104,7 @@ total <- nrow(allTraits_sub_wide)*ntraits
 miss/total*100
 
 spnum <- length(unique(allTraits_sub_wide$species_matched)) 
-####with out subset we are now missing 88.07% of data for 3589 species
+# after selecting a subset of the traits, we are now missing 88.9% of data for 3589 species
 
 label <- allTraits_sub %>% 
   group_by(CleanTraitName, DatabaseID) %>% 
@@ -121,11 +117,12 @@ label <- allTraits_sub %>%
   mutate(DatabaseID=ifelse(name=='length2', 'total', DatabaseID)) %>% 
   unique()
 
+# How many observations do we have for each trait across our database?
 ggplot(data=label, aes(x=DatabaseID, y=length, label=length, fill=DatabaseID)) +
   geom_bar(stat='identity', position=position_dodge()) +
   geom_text() +
-  geom_hline(yintercept=23068) +
-  geom_hline(yintercept=11534, color='red') +
+  geom_hline(yintercept=254440*.2) + # 20% of observations missing any given trait
+  geom_hline(yintercept=254440*.1, color='red') + # 10% of observations missing any given trait
   facet_wrap(~CleanTraitName, ncol=10) +
   scale_x_discrete(breaks=c("AusTraits", "BIEN", "CPTD2", "TIPleaf", "TRY", "total"),
                    limits=c("AusTraits", "BIEN", "CPTD2", "TIPleaf", "TRY", "total"),
@@ -133,9 +130,9 @@ ggplot(data=label, aes(x=DatabaseID, y=length, label=length, fill=DatabaseID)) +
   scale_fill_manual(values=c('#4E3686', '#5DA4D9', '#80D87F', '#FED23F', '#EE724C', 'darkgrey')) +
   theme(legend.position='none')
 
-
 # Are there any outlier datasets for each trait?
 ggplot(data=allTraits_sub, aes(x=DatabaseID, y=StdValue)) +
+  scale_y_log10() + # note log axis!
   geom_jitter(aes(color=DatabaseID)) +
   geom_boxplot(color='black', alpha=0) +
   facet_wrap(~CleanTraitName, scales='free_y', ncol=4) +
@@ -156,9 +153,9 @@ talltraits <- allTraits_sub %>%
   pivot_wider(names_from=CleanTraitName, values_from=StdValue, values_fill=NA) %>% 
   ungroup()
 
-# write.csv(allTraits_sub, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_May2023_long.csv', row.names = F)
+# write.csv(allTraits_sub, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_June2023_long.csv', row.names = F)
 
-# write.csv(talltraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_May2023.csv', row.names = F)
+# write.csv(talltraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_June2023.csv', row.names = F)
 
 ##checking traits
 test <- allTraits_sub %>% 
@@ -169,35 +166,37 @@ test <- allTraits_sub %>%
 
 sum(test[,'n'])
 
-## all databases have repeats - 119,140 across all data
+## all databases have repeats - 118,916 across all data
 ## 12,758 are the same values repeated 10 or more times and were designated as keepers from cleaning code
 
 sppLength <- talltraits %>% 
   select(species_matched) %>% 
   unique()
+# 3589 species
 
-multiTraitInd <- allTraits %>% 
+multiTraitInd <- allTraits_sub %>% 
   group_by(DatabaseID, DatasetID, ObservationID, species_matched) %>% 
   summarise(num_traits=length(CleanTraitName)) %>% 
   ungroup() # %>%
   # filter(num_traits>1)
+# 254,440 individuals measured (some have more than 1 trait measured on the same individual)
+# 69,863 individuals have more than 1 trait measured on the same individual
 
 ggplot(data=multiTraitInd, aes(x=num_traits)) +
   geom_histogram(binwidth = 1) +
   xlab('Number of Traits per Individual') + ylab('Number of Individuals') +
-  scale_y_break(c(20000, 149000), ticklabels=c(150000, 155000))
+  scale_y_break(c(40000, 160000), ticklabels=c(170000, 180000))
 
 # ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 2_traits per individual histogram.png', width=8, height=8, units='in', dpi=300, bg='white')
 
-##Trying to figure out which families have very little observed data going into the gap filling methods
-
-traitmeasured <- allTraits_sub %>% 
+# Which families have very little observed data going into the gap filling methods?
+traitMeasured <- allTraits_sub %>% 
   mutate(present=1) %>% 
   group_by(DatabaseID, DatasetID, ObservationID, family, genus, species_matched) %>%
   pivot_wider(names_from=CleanTraitName, names_prefix="X", values_from=present, values_fill=0) %>% 
   ungroup()
 
-familycomplete <- traitmeasured %>% 
+familyComplete <- traitMeasured %>% 
   group_by(family) %>% 
   summarize(across(Xseed_dry_mass:X3114, mean)) %>% 
   pivot_longer(Xseed_dry_mass:X3114, names_to="trait", values_to = "value") %>% 
@@ -206,4 +205,4 @@ familycomplete <- traitmeasured %>%
   summarise(ntraits=sum(traitpresent)) %>% 
   mutate(percenttraits=(ntraits/12))
 
-# write.csv(familycomplete, "CompiledData\\TraitCompletnessbyFamily.csv", row.names = F)  
+# write.csv(familyComplete, "CompiledData\\TraitCompletnessbyFamily.csv", row.names = F)  
