@@ -31,8 +31,9 @@ GExSpecies <- read.csv('OriginalData\\Traits\\GEx_species_tree_complete.csv') %>
 
 names <- rbind(correSpecies, GExSpecies) %>% 
   unique() %>% 
-  mutate(drop=ifelse(species_matched=='Dianella longifolia'&family=='Xanthorrhoeaceae', 1, 0)) %>% 
-  filter(drop==1) %>% 
+  mutate(drop=ifelse(species_matched=='Dianella longifolia'&family=='Xanthorrhoeaceae', 1, 
+              ifelse(species_matched=='Lancea tibetica'&family=='Phrymaceae', 1, 0))) %>% 
+  filter(drop==0) %>% 
   select(-drop)
 
 # AusTraits
@@ -87,7 +88,7 @@ total <- nrow(allTraits_wide)*ntraits
 miss/total*100
 
 spnum <- length(unique(allTraits_wide$species_matched))
-#originally were missing 96.8% of data for all species
+#originally were missing 96.6% of data for all species
 
 # Drop traits that are related to physiology, water content, different ways of measuring SLA and leaf area, and root nutrients
 #Final option is SLA (3115, 3117), LDMC, LA (3108:3114), leaf mass, seed dry mass and plant veg, SRL (614), and leaf N [14 traits total to impute 7 traits]
@@ -104,31 +105,31 @@ total <- nrow(allTraits_sub_wide)*ntraits
 miss/total*100
 
 spnum <- length(unique(allTraits_sub_wide$species_matched)) 
-# after selecting a subset of the traits, we are now missing 88.9% of data for 3589 species
+# after selecting a subset of the traits, we are now missing 88.2% of data for 3193 species
 
-label <- allTraits_sub %>% 
-  group_by(CleanTraitName, DatabaseID) %>% 
-  summarise(length=length(StdValue)) %>% 
-  ungroup() %>% 
-  group_by(CleanTraitName) %>% 
-  mutate(length2=sum(length)) %>% 
-  ungroup() %>% 
-  pivot_longer(cols=length:length2, names_to='name', values_to='length') %>% 
-  mutate(DatabaseID=ifelse(name=='length2', 'total', DatabaseID)) %>% 
-  unique()
-
-# How many observations do we have for each trait across our database?
-ggplot(data=label, aes(x=DatabaseID, y=length, label=length, fill=DatabaseID)) +
-  geom_bar(stat='identity', position=position_dodge()) +
-  geom_text() +
-  geom_hline(yintercept=254440*.2) + # 20% of observations missing any given trait
-  geom_hline(yintercept=254440*.1, color='red') + # 10% of observations missing any given trait
-  facet_wrap(~CleanTraitName, ncol=10) +
-  scale_x_discrete(breaks=c("AusTraits", "BIEN", "CPTD2", "TIPleaf", "TRY", "total"),
-                   limits=c("AusTraits", "BIEN", "CPTD2", "TIPleaf", "TRY", "total"),
-                   labels=c("A", "B", "C", "TIP", "TRY", 'tot')) +
-  scale_fill_manual(values=c('#4E3686', '#5DA4D9', '#80D87F', '#FED23F', '#EE724C', 'darkgrey')) +
-  theme(legend.position='none')
+# label <- allTraits_sub %>% 
+#   group_by(CleanTraitName, DatabaseID) %>% 
+#   summarise(length=length(StdValue)) %>% 
+#   ungroup() %>% 
+#   group_by(CleanTraitName) %>% 
+#   mutate(length2=sum(length)) %>% 
+#   ungroup() %>% 
+#   pivot_longer(cols=length:length2, names_to='name', values_to='length') %>% 
+#   mutate(DatabaseID=ifelse(name=='length2', 'total', DatabaseID)) %>% 
+#   unique()
+# 
+# # How many observations do we have for each trait across our database?
+# ggplot(data=label, aes(x=DatabaseID, y=length, label=length, fill=DatabaseID)) +
+#   geom_bar(stat='identity', position=position_dodge()) +
+#   geom_text() +
+#   geom_hline(yintercept=254440*.2) + # 20% of observations missing any given trait
+#   geom_hline(yintercept=254440*.1, color='red') + # 10% of observations missing any given trait
+#   facet_wrap(~CleanTraitName, ncol=10) +
+#   scale_x_discrete(breaks=c("AusTraits", "BIEN", "CPTD2", "TIPleaf", "TRY", "total"),
+#                    limits=c("AusTraits", "BIEN", "CPTD2", "TIPleaf", "TRY", "total"),
+#                    labels=c("A", "B", "C", "TIP", "TRY", 'tot')) +
+#   scale_fill_manual(values=c('#4E3686', '#5DA4D9', '#80D87F', '#FED23F', '#EE724C', 'darkgrey')) +
+#   theme(legend.position='none')
 
 # Are there any outlier datasets for each trait?
 ggplot(data=allTraits_sub, aes(x=DatabaseID, y=StdValue)) +
@@ -162,17 +163,17 @@ test <- allTraits_sub %>%
   group_by(species_matched, CleanTraitName, StdValue, DatabaseID) %>% 
   summarize(n=length(StdValue)) %>% 
   ungroup() %>% 
-  filter(n>9)
+  filter(n>1)
 
 sum(test[,'n'])
 
-## all databases have repeats - 118,916 across all data
+## all databases have repeats - 118,536 across all data
 ## 12,758 are the same values repeated 10 or more times and were designated as keepers from cleaning code
 
 sppLength <- talltraits %>% 
   select(species_matched) %>% 
   unique()
-# 3589 species
+# 3193 species
 
 multiTraitInd <- allTraits_sub %>% 
   group_by(DatabaseID, DatasetID, ObservationID, species_matched) %>% 

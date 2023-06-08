@@ -29,16 +29,20 @@ GExSpecies <- read.csv('OriginalData\\Traits\\GEx_species_tree_complete.csv') %>
 
 # Combine species lists
 allSpecies <- rbind(correSpecies, GExSpecies) %>% 
-  unique()
+  unique() %>% 
+  mutate(drop=ifelse(species_matched=='Lancea tibetica'&family=='Phrymaceae', 1, 0)) %>% 
+  filter(drop==0) %>% 
+  select(-drop)
 
 
 # Import trait data and subset to our species of interest
 tip <- read_xlsx('OriginalData\\Traits\\TiP_leaf\\The TiP-Leaf dataset.xlsx', sheet='plant traits') %>% 
-  rename(species_matched=Species) %>%
+  dplyr::rename(species_matched=Species) %>%
   filter(species_matched!='/') %>% 
-  mutate(ObservationID=row_number()) %>% 
+  mutate(ObservationID=row_number(.)) %>% 
   mutate(DatasetID='1', DatabaseID='TIPleaf') %>% 
   left_join(allSpecies) %>% 
+  filter(!is.na(family)) %>% 
   mutate(LCC=as.numeric(ifelse(LCC=='/', NA, LCC)),
          LNC=as.numeric(ifelse(LNC=='/', NA, LNC)),
          LPC=as.numeric(ifelse(LPC=='/', NA, LPC)),
