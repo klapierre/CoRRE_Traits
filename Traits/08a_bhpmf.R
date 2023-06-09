@@ -49,10 +49,14 @@ hierarchy.info$plant_id <- 1:nrow(hierarchy.info)
 hierarchy.info$family[hierarchy.info$genus=="Lancea"] <- "Mazaceae"
 hierarchy.info$family[hierarchy.info$genus=="Toxicoscordion"] <- "Melanthiaceae"
 hierarchy.info$family[hierarchy.info$genus=="Heliotropium"] <- "Boraginaceae"
+hierarchy.info$family[hierarchy.info$genus=="Phacelia"] <- "Boraginaceae"
+hierarchy.info$family[hierarchy.info$genus=="Pholistoma"] <- "Boraginaceae"
 
-# test <- hierarchy.info %>% 
-#   group_by(genus, species) %>% 
-#   summarize(length(unique(family))) %>% 
+# test <- hierarchy.info %>%
+#   select(family, genus) %>% 
+#   unique(.) %>% 
+#   group_by(genus) %>%
+#   summarize(length(family)) %>%
 #   ungroup()
 
 #create trait info file:
