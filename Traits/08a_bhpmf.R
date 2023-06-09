@@ -18,6 +18,8 @@ setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE
 
 traits <- read.table("OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_June2023.csv", row.names=NULL, sep=",", header=T)
 
+# traits <- traits[1:100000,]
+
 #remove trait values with > 4 SD:
 spp <- unique(traits$species_matched) #get vector with species names
 
@@ -46,6 +48,7 @@ hierarchy.info$plant_id <- 1:nrow(hierarchy.info)
 #some genera are assigned to different families. Need to be unified:
 hierarchy.info$family[hierarchy.info$genus=="Lancea"] <- "Mazaceae"
 hierarchy.info$family[hierarchy.info$genus=="Toxicoscordion"] <- "Melanthiaceae"
+hierarchy.info$family[hierarchy.info$genus=="Heliotropium"] <- "Boraginaceae"
 
 #create trait info file:
 trait.info <- as.data.frame(subset(traits, select = -c(family, genus, species_matched, ObservationID,
