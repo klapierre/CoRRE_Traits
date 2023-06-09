@@ -50,6 +50,11 @@ hierarchy.info$family[hierarchy.info$genus=="Lancea"] <- "Mazaceae"
 hierarchy.info$family[hierarchy.info$genus=="Toxicoscordion"] <- "Melanthiaceae"
 hierarchy.info$family[hierarchy.info$genus=="Heliotropium"] <- "Boraginaceae"
 
+# test <- hierarchy.info %>% 
+#   group_by(genus, species) %>% 
+#   summarize(length(unique(family))) %>% 
+#   ungroup()
+
 #create trait info file:
 trait.info <- as.data.frame(subset(traits, select = -c(family, genus, species_matched, ObservationID,
                                                        DatabaseID, DatasetID)))
