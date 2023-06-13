@@ -47,18 +47,18 @@ mossKey <- read.csv("CleanedData\\Traits\\complete categorical traits\\sCoRRE ca
 
 # Read in imputed trait data and bind on species information
 ## this is trait data without replacement (all imputed)
-imputedRaw <- read.csv("CleanedData\\Traits\\gap filled continuous traits\\20230510\\imputed_traits_mice.csv") %>%
-  bind_cols(read.csv('OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_May2023.csv')[,c('DatabaseID', 'DatasetID', 'ObservationID', 'family', 'genus', 'species_matched')]) %>%   
+imputedRaw <- read.csv("CleanedData\\Traits\\gap filled continuous traits\\20230608\\imputed_traits_mice.csv") %>%
+  bind_cols(read.csv('OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_June2023.csv')[,c('DatabaseID', 'DatasetID', 'ObservationID', 'family', 'genus', 'species_matched')]) %>%   
   left_join(mossKey) %>% 
   filter(moss!="moss") %>%
   dplyr::select(-moss) #removes 6 species observations
 
 imputedLong <- imputedRaw %>% 
-  pivot_longer(names_to='trait', values_to='imputed_value', seed_dry_mass:X3114)
+  pivot_longer(names_to='trait', values_to='imputed_value', seed_dry_mass:SRL)
 
 # Read original trait data and join with imputed data
-originalRaw <- read.csv('OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_May2023.csv') %>%
-  pivot_longer(names_to='trait', values_to='original_value', seed_dry_mass:X3114) %>%
+originalRaw <- read.csv('OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_June2023.csv') %>%
+  pivot_longer(names_to='trait', values_to='original_value', seed_dry_mass:SRL) %>%
   na.omit()
 
 
@@ -84,7 +84,7 @@ meanContinuous <- allContinuous %>%
 speciesCount <- meanContinuous %>% 
   group_by(family) %>% 
   summarize(num_species=length(family)) %>% 
-  ungroup() #112 families
+  ungroup() #116 families
 
 
 # Compare imputed to original continuous trait data
@@ -140,7 +140,7 @@ meanSD <- allContinuous %>%
   summarize(across('imputed_value', .fns=list(mean=mean, sd=sd))) %>% 
   ungroup()
 
-meanSDSpecies <- cleanContinuous %>% 
+meanSDSpecies <- allContinuous %>% 
   group_by(trait, species_matched) %>% 
   summarize(across('imputed_value', .fns=list(species_mean=mean, species_sd=sd, species_length=length))) %>% 
   ungroup()
@@ -274,10 +274,10 @@ traitsAll <- meanCleanContinuousErrorRisk %>%
   select(-original_value_sd, -original_value_mean, -imputed_value_sd) %>% 
   rbind(longCategorical)
 
-# write.csv(traitsAll, 'CleanedData\\Traits\\CoRRE_allTraitData_May2023.csv')
+# write.csv(traitsAll, 'CleanedData\\Traits\\CoRRE_allTraitData_June2023.csv')
 
 traitsWide <- traitsAll %>% 
   select(-error_risk_overall, -error_risk_family, -error_risk_genus) %>% 
   pivot_wider(names_from=trait, values_from=trait_value)
 
-# write.csv(traitsWide, 'CleanedData\\Traits\\CoRRE_allTraitData_wide_May2023.csv')
+# write.csv(traitsWide, 'CleanedData\\Traits\\CoRRE_allTraitData_wide_June2023.csv')
