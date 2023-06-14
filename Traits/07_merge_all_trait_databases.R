@@ -10,6 +10,13 @@ library(ggbreak)
 setwd('C:\\Users\\mavolio2\\Dropbox\\CoRRE_database\\Data') #meghan's
 setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data') #kim's
 
+theme_set(theme_bw())
+theme_update(axis.title.x=element_text(size=20, vjust=-0.35, margin=margin(t=15)), axis.text.x=element_text(size=16),
+             axis.title.y=element_text(size=20, angle=90, vjust=0.5, margin=margin(r=15)), axis.text.y=element_text(size=16),
+             plot.title = element_text(size=24, vjust=2),
+             panel.grid.major=element_blank(), panel.grid.minor=element_blank(),
+             legend.title=element_blank(), legend.text=element_text(size=20))
+
 
 #### Read in data ####
 
@@ -107,29 +114,32 @@ miss/total*100
 spnum <- length(unique(allTraits_sub_wide$species_matched)) 
 # after selecting a subset of the traits, we are now missing 88.2% of data for 3193 species
 
-# label <- allTraits_sub %>% 
-#   group_by(CleanTraitName, DatabaseID) %>% 
-#   summarise(length=length(StdValue)) %>% 
-#   ungroup() %>% 
-#   group_by(CleanTraitName) %>% 
-#   mutate(length2=sum(length)) %>% 
-#   ungroup() %>% 
-#   pivot_longer(cols=length:length2, names_to='name', values_to='length') %>% 
-#   mutate(DatabaseID=ifelse(name=='length2', 'total', DatabaseID)) %>% 
-#   unique()
-# 
-# # How many observations do we have for each trait across our database?
-# ggplot(data=label, aes(x=DatabaseID, y=length, label=length, fill=DatabaseID)) +
-#   geom_bar(stat='identity', position=position_dodge()) +
-#   geom_text() +
-#   geom_hline(yintercept=254440*.2) + # 20% of observations missing any given trait
-#   geom_hline(yintercept=254440*.1, color='red') + # 10% of observations missing any given trait
-#   facet_wrap(~CleanTraitName, ncol=10) +
-#   scale_x_discrete(breaks=c("AusTraits", "BIEN", "CPTD2", "TIPleaf", "TRY", "total"),
-#                    limits=c("AusTraits", "BIEN", "CPTD2", "TIPleaf", "TRY", "total"),
-#                    labels=c("A", "B", "C", "TIP", "TRY", 'tot')) +
-#   scale_fill_manual(values=c('#4E3686', '#5DA4D9', '#80D87F', '#FED23F', '#EE724C', 'darkgrey')) +
-#   theme(legend.position='none')
+label <- allTraits_sub %>%
+  group_by(CleanTraitName, DatabaseID) %>%
+  summarise(length=length(StdValue)) %>%
+  ungroup() %>%
+  group_by(CleanTraitName) %>%
+  mutate(length2=sum(length)) %>%
+  ungroup() %>%
+  pivot_longer(cols=length:length2, names_to='name', values_to='length') %>%
+  mutate(DatabaseID=ifelse(name=='length2', 'total', DatabaseID)) %>%
+  unique() %>%
+  mutate(percent=round((length/254440)*100, 1))
+
+# How many observations do we have for each trait across our database?
+ggplot(data=label, aes(x=DatabaseID, y=length, label=percent, fill=DatabaseID)) +
+  geom_bar(stat='identity', position=position_dodge()) +
+  geom_text(vjust = -0.25) +
+  geom_hline(yintercept=254440*.2) + # 20% of observations missing any given trait
+  geom_hline(yintercept=254440*.1, color='red') + # 10% of observations missing any given trait
+  facet_wrap(~CleanTraitName, ncol=7) +
+  scale_x_discrete(breaks=c("AusTraits", "BIEN", "CPTD2", "TIPleaf", "TRY", "total"),
+                   limits=c("AusTraits", "BIEN", "CPTD2", "TIPleaf", "TRY", "total"),
+                   labels=c("A", "B", "C", "TIP", "TRY", 'total')) +
+  scale_fill_manual(values=c('#4E3686', '#5DA4D9', '#80D87F', '#FED23F','darkgrey', '#EE724C')) +
+  theme(legend.position='none', strip.text.x = element_text(size = 12)) +
+  xlab('Number of Observations') + ylab('Database ID')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 1_input percent complete.png', width=22, height=10, units='in', dpi=300, bg='white')
 
 # Are there any outlier datasets for each trait?
 ggplot(data=allTraits_sub, aes(x=DatabaseID, y=StdValue)) +
@@ -145,7 +155,7 @@ ggplot(data=allTraits_sub, aes(x=DatabaseID, y=StdValue)) +
         panel.grid.minor=element_blank(),
         legend.position='top') 
 
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 1_input traits histograms.png', width=7.5, height=10, units='in', dpi=300, bg='white')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig x_input traits histograms.png', width=7.5, height=10, units='in', dpi=300, bg='white')
 
 
 # Transpose to wide format for gap filling.
