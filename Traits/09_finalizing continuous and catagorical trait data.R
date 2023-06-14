@@ -91,7 +91,10 @@ speciesCount <- meanContinuous %>%
 ggplot(data=na.omit(meanContinuous), aes(x=original_value_mean, y=imputed_value_mean)) +
   geom_point() +
   geom_abline(slope=1) +
-  facet_wrap(~trait, scales='free')
+  facet_wrap(~trait, scales='free') +
+  xlab('Mean Original Value') + ylab('Mean Imputed Value') +
+  theme(strip.text.x = element_text(size = 12)) 
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig x_mean original v imputed.png', width=12, height=12, units='in', dpi=300, bg='white')
 
 # Only grasses -- 11620 species
 ggplot(data=na.omit(subset(allContinuous, family=='Poaceae')), aes(x=original_value, y=imputed_value)) +
@@ -111,12 +114,14 @@ ggplot(data=na.omit(subset(allContinuous, family=='Fabaceae')), aes(x=original_v
   geom_abline(slope=1) +
   facet_wrap(~trait, scales='free')
 
-
 # Compare raw imputed and original data
 ggplot(data=na.omit(allContinuous), aes(x=original_value, y=imputed_value)) +
   geom_point() +
   geom_abline(slope=1) +
-  facet_wrap(~trait, scales='free')
+  facet_wrap(~trait, scales='free') +
+  xlab('Original Value') + ylab('Imputed Value') +
+  theme(strip.text.x = element_text(size = 12)) 
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig x_pre cleaning original v imputed.png', width=12, height=12, units='in', dpi=300, bg='white')
 
 
 allTogether <- allContinuous %>% 
@@ -169,12 +174,13 @@ ggplot(data=cleanContinousWide, aes(x=as.factor(data_type2), y=trait_value)) +
   scale_x_discrete(breaks=c("AusTraits", "BIEN", "CPTD2", "TIPleaf", "TRY", "imputed_value"),
                    limits=c("AusTraits", "BIEN", "CPTD2", "TIPleaf", "TRY", "imputed_value"),
                    labels=c("A", "B", "C", "TIP", "TRY", "imp.")) +
-  scale_color_manual(values=c('#4E3686', '#5DA4D9', '#80D87F', '#FED23F', '#EE724C', 'darkgrey')) +
+  scale_color_manual(values=c('#4E3686', '#5DA4D9', '#80D87F', 'darkgrey', '#FED23F', '#EE724C')) +
   theme_bw() +
   theme(panel.grid.major=element_blank(),
         panel.grid.minor=element_blank(),
-        legend.position='top') 
-
+        legend.position='top') +
+  xlab('Data Type') + ylab('Trait Value')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 4_boxplots of original and imputed.png', width=8, height=8, units='in', dpi=300, bg='white')
 
 # Look at boxplots for each trait
 ggplot(data=subset(cleanContinousWide, species_matched %in% c('Helianthus maximiliani', 'Potentilla anserina', 'Clintonia borealis')), aes(x=species_matched, y=trait_value)) +
@@ -200,7 +206,10 @@ ggplot(data=subset(cleanContinuousFamilyRisk, family %in% c('Asteraceae', 'Frank
 ggplot(data=na.omit(cleanContinuous), aes(x=original_value, y=imputed_value)) +
   geom_point() +
   geom_abline(slope=1) +
-  facet_wrap(~trait, scales='free')
+  facet_wrap(~trait, scales='free') +
+  xlab('Original Value') + ylab('Imputed Value') +
+  theme(strip.text.x = element_text(size = 12)) 
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 3_original v imputed.png', width=12, height=12, units='in', dpi=300, bg='white')
 
 
 # look up some values for species that we know and make sure they are right
@@ -248,20 +257,44 @@ meanCleanContinuousErrorRisk <- meanCleanContinuous %>%
 ggplot(data=na.omit(meanCleanContinuousErrorRisk), aes(x=original_value_mean, y=trait_value)) +
   geom_point() +
   geom_abline(slope=1) +
-  facet_wrap(~trait, scales='free')
+  facet_wrap(~trait, scales='free') +
+  theme(strip.text.x = element_text(size = 12)) +
+  xlab('Mean Original Value') + ylab('Mean Imputed Value')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 5_mean original v imputed.png', width=12, height=12, units='in', dpi=300, bg='white')
+
 
 meanCleanContinuousWide <- meanCleanContinuousErrorRisk %>% 
   pivot_longer(cols=c('original_value_mean', 'trait_value'))
 
 ggplot(data=na.omit(meanCleanContinuousWide), aes(x=name, y=value)) +
   geom_boxplot() +
-  facet_wrap(~trait, scales='free')
+  facet_wrap(~trait, scales='free') +
+  theme(strip.text.x = element_text(size = 12)) +
+  xlab('') + ylab('Trait Value')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 6_mean original v imputed.png', width=12, height=12, units='in', dpi=300, bg='white')
 
 
 ##### Combine continuous and categorical traits #####
-sppNames <- read.csv('CompiledData\\Species_lists\\species_families_trees_2021.csv') %>% 
-  separate(species_matched, into=c('genus', 'species'), sep=' ', remove=F) %>% 
-  select(family, genus, species_matched)
+correSpecies <- read.csv("CompiledData\\Species_lists\\FullList_Nov2021.csv") %>%  #species names are standardized
+  left_join(read.csv("CompiledData\\Species_lists\\species_families_trees_2021.csv")) %>% 
+  filter(tree.non.tree != "tree") %>% #Remove trees
+  separate(species_matched, into=c('genus', 'species', 'subspp'), sep=' ') %>% 
+  filter(species!='sp.') %>% 
+  unite(col='species_matched', genus:species, sep=' ', remove=T) %>% 
+  select(family, species_matched) %>% 
+  unique()
+
+# Import GEx species names
+GExSpecies <- read.csv('OriginalData\\Traits\\GEx_species_tree_complete.csv') %>% 
+  select(family, species_matched) %>% 
+  unique()
+
+sppNames <- rbind(correSpecies, GExSpecies) %>% 
+  unique() %>% 
+  mutate(drop=ifelse(species_matched=='Dianella longifolia'&family=='Xanthorrhoeaceae', 1, 
+                     ifelse(species_matched=='Lancea tibetica'&family=='Phrymaceae', 1, 0))) %>% 
+  filter(drop==0) %>% 
+  select(-drop)
 
 longCategorical <- catagoricalTraits %>%
   pivot_longer(growth_form:n_fixation, names_to="trait", values_to="trait_value") %>% 
@@ -269,7 +302,9 @@ longCategorical <- catagoricalTraits %>%
          error_risk_family=NA,
          error_risk_genus=NA) %>% 
   left_join(sppNames)
-  
+
+
+#### START HERE: need GEx categorical to bind onto continuous data ####
 traitsAll <- meanCleanContinuousErrorRisk %>%
   select(-original_value_sd, -original_value_mean, -imputed_value_sd) %>% 
   rbind(longCategorical)
