@@ -25,3 +25,18 @@ gex <- read.csv('OriginalData\\Traits\\GEx_species_tree_complete.csv') %>%
   select(-subspp)
 
 # write.csv(gex, 'OriginalData\\Traits\\GEx_species_family_May2023.csv', row.names=F)
+
+
+#### New spp from GEx ####
+corre <- read.csv('OriginalData\\Traits\\TRY\\corre2trykey_2021.csv') %>% 
+  select(species_matched) %>% 
+  mutate(database2='corre') %>% 
+  unique()
+
+gexOnly <- read.csv('OriginalData\\Traits\\GEx_species_family_May2023.csv') %>% 
+  full_join(corre) %>% 
+  filter(is.na(database2)) %>% 
+  select(family, species_matched) %>% 
+  unique()
+
+# write.csv(gexOnly, 'OriginalData\\Traits\\GEx_uniqueSpp_June2023.csv', row.names=F)
