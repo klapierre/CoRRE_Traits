@@ -38,7 +38,7 @@ bienData <- BIEN_trait_species(species=sp.vector)
 # Subset to data that we want
 continuous <- bienData %>% 
   filter(trait_name %in% c('leaf area', 'leaf area per dry mass', 'leaf dry mass', 'leaf dry mass per leaf fresh mass', 'seed mass',
-                           'leaf nitrogen content per leaf dry mass',
+                           'leaf nitrogen content per leaf dry mass'
                            # 'leaf life span', 'leaf nitrogen content per leaf area', 'leaf phosphorus content per leaf area',
                            # 'leaf photosynthetic rate per leaf area', 'stem wood density', 'leaf stomatal conductance for H2O per leaf area',
                            # 'leaf stomatal conductance per leaf area', 'leaf photosynthetic rate per leaf area', 'leaf carbon content per leaf dry mass', 
@@ -68,7 +68,7 @@ continuous <- bienData %>%
   ungroup() %>% 
   select(-id) %>% 
   unique() %>% 
-  pivot_longer(3:13, names_to = "CleanTraitName1", values_to = "StdValue") %>% 
+  pivot_longer(3:7, names_to = "CleanTraitName1", values_to = "StdValue") %>% 
   separate(CleanTraitName1, into = c("prefix", "CleanTraitName"), "__") %>% 
   select( -prefix, -n) %>% 
   na.omit() %>% 
@@ -85,21 +85,21 @@ test <- continuous %>%
 continuous$CleanTraitName <- recode(continuous$CleanTraitName, 
                                 'leaf area'='leaf_area',
                                 'leaf area per dry mass'='SLA',
-                                'leaf carbon content per leaf dry mass'='leaf_C',
-                                'leaf carbon content per leaf nitrogen content'='leaf_C:N',
+                                # 'leaf carbon content per leaf dry mass'='leaf_C',
+                                # 'leaf carbon content per leaf nitrogen content'='leaf_C:N',
                                 'leaf dry mass'='leaf_dry_mass',
                                 'leaf dry mass per leaf fresh mass'='LDMC',
-                                'leaf life span'='leaf_longevity',
-                                'leaf nitrogen content per leaf area'='50',
+                                # 'leaf life span'='leaf_longevity',
+                                # 'leaf nitrogen content per leaf area'='50',
                                 'leaf nitrogen content per leaf dry mass'='leaf_N',
-                                'leaf phosphorus content per leaf area'='51',
-                                'leaf phosphorus content per leaf dry mass'='leaf_P',
+                                # 'leaf phosphorus content per leaf area'='51',
+                                # 'leaf phosphorus content per leaf dry mass'='leaf_P',
                                 # 'leaf photosynthetic rate per leaf area'='photosynthesis_rate',
                                 # 'leaf stomatal conductance for H2O per leaf area'='stomatal_conductance',
                                 # 'leaf stomatal conductance per leaf area'='stomatal_conductance',
-                                'leaf thickness'='leaf_thickness',
-                                'seed length'='seed_length',
-                                'seed mass'='seed_dry_mass',
+                                # 'leaf thickness'='leaf_thickness',
+                                # 'seed length'='seed_length',
+                                'seed mass'='seed_dry_mass'
                                 # 'stem wood density'='stem_spec_density'
                                 )
 
