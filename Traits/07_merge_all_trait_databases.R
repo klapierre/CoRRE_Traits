@@ -95,10 +95,10 @@ total <- nrow(allTraits_wide)*ntraits
 miss/total*100
 
 spnum <- length(unique(allTraits_wide$species_matched))
-#originally were missing 96.6% of data for all species
+# originally were missing 96.6% of data for all species
 
 # Drop traits that are related to physiology, water content, different ways of measuring SLA and leaf area, and root nutrients
-#Final option is SLA (3115, 3117), LDMC, LA (3108:3114), leaf mass, seed dry mass and plant veg, SRL (614), and leaf N [14 traits total to impute 7 traits]
+# Final option is SLA (3115, 3117), LDMC, LA (3109, 3114), leaf mass, seed dry mass and plant veg, SRL (614), and leaf N [14 traits total to impute 7 traits]
 allTraits_sub <- allTraits %>% 
   filter(CleanTraitName %in% c('SLA', 3115, 3117, 'LDMC', 'leaf_area', 3109, 3114, 'leaf_dry_mass', 'seed_dry_mass', 'plant_height_vegetative', 'SRL', 614, 'leaf_N'))
 
@@ -124,22 +124,43 @@ label <- allTraits_sub %>%
   pivot_longer(cols=length:length2, names_to='name', values_to='length') %>%
   mutate(DatabaseID=ifelse(name=='length2', 'total', DatabaseID)) %>%
   unique() %>%
-  mutate(percent=round((length/254440)*100, 1))
+  mutate(percent=round((length/254440)*100, 1)) %>% 
+  mutate(CleanTraitName2=
+                         # ifelse(CleanTraitName==3108, 'LA (leaf, -petiole)',
+                         ifelse(CleanTraitName==3109, 'Leaf Area (leaflet, -petiole)',
+                         # ifelse(CleanTraitName==3111, 'LA (leaflet, +petiole)',
+                         # ifelse(CleanTraitName==3112, 'LA (leaf, undefined)',
+                         # ifelse(CleanTraitName==3113, 'LA (leaflet, undefined)',
+                         ifelse(CleanTraitName==3114, 'Leaf Area (undefined, undefined)',
+                         ifelse(CleanTraitName=='leaf_area', 'Leaf Area (leaf, +petiole)',
+                         ifelse(CleanTraitName==3115, 'Specific Leaf Area (-petiole)',
+                         ifelse(CleanTraitName==3117, 'Specific Leaf Area (undefined)',
+                         ifelse(CleanTraitName=='SLA', 'Specific Leaf Area (+petiole)', 
+                         ifelse(CleanTraitName=='SRL', 'Specific Root Length (all root)',
+                         ifelse(CleanTraitName==614, 'Specific Root Length (fine root)', 
+                         ifelse(CleanTraitName=='leaf_N', 'Leaf N Content',
+                         ifelse(CleanTraitName=='plant_height_vegetative', 'Plant Vegetative Height',
+                         ifelse(CleanTraitName=='seed_dry_mass', 'Seed Dry Mass',
+                         ifelse(CleanTraitName=='leaf_dry_mass', 'Leaf Dry Mass',
+                         ifelse(CleanTraitName=='LDMC', 'Leaf Dry Matter Content',
+                                CleanTraitName))))))))))))))
+
+label$CleanTraitName2 = factor(label$CleanTraitName2, levels=c('Leaf Area (leaf, +petiole)', 'Leaf Area (leaflet, -petiole)', 'Leaf Area (undefined, undefined)', 'Leaf Dry Mass', 'Leaf Dry Matter Content', 'Specific Leaf Area (+petiole)', 'Specific Leaf Area (-petiole)', 'Specific Leaf Area (undefined)', 'Leaf N Content', 'Plant Vegetative Height', 'Specific Root Length (all root)', 'Specific Root Length (fine root)', 'Seed Dry Mass'))
 
 # How many observations do we have for each trait across our database?
-ggplot(data=label, aes(x=DatabaseID, y=length, label=percent, fill=DatabaseID)) +
+ggplot(data=label, aes(x=DatabaseID, y=length, label=round(percent,1), fill=DatabaseID)) +
   geom_bar(stat='identity', position=position_dodge()) +
-  geom_text(vjust = -0.25) +
   geom_hline(yintercept=254440*.2) + # 20% of observations missing any given trait
   geom_hline(yintercept=254440*.1, color='red') + # 10% of observations missing any given trait
-  facet_wrap(~CleanTraitName, ncol=7) +
+  geom_text(vjust = -0.25) +
+  facet_wrap(~CleanTraitName2, ncol=5) +
   scale_x_discrete(breaks=c("AusTraits", "BIEN", "CPTD2", "TIPleaf", "TRY", "total"),
                    limits=c("AusTraits", "BIEN", "CPTD2", "TIPleaf", "TRY", "total"),
-                   labels=c("A", "B", "C", "TIP", "TRY", 'total')) +
+                   labels=c("Aus", "BN", "C2", "TIP", "TRY", 'total')) +
   scale_fill_manual(values=c('#4E3686', '#5DA4D9', '#80D87F', '#FED23F','darkgrey', '#EE724C')) +
-  theme(legend.position='none', strip.text.x = element_text(size = 12)) +
-  xlab('Number of Observations') + ylab('Database ID')
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 1_input percent complete.png', width=22, height=10, units='in', dpi=300, bg='white')
+  theme(legend.position='none', strip.text.x = element_text(size = 15)) +
+  ylab('Number of Observations') + xlab('Database ID')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 1_input percent complete_20230608.png', width=18, height=15, units='in', dpi=300, bg='white')
 
 # Are there any outlier datasets for each trait?
 ggplot(data=allTraits_sub, aes(x=DatabaseID, y=StdValue)) +
