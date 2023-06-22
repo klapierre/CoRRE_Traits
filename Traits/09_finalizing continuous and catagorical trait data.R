@@ -12,7 +12,7 @@ library(PerformanceAnalytics)
 library(tidyverse)
 
 setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data') #Kim's
-setwd("C:\\Users\\wilco\\Dropbox\\shared working groups\\sDiv_sCoRRE_shared\\CoRRE data\\") # Kevin's laptop wd
+# setwd("C:\\Users\\wilco\\Dropbox\\shared working groups\\sDiv_sCoRRE_shared\\CoRRE data\\") # Kevin's laptop wd
 
 theme_set(theme_bw())
 theme_update(axis.title.x=element_text(size=20, vjust=-0.35, margin=margin(t=15)), axis.text.x=element_text(size=16),
@@ -82,9 +82,13 @@ meanContinuous <- allContinuous %>%
   ungroup()
 
 speciesCount <- meanContinuous %>% 
+  select(family, species_matched) %>% 
+  unique() %>% 
   group_by(family) %>% 
   summarize(num_species=length(family)) %>% 
   ungroup() #116 families
+
+sum(speciesCount$num_species)
 
 
 # Compare imputed to original continuous trait data
@@ -94,7 +98,7 @@ ggplot(data=na.omit(meanContinuous), aes(x=original_value_mean, y=imputed_value_
   facet_wrap(~trait, scales='free') +
   xlab('Mean Original Value') + ylab('Mean Imputed Value') +
   theme(strip.text.x = element_text(size = 12)) 
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig x_mean original v imputed.png', width=12, height=12, units='in', dpi=300, bg='white')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig x_mean original v imputed_20230620.png', width=12, height=12, units='in', dpi=300, bg='white')
 
 # Only grasses -- 11620 species
 ggplot(data=na.omit(subset(allContinuous, family=='Poaceae')), aes(x=original_value, y=imputed_value)) +
@@ -179,8 +183,9 @@ ggplot(data=cleanContinousWide, aes(x=as.factor(data_type2), y=trait_value)) +
   theme(panel.grid.major=element_blank(),
         panel.grid.minor=element_blank(),
         legend.position='top') +
-  xlab('Data Type') + ylab('Trait Value')
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 4_boxplots of original and imputed.png', width=8, height=8, units='in', dpi=300, bg='white')
+  xlab('Data Type') + ylab('Trait Value')  +
+  scale_y_continuous(trans='log10')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 4_boxplots of original and imputed_20230608.png', width=8, height=8, units='in', dpi=300, bg='white')
 
 # Look at boxplots for each trait
 ggplot(data=subset(cleanContinousWide, species_matched %in% c('Helianthus maximiliani', 'Potentilla anserina', 'Clintonia borealis')), aes(x=species_matched, y=trait_value)) +
@@ -209,7 +214,7 @@ ggplot(data=na.omit(cleanContinuous), aes(x=original_value, y=imputed_value)) +
   facet_wrap(~trait, scales='free') +
   xlab('Original Value') + ylab('Imputed Value') +
   theme(strip.text.x = element_text(size = 12)) 
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 3_original v imputed.png', width=12, height=12, units='in', dpi=300, bg='white')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 3_original v imputed_20230608.png', width=12, height=12, units='in', dpi=300, bg='white')
 
 
 # look up some values for species that we know and make sure they are right
@@ -260,7 +265,7 @@ ggplot(data=na.omit(meanCleanContinuousErrorRisk), aes(x=original_value_mean, y=
   facet_wrap(~trait, scales='free') +
   theme(strip.text.x = element_text(size = 12)) +
   xlab('Mean Original Value') + ylab('Mean Imputed Value')
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 5_mean original v imputed.png', width=12, height=12, units='in', dpi=300, bg='white')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 5_mean original v imputed_20230608.png', width=12, height=12, units='in', dpi=300, bg='white')
 
 
 meanCleanContinuousWide <- meanCleanContinuousErrorRisk %>% 
@@ -270,8 +275,9 @@ ggplot(data=na.omit(meanCleanContinuousWide), aes(x=name, y=value)) +
   geom_boxplot() +
   facet_wrap(~trait, scales='free') +
   theme(strip.text.x = element_text(size = 12)) +
-  xlab('') + ylab('Trait Value')
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 6_mean original v imputed.png', width=12, height=12, units='in', dpi=300, bg='white')
+  xlab('') + ylab('Trait Value') +
+  scale_y_continuous(trans='log10')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 6_mean original v imputed_20230608.png', width=12, height=12, units='in', dpi=300, bg='white')
 
 
 ##### Combine continuous and categorical traits #####
@@ -316,3 +322,147 @@ traitsWide <- traitsAll %>%
   pivot_wider(names_from=trait, values_from=trait_value)
 
 # write.csv(traitsWide, 'CleanedData\\Traits\\CoRRE_allTraitData_wide_June2023.csv')
+
+
+#### testing if imputation runs are different ####
+imputedRaw0620 <- read.csv("CleanedData\\Traits\\gap filled continuous traits\\20230620\\imputed_traits_mice.csv") %>% 
+  mutate(run='run_2') %>% 
+  rowid_to_column(var="rowid")
+
+imputedRaw0608 <- read.csv("CleanedData\\Traits\\gap filled continuous traits\\20230608\\imputed_traits_mice.csv") %>% 
+  mutate(run='run_1') %>% 
+  rowid_to_column(var="rowid")
+
+compareImputed <- rbind(imputedRaw0608, imputedRaw0620) %>% 
+  pivot_longer(cols=seed_dry_mass:SRL, names_to='trait', values_to='values') %>% 
+  pivot_wider(names_from=run, values_from=values) %>% 
+  left_join(originalRaw)
+
+ggplot(data=subset(compareImputed, trait=='SLA'), aes(x=run_1, y=run_2)) +
+  geom_point() +
+  geom_abline(slope=1) +
+  xlab('Run 1 Value') + ylab('Run 2 Value')
+
+ggplot(data=subset(compareImputed, trait=='seed_dry_mass'), aes(x=run_1, y=run_2)) +
+  geom_point() +
+  geom_abline(slope=1) +
+  xlab('Run 1 Value') + ylab('Run 2 Value') +
+  scale_x_continuous(trans='log10') +
+  scale_y_continuous(trans='log10')
+
+ggplot(data=subset(compareImputed, trait=='plant_height_vegetative'), aes(x=run_1, y=run_2)) +
+  geom_point() +
+  geom_abline(slope=1) +
+  xlab('Run 1 Value') + ylab('Run 2 Value') +
+  scale_x_continuous(trans='log10') +
+  scale_y_continuous(trans='log10')
+
+ggplot(data=subset(compareImputed, trait=='SRL'), aes(x=run_1, y=run_2)) +
+  geom_point() +
+  geom_abline(slope=1) +
+  xlab('Run 1 Value') + ylab('Run 2 Value')
+
+ggplot(data=subset(compareImputed, trait=='LDMC'), aes(x=run_1, y=run_2)) +
+  geom_point() +
+  geom_abline(slope=1) +
+  xlab('Run 1 Value') + ylab('Run 2 Value')
+
+ggplot(data=subset(compareImputed, trait=='leaf_area'), aes(x=run_1, y=run_2)) +
+  geom_point() +
+  geom_abline(slope=1) +
+  xlab('Run 1 Value') + ylab('Run 2 Value') +
+  scale_x_continuous(trans='log10') +
+  scale_y_continuous(trans='log10')
+
+ggplot(data=subset(compareImputed, trait=='leaf_N'), aes(x=run_1, y=run_2)) +
+  geom_point() +
+  geom_abline(slope=1) +
+  xlab('Run 1 Value') + ylab('Run 2 Value')
+
+ggplot(data=subset(compareImputed, trait=='leaf_dry_mass'), aes(x=run_1, y=run_2)) +
+  geom_point() +
+  geom_abline(slope=1) +
+  xlab('Run 1 Value') + ylab('Run 2 Value')
+
+
+#only those with original data
+imputedRawRun1 <- read.csv("CleanedData\\Traits\\gap filled continuous traits\\20230608\\imputed_traits_mice.csv") %>%
+  bind_cols(read.csv('OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_June2023.csv')[,c('DatabaseID', 'DatasetID', 'ObservationID', 'family', 'genus', 'species_matched')]) %>%   
+  left_join(mossKey) %>% 
+  filter(moss!="moss") %>%
+  dplyr::select(-moss) #removes 6 species observations
+
+imputedLongRun1 <- imputedRawRun1 %>% 
+  pivot_longer(names_to='trait', values_to='imputed_value', seed_dry_mass:SRL) %>% 
+  rename(imputed_value_run1=imputed_value)
+
+imputedRawRun2 <- read.csv("CleanedData\\Traits\\gap filled continuous traits\\20230620\\imputed_traits_mice.csv") %>%
+  bind_cols(read.csv('OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_June2023.csv')[,c('DatabaseID', 'DatasetID', 'ObservationID', 'family', 'genus', 'species_matched')]) %>%   
+  left_join(mossKey) %>% 
+  filter(moss!="moss") %>%
+  dplyr::select(-moss) #removes 6 species observations
+
+imputedLongRun2 <- imputedRawRun2 %>% 
+  pivot_longer(names_to='trait', values_to='imputed_value', seed_dry_mass:SRL) %>% 
+  rename(imputed_value_run2=imputed_value)
+
+# Read original trait data and join with imputed data
+originalRaw <- read.csv('OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_June2023.csv') %>%
+  pivot_longer(names_to='trait', values_to='original_value', seed_dry_mass:SRL) %>%
+  na.omit()
+
+
+# Join original trait data with imputed data. Only keep traits of interest.
+allContinuousComparison <- imputedLongRun1 %>% 
+  left_join(imputedLongRun2) %>% 
+  left_join(originalRaw) %>% 
+  filter(trait %in% c('LDMC', 'leaf_area', 'leaf_dry_mass', 'leaf_N', 'plant_height_vegetative', 'seed_dry_mass', 'SLA', 'SRL'))
+
+originalComparison <- allContinuousComparison %>% 
+  na.omit()
+
+ggplot(data=subset(originalComparison, trait=='SLA'), aes(x=imputed_value_run1, y=imputed_value_run2)) +
+  geom_point() +
+  geom_abline(slope=1) +
+  xlab('Run 1 Value') + ylab('Run 2 Value')
+
+ggplot(data=subset(originalComparison, trait=='seed_dry_mass'), aes(x=imputed_value_run1, y=imputed_value_run2)) +
+  geom_point() +
+  geom_abline(slope=1) +
+  xlab('Run 1 Value') + ylab('Run 2 Value') +
+  scale_x_continuous(trans='log10') +
+  scale_y_continuous(trans='log10')
+
+ggplot(data=subset(originalComparison, trait=='plant_height_vegetative'), aes(x=imputed_value_run1, y=imputed_value_run2)) +
+  geom_point() +
+  geom_abline(slope=1) +
+  xlab('Run 1 Value') + ylab('Run 2 Value') +
+  scale_x_continuous(trans='log10') +
+  scale_y_continuous(trans='log10')
+
+ggplot(data=subset(originalComparison, trait=='SRL'), aes(x=imputed_value_run1, y=imputed_value_run2)) +
+  geom_point() +
+  geom_abline(slope=1) +
+  xlab('Run 1 Value') + ylab('Run 2 Value')
+
+ggplot(data=subset(originalComparison, trait=='LDMC'), aes(x=imputed_value_run1, y=imputed_value_run2)) +
+  geom_point() +
+  geom_abline(slope=1) +
+  xlab('Run 1 Value') + ylab('Run 2 Value')
+
+ggplot(data=subset(originalComparison, trait=='leaf_area'), aes(x=imputed_value_run1, y=imputed_value_run2)) +
+  geom_point() +
+  geom_abline(slope=1) +
+  xlab('Run 1 Value') + ylab('Run 2 Value') +
+  scale_x_continuous(trans='log10') +
+  scale_y_continuous(trans='log10')
+
+ggplot(data=subset(originalComparison, trait=='leaf_N'), aes(x=imputed_value_run1, y=imputed_value_run2)) +
+  geom_point() +
+  geom_abline(slope=1) +
+  xlab('Run 1 Value') + ylab('Run 2 Value')
+
+ggplot(data=subset(originalComparison, trait=='leaf_dry_mass'), aes(x=imputed_value_run1, y=imputed_value_run2)) +
+  geom_point() +
+  geom_abline(slope=1) +
+  xlab('Run 1 Value') + ylab('Run 2 Value')
