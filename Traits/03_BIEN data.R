@@ -120,7 +120,7 @@ continuousClean <- continuous %>%
 
 
 
-# write.csv(continuousClean, "OriginalData\\Traits\\BIEN\\BIEN_for_scorre_20230511.csv", row.names=F)
+# write.csv(continuousClean, "OriginalData\\Traits\\BIEN\\BIEN_for_scorre_20230623.csv", row.names=F)
 
 
 
