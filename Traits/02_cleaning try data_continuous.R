@@ -1,12 +1,13 @@
 ################################################################################
 ##  cleaning try data_continuous.R: Removing outliers and repeats from TRY Plant Database continous data
-##  for CoRRE database plant species. Updated to include GEx and fewer species May2023
+##  for CoRRE and GEx database plant species.
 ##
 ##  Authors: Meghan Avolio, Kimberly Komatsu
 ################################################################################
 
 ## NOTES: Update Feb 2021. We are adding new species with the CoRRE database 2.0 update and adding the species
 ## that were missing from the 2019 data pull. Redoing traits for all species.
+## Update May 2023, adding in the GEx species. Redoing traits with updated and "clean" TRY database.
 
 #### Setting up script ####
 library(tidyverse)
@@ -62,26 +63,26 @@ corresp<-corre_key %>%
   unique() %>% 
   mutate(corre=1)
 
-#get list to merge gex with try
+# Merge GEx with try
 gex <- read.csv("OriginalData\\Traits\\GEx_species_family_May2023.csv")
 
-gexlist<-gex %>% 
+gexlist <- gex %>% 
   select(species_matched) %>% 
   mutate(AccSpeciesName=species_matched)
   
-trysp<-dat %>% 
+trysp <- dat %>% 
   select(AccSpeciesID, AccSpeciesName) %>% 
   unique()
 
-gex_key<-gexlist %>% 
+gex_key <- gexlist %>% 
   right_join(trysp) %>% 
   na.omit()
 
-key<-corre_key %>% 
+key <- corre_key %>% 
   bind_rows(gex_key) %>% 
   unique()
 
-# Merge CoRRE species names with TRY data
+# Merge CoRRE and GEx species names with TRY data
 dat2 <- dat %>%
   right_join(key)
 
@@ -98,7 +99,7 @@ dat2 <- dat %>%
 #   summarize(n=length(TraitID))
 
 # Subsetting out traits we want and replacing the numbers with names
-#if origlname or unit is blank but there are no duplicates we are keeping it.
+# if origlname or unit is blank but there are no duplicates, then we are keeping it
 dat3 <- dat2 %>%
   filter(TraitID %in% c(4, 6, 9, 12, 13, 14, 15, 26, 27, 40, 41, 44, 45, 46, 47, 48, 50, 51, 52, 53, 55, 56, 57, 58, 66, 77, 80, 82, 83, 84, 106, 111, 138, 145, 146, 185, 186, 269, 270, 363, 475, 570, 614, 683, 1080, 1104, 1781, 3106, 3107, 3108, 3109, 3110, 3111, 3112, 3113, 3114, 3115, 3116, 3117, 3121, 3122)) %>%
   mutate(remove=ifelse(TraitID==48 & UnitName=='', 1, 
@@ -279,7 +280,7 @@ healthy <- dat3 %>% #merge to drop observations on dead plants
 corre_treesp <- read.csv("CompiledData/Species_lists/species_families_trees_2021.csv") %>%
   mutate(AccSpeciesName=species_matched) #read in which species are trees
 
-gex_treesp<-read.csv("C:/Users/mavolio2/Dropbox/CoRRE_database/Data/OriginalData/Traits/GEx_species_tree_complete.csv") %>% 
+gex_treesp<-read.csv("OriginalData/Traits/GEx_species_tree_complete.csv") %>% 
   filter(tree.non.tree %in% c("tree", "non-tree")) %>% 
   select(species_matched, family, tree.non.tree) %>% 
   separate(species_matched, into = c("genus", "species", "other"), sep=" ") %>% 
@@ -315,6 +316,7 @@ setting <- dat %>% #get list of observations that were not in natural settings
   mutate(drop=ifelse(OrigValueStr %in% c("Canadian High Arctic Research Station", "Control Plot", "field","Field", "Field (CG)", "Field (NE)", "field experiment", "Field Experiment", "Field plants", "forest stand", "Forest trees", "Forest understorey", "Fully open overstory 90 days, seedling", "Fully open overstory, seedling","Fully sunlit - Natural environment","High desert", "in situ", "In situ", "La Selva Biological Station", "meadows (M) and pastures (P) on south east to south west exposed slopes", "Montane meadow", "Mosses in forest", "nat env", "natural", "Natural", "natural-environment", "natural env", "natural envireonment", "natural enviroment", "Natural Enviroment", "natural environment", "Natural environment", "Natural Environment", "natural environment, high regional N and S deposition","natural environment, no warming, preccipitation ambient", "natural environment, sun exposed", "Natural Envrionment", "Natural Forest", "natural forest environment", "natural vegetation", "Natural Vegetation", "Natural Vegetation", "natural vegetation, but not top canopy", "natural wetland environment", "natural wetlands (field conditions)", "Natural/C", "natural_environment", "none", "None", "North facing slope", "Shade - Natural environment","South facing slope", "Trees in field"), 0, 1)) %>%
   select(ObsDataID, drop) %>%
   unique()
+
 natural <- dat3 %>% #merge to drop observations in non-natural settings
   left_join(setting) %>% 
   mutate(drop=ifelse(is.na(drop), 0, drop)) %>% 
@@ -343,32 +345,29 @@ cont_traits <- dat3 %>%
   mutate(remove=ifelse(tree.non.tree=="non-tree", 0, 1)) %>%
   filter(remove==0) %>%
   select(-tree.non.tree, -AccSpeciesName.y, -remove) %>%
-  rename(AccSpeciesName=AccSpeciesName.x) #drops X observations
+  rename(AccSpeciesName=AccSpeciesName.x) # drops 196,547 observations
 
 
-#### Add taxonomic information for each species ####
+#### Add taxonomic information for each species and filter to traits we are settling on for successful gap filling ####
 cont_traits2 <- cont_traits %>%
   select(DatasetID, ObservationID, family, species_matched, CleanTraitName, StdValue, ErrorRisk) %>%
   separate(remove = F, species_matched, into = c("genus", "species"), sep=" ") %>%
-  select(-species)
+  select(-species) %>% 
+  filter(CleanTraitName %in% c('SLA', 3115, 3117, 'LDMC', 'leaf_area', 3109, 3114, 'leaf_dry_mass', 'seed_dry_mass', 'plant_height_vegetative', 'SRL', 614, 'leaf_N')) 
 
 
 #### Removing trait outliers based on TRY's Error Risk designation ####
 cont_traits3 <- cont_traits2 %>%
   select(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue, ErrorRisk) %>%
   mutate(ErrorRisk2=ifelse(is.na(ErrorRisk), 0, ErrorRisk)) %>%
-  filter(ErrorRisk2<3) %>% #removes all observations that are greater than 3 sd from full database mean: drops X observations
+  filter(ErrorRisk2<3) %>% #removes all observations that are greater than 3 sd from full database mean: drops 34,699 observations
   select(-ErrorRisk, -ErrorRisk2) %>% 
-  mutate(drop=ifelse(CleanTraitName=="seed_number" & StdValue==0, 1,
-              ifelse(CleanTraitName==1104 & StdValue==0, 1, 0))) %>%  #removing seed number where 0 (X observations)
-  filter(drop==0) %>% 
-  select(-drop) %>% 
-  filter(StdValue>0) #removing negative and 0 values (X)
+  filter(StdValue>0) #removing negative and 0 values (drops 22 observations)
 
 
 #### Problem Datasets -- duplicate entries ####
 
-# Problem: We investigated many repeats of similar plant vegetative height, LDMC, and water content values. We think this data was probably methodologically linked in some way to give these similar values. 
+# Problem: We investigated many repeats of similar plant vegetative height, LDMC, and water content values. We think this data was probably methodologically linked in some way to give these similar values (e.g., poor resolution of measurements). 
 # Solution: We think the values are real (despite the methodological linkage), not duplicated data. Therefore, we are keeping all of this data.
 
 
@@ -379,14 +378,16 @@ d453 <- cont_traits3 %>%
   summarise(StdValue=mean(StdValue)) %>% 
   ungroup()
 
-# Problem: Two height values per plant (maybe temporal observations). Additionally, some plants have two identical values for root_P. Solution: Taking largest value.
+# Problem: Two height values per plant (maybe temporal observations). Additionally, some plants have two identical values for root_P.
+# Solution: Taking largest value.
 d428 <- cont_traits3 %>% 
   filter(DatasetID==428 & CleanTraitName=="plant_height_vegetative" | DatasetID==428 & CleanTraitName=="root_P") %>%
   group_by(DatasetID, ObservationID, species_matched, CleanTraitName, family, genus) %>%
   summarise(StdValue=max(StdValue)) %>% 
   ungroup()
 
-# Problem: Many observations with exactly repeated values for each trait*species. Solution: Take the average and make them all unique observations (loses linking of data on same individuals, but this seems better than keeping so many repeats).
+# Problem: Many observations with exactly repeated values for each trait*species. 
+# Solution: Take the average and make them all unique observations (loses linking of data on same individuals, but this seems better than keeping so many repeats).
 d415 <- cont_traits3 %>% 
   filter(DatasetID==415) %>% 
   group_by(DatasetID, species_matched, CleanTraitName, family, genus)%>%
@@ -394,7 +395,8 @@ d415 <- cont_traits3 %>%
   ungroup() %>% 
   mutate(ObservationID=row_number())
 
-# Problem: Many doubles of values for trait*speices with no clear pattern. Solution: Take the average and make them all unique observations (loses linking of data on same individuals, but this seems better than keeping so many repeats).
+# Problem: Many doubles of values for trait*species with no clear pattern. 
+# Solution: Take the average and make them all unique observations (loses linking of data on same individuals, but this seems better than keeping so many repeats).
 d25 <- cont_traits3 %>% 
   filter(DatasetID==25) %>% 
   group_by(DatasetID, species_matched, CleanTraitName, family, genus) %>%
@@ -402,7 +404,8 @@ d25 <- cont_traits3 %>%
   ungroup() %>% 
   mutate(ObservationID=row_number())
 
-# Problem: Repeated Arabidopsis data. Dataset 102 has repeats with dataset 226. Datasets 359, 102, and 226 are all from the same data provider. Solution: Join all together and keep the data identifiers from 226 if there are repeats (otherwise use identifiers from original dataset).
+# Problem: Repeated Arabidopsis data. Dataset 102 has repeats with dataset 226. Datasets 359, 102, and 226 are all from the same data provider. 
+# Solution: Join all together and keep the data identifiers from 226 if there are repeats (otherwise use identifiers from original dataset).
 d359 <- cont_traits3 %>% #all arabidopsis
   filter(DatasetID==359) 
 
@@ -421,7 +424,8 @@ d226 <- cont_traits3 %>%
   select(-ob, -did) %>% 
   unique()
 
-# Problem: Two datasets with lot of repeated data, but they are the same dataset. Solution: Join all data together and keep the data identifiers from dataset 327 if there are repeats (otherwise use identifiers from original dataset).
+# Problem: Two datasets with lot of repeated data, but they are the same dataset. 
+# Solution: Join all data together and keep the data identifiers from dataset 327 if there are repeats (otherwise use identifiers from original dataset).
 d327 <- cont_traits3 %>% 
   filter(DatasetID==327) %>% 
   rename(did=DatasetID, 
@@ -435,140 +439,167 @@ d353 <- cont_traits3 %>%
   select(-ob, -did) %>% 
   unique() 
 
-# Problem: Dataset has lots of repeated data for some traits*species. Solution: For each species, find if there is repeated data for all traits collected on an individual. Where this occurs, keep the lowest ObservationID.
+# Problem: Dataset has lots of repeated data for some traits*species. 
+# Solution: For each species, find if there is repeated data for all traits collected on an individual. Where this occurs, keep the lowest ObservationID.
 d1 <- cont_traits3 %>% 
   filter(DatasetID==1) %>% 
   pivot_wider(names_from=CleanTraitName, values_from = StdValue, names_prefix = "d__") %>% 
-  group_by(species_matched, d__3115, d__leaf_N, d__leaf_C, d__plant_height_vegetative, d__leaf_longevity, d__3109  , d__leaf_thickness, d__40, d__50 , d__photosynthesis_rate, d__570) %>% 
+  group_by(species_matched, d__3115, d__leaf_N, d__plant_height_vegetative, d__3109) %>% 
   mutate(n=length(species_matched), obid2=min(ObservationID)) %>% 
   ungroup() %>% 
   select(-ObservationID) %>% 
   unique() %>% 
-  pivot_longer(d__3115:d__570, names_to = "CleanTraitName1", values_to = "StdValue") %>% 
+  pivot_longer(d__3115:d__3109, names_to = "CleanTraitName1", values_to = "StdValue") %>% 
   separate(CleanTraitName1, into = c("prefix", "CleanTraitName"), "__") %>% 
   select( -prefix, -n) %>% 
   na.omit() %>% 
   rename(ObservationID=obid2)
 
-# Problem: has repeated individuals within the dataset. Solution: Take the average for each individual for each trait. For each species, find if there is repeated data for all traits collected on an individual.
+# Problem: has repeated individuals within the dataset. 
+# Solution: Take the average for each individual for each trait. For each species, find if there is repeated data for all traits collected on an individual.
 d412 <- cont_traits3 %>% 
   filter(DatasetID==412) %>% 
   group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName) %>% 
   summarize(StdValue=mean(StdValue)) %>% 
   ungroup()
 
-
-
-# Problem: Many repeated values for trait 3117 (SLA undefined petiole), but they are attached to unique observations for other traits. Perhaps this is another methodological issue with how SLA was measured. Solution: Just keep what is there despite the repeats.
+# Problem: Many repeated values for trait 3117 (SLA undefined petiole), but they are attached to unique observations for other traits. Perhaps this is another methodological issue with how SLA was measured. 
+# Solution: Just keep what is there despite the repeats.
 # d400 <- cont_traits3 %>% 
 #   filter(DatasetID==400) %>% 
 #   pivot_wider(names_from=CleanTraitName, values_from=StdValue)
 
-# Problem: Rooting depth was recorded as the exact same value across many species. Solution: Drop rooting depth data from this dataset. Also trait 614 (measure of SRL) three values for a few observations. Solution 2: just average across traits
+# Problem: Rooting depth was recorded as the exact same value across many species. 
+# Solution: Drop rooting depth data from this dataset. Also trait 614 (measure of SRL) three values for a few observations. Solution 2: just average across traits
 d339 <- cont_traits3 %>% 
   filter(DatasetID==339) %>% 
   group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName) %>% 
-  summarize(StdValue=mean(StdValue))
+  summarize(StdValue=mean(StdValue)) %>% 
+  ungroup()
   
-# Problem: Plant vegetative height is measured 5x for for each plant (maybe temporal observations). Solution: keep the maximum height. Also only has one value for roots
-d201<-cont_traits3 %>% 
+# Problem: Plant vegetative height is measured 5x for for each plant (maybe temporal observations). 
+# Solution: keep the maximum height. Also only has one value for roots
+d201 <- cont_traits3 %>% 
   filter(DatasetID==201) %>% 
   group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName) %>% 
-  summarize(StdValue=max(StdValue))
+  summarize(StdValue=max(StdValue)) %>% 
+  ungroup()
 
-# Problem: Dark respiration rate is measured 3-4x for for each plant (maybe temporal observations). Solution: keep the max Has only one value for all other traits
-d96<-cont_traits3 %>% 
+# Problem: Dark respiration rate is measured 3-4x for for each plant (maybe temporal observations). 
+# Solution: keep the max Has only one value for all other traits
+d96 <- cont_traits3 %>% 
   filter(DatasetID==96) %>% 
   group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName) %>% 
-  summarize(StdValue=max(StdValue))
+  summarize(StdValue=max(StdValue)) %>% 
+  ungroup()
 
-# Problem: trait 1104 (seed number / inflor) is measured 3x for for each plant. Solution: keep the mean
-d355<-cont_traits3 %>% 
+# Problem: trait 1104 (seed number / inflor) is measured 3x for for each plant. 
+# Solution: keep the mean
+d355 <- cont_traits3 %>% 
   filter(DatasetID==355) %>% 
   group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName) %>% 
-  summarize(StdValue=mean(StdValue))
+  summarize(StdValue=mean(StdValue)) %>% 
+  ungroup()
 
-# Problem: for some individuals plant height is measured 2x (maybe over time). Solution. Take the max of all traits as all other traits only in there 1x.
-d45<-cont_traits3 %>% 
+# Problem: for some individuals plant height is measured 2x (maybe over time). 
+# Solution: Take the max of all traits as all other traits only in there 1x.
+d45 <- cont_traits3 %>% 
   filter(DatasetID==45) %>% 
   group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName) %>% 
-  summarize(StdValue=max(StdValue))
+  summarize(StdValue=max(StdValue)) %>% 
+  ungroup()
 
-# Problem: for some individuals there are 2 measurements of 185 (related to VCmax). Solution. Take the mean of all traits as all other traits only in there 1x.
-d87<-cont_traits3 %>% 
+# Problem: for some individuals there are 2 measurements of 185 (related to VCmax). 
+# Solution: Take the mean of all traits as all other traits only in there 1x.
+d87 <- cont_traits3 %>% 
   filter(DatasetID==87) %>% 
   group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName) %>% 
-  summarize(StdValue=mean(StdValue))
+  summarize(StdValue=mean(StdValue)) %>% 
+  ungroup()
 
-# Problem: for some individuals there are 2 measurements of plant height (maybe measured over time). Solution. Take the max of all traits as all other traits only in there 1x.
-d299<-cont_traits3 %>% 
+# Problem: for some individuals there are 2 measurements of plant height (maybe measured over time). 
+# Solution: Take the max of all traits as all other traits only in there 1x.
+d299 <- cont_traits3 %>% 
   filter(DatasetID==299) %>% 
   group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName) %>% 
-  summarize(StdValue=max(StdValue))
+  summarize(StdValue=max(StdValue)) %>% 
+  ungroup()
 
-# Problem: there are 2 measurements of leaf dry mass for all plants. Solution. Take the mean of all traits as all other traits only in there 1x.
-d477<-cont_traits3 %>% 
+# Problem: there are 2 measurements of leaf dry mass for all plants. 
+# Solution: Take the mean of all traits as all other traits only in there 1x.
+d477 <- cont_traits3 %>% 
   filter(DatasetID==477) %>% 
   group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName) %>% 
-  summarize(StdValue=mean(StdValue))
+  summarize(StdValue=mean(StdValue)) %>% 
+  ungroup()
 
-# Problem: there are 2 measurements of plant height for some plants. Solution. Take the max of all traits as all other traits only in there 1x.
-d520<-cont_traits3 %>% 
+# Problem: there are 2 measurements of plant height for some plants. 
+# Solution: Take the max of all traits as all other traits only in there 1x.
+d520 <- cont_traits3 %>% 
   filter(DatasetID==520) %>% 
   group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName) %>% 
-  summarize(StdValue=max(StdValue))
+  summarize(StdValue=max(StdValue)) %>% 
+  ungroup()
 
-# Problem: there are 2 measurements of plant height for some plants. Solution. Take the max of all traits as all other traits only in there 1x.
-d655<-cont_traits3 %>% 
+# Problem: there are 2 measurements of plant height for some plants. 
+# Solution: Take the max of all traits as all other traits only in there 1x.
+d655 <- cont_traits3 %>% 
   filter(DatasetID==655) %>% 
   group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName) %>% 
-  summarize(StdValue=max(StdValue))
+  summarize(StdValue=max(StdValue)) %>% 
+  ungroup()
 
-# Problem: there are multiple measurements of 3114 (a measure of leaf area) for many individuals. Solution. Take the mean of all traits as all other traits are in there 1x.
-d486<-cont_traits3 %>% 
+# Problem: there are multiple measurements of 3114 (a measure of leaf area) for many individuals. 
+# Solution: Take the mean of all traits as all other traits are in there 1x.
+d486 <- cont_traits3 %>% 
   filter(DatasetID==486) %>% 
   group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName) %>% 
-  summarize(StdValue=mean(StdValue))
+  summarize(StdValue=mean(StdValue)) %>% 
+  ungroup()
 
-#dataset 468 has many many repeats (50+) for plant height and not other measurements. This will add lots of missing data and not much information. We are going to replace all these repeats with 10 repeats
-d468sub<-cont_traits3 %>% 
+#dataset 468 has many many repeats (50+) for plant height and not other measurements. This will add lots of missing data and not much information.
+# Solution: Only keep 10 repeats, which is likely real data (measurement precision problems again), but not meaningful.
+d468sub <- cont_traits3 %>% 
   filter(DatasetID==468) %>% 
   group_by(DatasetID, family, genus, species_matched, CleanTraitName, StdValue) %>% 
   summarize(n=length(StdValue)) %>% 
-  filter(n>10)
+  filter(n>10) %>% 
+  ungroup()
 
-d468todrop<-d468sub %>% 
+d468todrop <- d468sub %>% 
   filter(DatasetID==468) %>% 
-  ungroup() %>% 
   select(species_matched, CleanTraitName, StdValue) %>%
   unique() %>% 
   mutate(drop=1)
  
-d468sub1<-cont_traits3 %>% 
+d468sub1 <- cont_traits3 %>% 
   filter(DatasetID==468) %>% 
   right_join(d468sub) %>% 
   group_by(DatasetID, family, genus, species_matched, CleanTraitName, StdValue) %>% 
   mutate(number=row_number()) %>% 
   filter(number< max(10, length(StdValue)*0.05)) %>% 
-  select(-n, -number)
+  select(-n, -number) %>% 
+  ungroup()
 
-d468<-cont_traits3 %>% 
+d468 <- cont_traits3 %>% 
   filter(DatasetID==468) %>% 
   left_join(d468todrop) %>% 
   filter(is.na(drop)) %>% 
   select(-drop) %>% 
   bind_rows(d468sub1)
 
-# Problem: there are multiple measurements of many traits for many individuals. Solution. Take the mean of all traits.
-d231<-cont_traits3 %>% 
+# Problem: there are multiple measurements of many traits for many individuals. 
+# Solution: Take the mean of all traits.
+d231 <- cont_traits3 %>% 
   filter(DatasetID==231) %>% 
   group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName) %>% 
-  summarize(StdValue=mean(StdValue))
+  summarize(StdValue=mean(StdValue)) %>% 
+  ungroup()
 
 
 # Dropping problem datasets and appending clean versions.
 cont_traits4 <- cont_traits3 %>%
-  filter(DatasetID!=453 & DatasetID!=415 & DatasetID!=25 & DatasetID!=226 & DatasetID!=359 & DatasetID!=102 & DatasetID!=353 & DatasetID!=327 & DatasetID!=1 & DatasetID!=412 & DatasetID!=201 & DatasetID!=96 & DatasetID!=339 & DatasetID!=355 & DatasetID!=45 & DatasetID!=87 & DatasetID!=299 & DatasetID!=477 & DatasetID!=520 & DatasetID!=655 & DatasetID!=486 & DatasetID!=231 & DatasetID!=468) %>%
+  filter(!(DatasetID %in% c(453, 415, 25, 359, 102, 226, 327, 353, 1, 412, 339, 201, 96, 355, 45, 87, 299, 477, 520, 655, 486, 468, 231))) %>%
   bind_rows(d339) %>% 
   mutate(remove=ifelse(DatasetID==428 & CleanTraitName=="plant_height_vegetative", 1, 
                 ifelse(DatasetID==428 & CleanTraitName=="root_P", 1, 
@@ -576,26 +607,25 @@ cont_traits4 <- cont_traits3 %>%
   filter(remove==0) %>%
   select(-remove) %>%
   bind_rows(d453) %>%
-  bind_rows(d428) %>% 
-  bind_rows(d415) %>% 
-  bind_rows(d25) %>% 
-  bind_rows(d226) %>% 
-  bind_rows(d353) %>% 
-  bind_rows(d1) %>% 
-  bind_rows(d201) %>% 
-  bind_rows(d96) %>% 
-  bind_rows(d355) %>% 
-  bind_rows(d45) %>% 
-  bind_rows(d87) %>% 
-  bind_rows(d299) %>%
-  bind_rows(d477) %>% 
-  bind_rows(d520) %>% 
-  bind_rows(d655) %>% 
+  bind_rows(d428) %>%
+  bind_rows(d415) %>%
+  bind_rows(d25) %>%
+  bind_rows(d226) %>%
+  bind_rows(d353) %>%
+  bind_rows(d1) %>%
   bind_rows(d412) %>%
-  bind_rows(d486) %>% 
-  bind_rows(d231) %>% 
-  bind_rows(d468) %>% 
-  ungroup()
+  bind_rows(d201) %>%
+  bind_rows(d96) %>%
+  bind_rows(d355) %>%
+  bind_rows(d45) %>%
+  bind_rows(d87) %>%
+  bind_rows(d299) %>%
+  bind_rows(d477) %>%
+  bind_rows(d520) %>%
+  bind_rows(d655) %>%
+  bind_rows(d486) %>%
+  bind_rows(d468) %>%
+  bind_rows(d231)
 
 # Making sure there is just one measurement per variable.  
 cont_traits5 <- cont_traits4 %>%
@@ -604,7 +634,7 @@ cont_traits5 <- cont_traits4 %>%
   summarise(n=sum(present)) %>% 
   ungroup()
 
-# Finding problem data (repeats).
+# Finding problem data (repeats)
 # Remaining data with repeats were determined to either be real data (see above) or below the threshold to investigate (<3 repeats).
 repeats <- cont_traits4 %>% 
   group_by(species_matched, CleanTraitName, StdValue) %>%
@@ -617,5 +647,5 @@ ttraits <- cont_traits4 %>%
   spread(CleanTraitName, StdValue, fill=NA)
   
 
-# write.csv(ttraits, "OriginalData\\Traits\\TRY\\TRY_trait_data_continuous_May2023.csv", row.names = F)
-# write.csv(cont_traits4, "OriginalData\\Traits\\TRY\\TRY_trait_data_continuous_long_May2023.csv", row.names = F)
+# write.csv(ttraits, "OriginalData\\Traits\\TRY\\TRY_trait_data_continuous_June2023.csv", row.names = F)
+# write.csv(cont_traits4, "OriginalData\\Traits\\TRY\\TRY_trait_data_continuous_long_June2023.csv", row.names = F)
