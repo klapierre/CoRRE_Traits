@@ -37,23 +37,23 @@ bienData <- BIEN_trait_species(species=sp.vector)
 
 # Subset to data that we want
 continuous <- bienData %>% 
-  filter(trait_name %in% c('leaf area', 'leaf area per dry mass', 'leaf carbon content per leaf dry mass', 
-                           'leaf carbon content per leaf nitrogen content', 'leaf dry mass', 'leaf dry mass per leaf fresh mass',
-                           'leaf life span', 'leaf nitrogen content per leaf area', 'leaf nitrogen content per leaf dry mass',
-                           'leaf phosphorus content per leaf area', 'leaf phosphorus content per leaf dry mass',
+  filter(trait_name %in% c('leaf area', 'leaf area per dry mass', 'leaf dry mass', 'leaf dry mass per leaf fresh mass', 'seed mass',
+                           'leaf nitrogen content per leaf dry mass',
+                           # 'leaf life span', 'leaf nitrogen content per leaf area', 'leaf phosphorus content per leaf area',
                            # 'leaf photosynthetic rate per leaf area', 'stem wood density', 'leaf stomatal conductance for H2O per leaf area',
-                           # 'leaf stomatal conductance per leaf area', 'leaf photosynthetic rate per leaf area',
-                           # 'leaf photosynthetic rate per leaf dry mass'
-                           'leaf thickness', 'seed length', 'seed mass')) %>% 
+                           # 'leaf stomatal conductance per leaf area', 'leaf photosynthetic rate per leaf area', 'leaf carbon content per leaf dry mass', 
+                           # 'leaf photosynthetic rate per leaf dry mass', 'leaf carbon content per leaf nitrogen content',
+                           # 'leaf phosphorus content per leaf dry mass', 'leaf thickness', 'seed length'
+                           )) %>% 
   mutate(trait_value=as.numeric(trait_value)) %>% 
   # Standardize units to fit TRY
   mutate(clean_trait_value=ifelse(trait_name=='leaf dry mass per leaf fresh mass', trait_value/1000, #LDMC (BIEN mg/g   TRY g/g)
                            ifelse(trait_name=='leaf area per leaf dry mass', trait_value*1000, #SLA (BIEN m2/kg   TRY mm2/g)
-                           ifelse(trait_name=='leaf carbon content per area', trait_value*1000, #leaf C per area (BIEN kg/m2  TRY g/m2)
-                           ifelse(trait_name=='leaf nitrogen content per area', trait_value*1000, #leaf N per area (BIEN kg/m2  TRY g/m2)
-                           ifelse(trait_name=='leaf phosphorous content per area', trait_value*1000, #leaf P per area (BIEN kg/m2  TRY g/m2)
+                           # ifelse(trait_name=='leaf carbon content per area', trait_value*1000, #leaf C per area (BIEN kg/m2  TRY g/m2)
+                           # ifelse(trait_name=='leaf nitrogen content per area', trait_value*1000, #leaf N per area (BIEN kg/m2  TRY g/m2)
+                           # ifelse(trait_name=='leaf phosphorous content per area', trait_value*1000, #leaf P per area (BIEN kg/m2  TRY g/m2)
                            ifelse(trait_name=='leaf dry mass', trait_value*1000, #leaf dry mass (BIEN g   TRY mg)
-                                  trait_value))))))) %>% 
+                                  trait_value)))) %>% 
   # Remove data that was not from a naturally growing plant
   filter(method!='laboratory/greenhouse/garden experiment',
          trait_value!=0) %>% 
