@@ -1,4 +1,9 @@
-###figuring out which families are trees####
+################################################################################
+##  DeterminingTrees.R: Figuring out which species are trees to remove from database.
+##
+##  Authors: Meghan Avolio
+################################################################################
+
 library(tidyverse)
 
 setwd("C://Users//mavolio2//Dropbox//CoRRE_Database//Data//CompiledData//Species_lists//")
