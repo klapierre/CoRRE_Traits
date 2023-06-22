@@ -87,14 +87,14 @@ for(i in 1:ncol(trait.info)){
   trait.info[,i] <- x
 }
 #write.table(back_trans_pars, "AllTraits/back_trans_pars.csv")
-write.table(back_trans_pars, "CleanedData\\Traits\\gap filled continuous traits\\20230608\\back_trans_pars.csv")
+write.table(back_trans_pars, "CleanedData\\Traits\\gap filled continuous traits\\20230620\\back_trans_pars.csv")
 
 
 
 
 ##### gap-filling #####
 #set-directory
-tmp.dir <- dirname("CleanedData\\Traits\\gap filled continuous traits\\20230608\\tmp")
+tmp.dir <- dirname("CleanedData\\Traits\\gap filled continuous traits\\20230620\\tmp")
 
 #set parameters
 smpl <- 911:1000
@@ -117,8 +117,8 @@ for(i in 1:repe) { #loop for each trait (column)
 mean.trait<-list()
 for(i in 1:repe) { #loop for each trait (column)
   print(i)
-  trt <- read.table(paste0("CleanedData\\Traits\\gap filled continuous traits\\20230608\\mean_gap_filled_",i,".txt"), row.names=NULL, header=T)
-  std <- read.table(paste0("CleanedData\\Traits\\gap filled continuous traits\\20230608\\std_gap_filled_",i,".txt"), row.names=NULL, header=T)
+  trt <- read.table(paste0("CleanedData\\Traits\\gap filled continuous traits\\20230620\\mean_gap_filled_",i,".txt"), row.names=NULL, header=T)
+  std <- read.table(paste0("CleanedData\\Traits\\gap filled continuous traits\\20230620\\std_gap_filled_",i,".txt"), row.names=NULL, header=T)
 
   #Return to NA those values with SD > 1:
   for(j in 1:ncol(trt)) {
@@ -140,7 +140,7 @@ mean.trait <- apply(mean.trait, c(1,2), mean, na.rm=T)
 mean.trait[is.nan(mean.trait)] <- NA
 
 #data for back transforming output
-back <- read.table("CleanedData\\Traits\\gap filled continuous traits\\20230608\\back_trans_pars.csv")
+back <- read.table("CleanedData\\Traits\\gap filled continuous traits\\20230620\\back_trans_pars.csv")
 
 
 # ##### replace missing values in the original table #####
@@ -204,7 +204,7 @@ for(i in 1:ncol(trait.info.noreplacement)){
 
 
 #save output
-write.csv(trait.info.noreplacement, "CleanedData\\Traits\\gap filled continuous traits\\20230608\\imputed_traits.csv", row.names=F)
+write.csv(trait.info.noreplacement, "CleanedData\\Traits\\gap filled continuous traits\\20230620\\imputed_traits.csv", row.names=F)
 
 
 
@@ -214,7 +214,7 @@ trait.info.mice <- complete(mice(trait.info.noreplacement, method="cart"))
 
 #save output:
 # write.csv(trait.info.original.mice, "CleanedData\\Traits\\gap filled continuous traits\\20230510\\imputed_traits_originalReplacement_mice.csv", row.names=F)
-write.csv(trait.info.mice, "CleanedData\\Traits\\gap filled continuous traits\\20230608\\imputed_traits_mice.csv", row.names=F)
+write.csv(trait.info.mice, "CleanedData\\Traits\\gap filled continuous traits\\20230620\\imputed_traits_mice.csv", row.names=F)
 
 #clean-up:
 # rm(list = ls())
