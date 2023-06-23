@@ -9,6 +9,7 @@
 # rm(list=ls()) clean up workspace
 #library(FD)
 library(PerformanceAnalytics)
+# library(ggforce)
 library(tidyverse)
 
 setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data') #Kim's
@@ -23,17 +24,178 @@ theme_update(axis.title.x=element_text(size=20, vjust=-0.35, margin=margin(t=15)
 
 
 #### Categorical trait data ####
-# NOTE: Categorical traits to include: growth_form, life_span, mycorrhizal_type, n_fixation, clonal, photosynthetic_pathway.
-# The rest were not complete (dispersal mode, pollinaton syndrome).
-
-catagoricalTraits <- read.csv("CleanedData\\Traits\\complete categorical traits\\sCoRRE categorical trait data_12142022.csv") %>%
-  dplyr::select(family, species_matched, growth_form, photosynthetic_pathway, lifespan,  clonal, mycorrhizal_type, n_fixation) %>%
+categoricalTraits <- read.csv("CleanedData\\Traits\\complete categorical traits\\sCoRRE categorical trait data_12142022.csv") %>%
+  dplyr::select(family, species_matched, leaf_type, leaf_compoundness, stem_support, growth_form, photosynthetic_pathway, lifespan,  clonal, mycorrhizal_type, n_fixation, rhizobial, actinorhizal) %>%
   mutate(photosynthetic_pathway = replace(photosynthetic_pathway, grep("possible", photosynthetic_pathway), NA)) %>%
   mutate(clonal = replace(clonal, clonal=="uncertain", NA)) %>%
   mutate(mycorrhizal_type = replace(mycorrhizal_type, mycorrhizal_type=="uncertain", NA)) %>%
   mutate(lifespan = replace(lifespan, lifespan=="uncertain", NA)) %>%
+  mutate(n_fixation_type=ifelse(rhizobial=='yes', 'rhizobial',
+                         ifelse(actinorhizal=='yes', 'actinorhizal', 'none'))) %>% 
   filter(lifespan != "moss") %>% 
-  select(-family)
+  select(-family, -n_fixation, -rhizobial, -actinorhizal)
+
+
+# #### Testing out stream graphs ####
+# categoricalTraitsGather <- categoricalTraits %>%
+#   # filter(clonal!='NA') %>%
+#   group_by(growth_form, leaf_type, leaf_compoundness) %>%
+#   summarise(value=length(species_matched)) %>%
+#   ungroup() %>%
+#   gather_set_data(c(1:3))
+# 
+# ggplot(categoricalTraitsGather, aes(x, id = id, split = y, value = value)) +
+#   geom_parallel_sets(aes(fill = growth_form), alpha = 0.3, axis.width = 0.1) +
+#   geom_parallel_sets_axes(axis.width = 0.1) +
+#   geom_parallel_sets_labels(colour = 'white')
+
+
+#### Pie Charts for each categorical trait ####
+# leaf type
+leafType <- categoricalTraits %>% 
+  group_by(leaf_type) %>%
+  count() %>% 
+  ungroup() %>% 
+  mutate(proportion = round((n/sum(n)), digits=3)) %>% 
+  arrange(proportion) %>%
+  mutate(labels=scales::percent(proportion))
+
+ggplot(leafType, aes(x="", y=proportion, fill=leaf_type)) +
+  geom_col() +
+  coord_polar(theta="y") +
+  scale_fill_manual(values=c('#7DCBBB', '#FFFFA4', '#B0AAD1', '#F7695F', '#6EA1C9', '#FBA550', '#A5DA56', '#AD68AF'))
+
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\leaf_type.png', width=8, height=8, units='in', dpi=300, bg='white')
+
+# leaf compoundness
+leafCompoundness <- categoricalTraits %>% 
+  group_by(leaf_compoundness) %>%
+  count() %>% 
+  ungroup() %>% 
+  mutate(proportion = round((n/sum(n)), digits=3)) %>% 
+  arrange(proportion) %>%
+  mutate(labels=scales::percent(proportion))
+
+ggplot(leafCompoundness, aes(x="", y=proportion, fill=leaf_compoundness)) +
+  geom_col() +
+  coord_polar(theta="y") +
+  scale_fill_manual(values=c('#7DCBBB', '#FFFFA4', '#B0AAD1', '#F7695F', '#6EA1C9', '#FBA550', '#A5DA56', '#AD68AF'))
+
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\leaf_compoundness.png', width=8, height=8, units='in', dpi=300, bg='white')
+
+# stem support
+stemSupport <- categoricalTraits %>% 
+  group_by(stem_support) %>%
+  count() %>% 
+  ungroup() %>% 
+  mutate(proportion = round((n/sum(n)), digits=3)) %>% 
+  arrange(proportion) %>%
+  mutate(labels=scales::percent(proportion))
+
+ggplot(stemSupport, aes(x="", y=proportion, fill=stem_support)) +
+  geom_col() +
+  coord_polar(theta="y") +
+  scale_fill_manual(values=c('#7DCBBB', '#FFFFA4', '#B0AAD1', '#F7695F', '#6EA1C9', '#FBA550', '#A5DA56', '#AD68AF'))
+
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\stem_support.png', width=8, height=8, units='in', dpi=300, bg='white')
+
+# growth form
+growthForm <- categoricalTraits %>% 
+  group_by(growth_form) %>%
+  count() %>% 
+  ungroup() %>% 
+  mutate(proportion = round((n/sum(n)), digits=3)) %>% 
+  arrange(proportion) %>%
+  mutate(labels=scales::percent(proportion))
+
+ggplot(growthForm, aes(x="", y=proportion, fill=growth_form)) +
+  geom_col() +
+  coord_polar(theta="y") +
+  scale_fill_manual(values=c('#7DCBBB', '#FFFFA4', '#B0AAD1', '#F7695F', '#6EA1C9', '#FBA550', '#A5DA56', '#AD68AF'))
+
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\growth_form.png', width=8, height=8, units='in', dpi=300, bg='white')
+
+# photosynthetic pathway
+photosyntheticPathway <- categoricalTraits %>% 
+  group_by(photosynthetic_pathway) %>%
+  count() %>% 
+  ungroup() %>% 
+  mutate(proportion = round((n/sum(n)), digits=3)) %>% 
+  arrange(proportion) %>%
+  mutate(labels=scales::percent(proportion))
+
+ggplot(photosyntheticPathway, aes(x="", y=proportion, fill=photosynthetic_pathway)) +
+  geom_col() +
+  coord_polar(theta="y") +
+  scale_fill_manual(values=c('#7DCBBB', '#FFFFA4', '#B0AAD1', '#F7695F', '#6EA1C9', '#FBA550', '#A5DA56', '#AD68AF'))
+
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\photosynthetic_pathway.png', width=8, height=8, units='in', dpi=300, bg='white')
+
+# lifespan
+lifespan <- categoricalTraits %>% 
+  group_by(lifespan) %>%
+  count() %>% 
+  ungroup() %>% 
+  mutate(proportion = round((n/sum(n)), digits=3)) %>% 
+  arrange(proportion) %>%
+  mutate(labels=scales::percent(proportion))
+
+ggplot(lifespan, aes(x="", y=proportion, fill=lifespan)) +
+  geom_col() +
+  coord_polar(theta="y") +
+  scale_fill_manual(values=c('#7DCBBB', '#FFFFA4', '#B0AAD1', '#F7695F', '#6EA1C9', '#FBA550', '#A5DA56', '#AD68AF'))
+
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\lifespan.png', width=8, height=8, units='in', dpi=300, bg='white')
+
+# clonal
+clonal <- categoricalTraits %>% 
+  group_by(clonal) %>%
+  count() %>% 
+  ungroup() %>% 
+  mutate(proportion = round((n/sum(n)), digits=3)) %>% 
+  arrange(proportion) %>%
+  mutate(labels=scales::percent(proportion))
+
+ggplot(clonal, aes(x="", y=proportion, fill=clonal)) +
+  geom_col() +
+  coord_polar(theta="y") +
+  scale_fill_manual(values=c('#7DCBBB', '#FFFFA4', '#B0AAD1', '#F7695F', '#6EA1C9', '#FBA550', '#A5DA56', '#AD68AF'))
+
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\clonal.png', width=8, height=8, units='in', dpi=300, bg='white')
+
+# mycorrhizal type
+mycorrhizalType <- categoricalTraits %>% 
+  group_by(mycorrhizal_type) %>%
+  count() %>% 
+  ungroup() %>% 
+  mutate(proportion = round((n/sum(n)), digits=3)) %>% 
+  arrange(proportion) %>%
+  mutate(labels=scales::percent(proportion))
+
+ggplot(mycorrhizalType, aes(x="", y=proportion, fill=mycorrhizal_type)) +
+  geom_col() +
+  coord_polar(theta="y") +
+  scale_fill_manual(values=c('#7DCBBB', '#FFFFA4', '#B0AAD1', '#F7695F', '#6EA1C9', '#FBA550', '#A5DA56', '#AD68AF'))
+
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\mycorrhizal_type.png', width=8, height=8, units='in', dpi=300, bg='white')
+
+# n fixation type
+nFixationType <- categoricalTraits %>% 
+  group_by(n_fixation_type) %>%
+  count() %>% 
+  ungroup() %>% 
+  mutate(proportion = round((n/sum(n)), digits=3)) %>% 
+  arrange(proportion) %>%
+  mutate(labels=scales::percent(proportion))
+
+ggplot(nFixationType, aes(x="", y=proportion, fill=n_fixation_type)) +
+  geom_col() +
+  coord_polar(theta="y") +
+  scale_fill_manual(values=c('#7DCBBB', '#FFFFA4', '#B0AAD1', '#F7695F', '#6EA1C9', '#FBA550', '#A5DA56', '#AD68AF'))
+
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\n_fixation_type.png', width=8, height=8, units='in', dpi=300, bg='white')
+
+
 
 
 #### Continuous traits ####
@@ -302,7 +464,7 @@ sppNames <- rbind(correSpecies, GExSpecies) %>%
   filter(drop==0) %>% 
   select(-drop)
 
-longCategorical <- catagoricalTraits %>%
+longCategorical <- categoricalTraits %>%
   pivot_longer(growth_form:n_fixation, names_to="trait", values_to="trait_value") %>% 
   mutate(error_risk_overall=NA,
          error_risk_family=NA,
