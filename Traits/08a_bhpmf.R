@@ -90,8 +90,6 @@ for(i in 1:ncol(trait.info)){
 write.table(back_trans_pars, "CleanedData\\Traits\\gap filled continuous traits\\20230623_final\\back_trans_pars.csv")
 
 
-
-
 ##### gap-filling #####
 #set-directory
 tmp.dir <- dirname("CleanedData\\Traits\\gap filled continuous traits\\20230623_final\\tmp")
