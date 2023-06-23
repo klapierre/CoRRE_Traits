@@ -65,7 +65,7 @@ ggplot(leafType, aes(x="", y=proportion, fill=leaf_type)) +
   coord_polar(theta="y") +
   scale_fill_manual(values=c('#7DCBBB', '#FFFFA4', '#B0AAD1', '#F7695F', '#6EA1C9', '#FBA550', '#A5DA56', '#AD68AF'))
 
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\leaf_type.png', width=8, height=8, units='in', dpi=300, bg='white')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\4_leaf_type.png', width=8, height=8, units='in', dpi=300, bg='white')
 
 # leaf compoundness
 leafCompoundness <- categoricalTraits %>% 
@@ -81,7 +81,7 @@ ggplot(leafCompoundness, aes(x="", y=proportion, fill=leaf_compoundness)) +
   coord_polar(theta="y") +
   scale_fill_manual(values=c('#7DCBBB', '#FFFFA4', '#B0AAD1', '#F7695F', '#6EA1C9', '#FBA550', '#A5DA56', '#AD68AF'))
 
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\leaf_compoundness.png', width=8, height=8, units='in', dpi=300, bg='white')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\5_leaf_compoundness.png', width=8, height=8, units='in', dpi=300, bg='white')
 
 # stem support
 stemSupport <- categoricalTraits %>% 
@@ -97,7 +97,7 @@ ggplot(stemSupport, aes(x="", y=proportion, fill=stem_support)) +
   coord_polar(theta="y") +
   scale_fill_manual(values=c('#7DCBBB', '#FFFFA4', '#B0AAD1', '#F7695F', '#6EA1C9', '#FBA550', '#A5DA56', '#AD68AF'))
 
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\stem_support.png', width=8, height=8, units='in', dpi=300, bg='white')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\6_stem_support.png', width=8, height=8, units='in', dpi=300, bg='white')
 
 # growth form
 growthForm <- categoricalTraits %>% 
@@ -113,7 +113,7 @@ ggplot(growthForm, aes(x="", y=proportion, fill=growth_form)) +
   coord_polar(theta="y") +
   scale_fill_manual(values=c('#7DCBBB', '#FFFFA4', '#B0AAD1', '#F7695F', '#6EA1C9', '#FBA550', '#A5DA56', '#AD68AF'))
 
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\growth_form.png', width=8, height=8, units='in', dpi=300, bg='white')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\1_growth_form.png', width=8, height=8, units='in', dpi=300, bg='white')
 
 # photosynthetic pathway
 photosyntheticPathway <- categoricalTraits %>% 
@@ -129,7 +129,7 @@ ggplot(photosyntheticPathway, aes(x="", y=proportion, fill=photosynthetic_pathwa
   coord_polar(theta="y") +
   scale_fill_manual(values=c('#7DCBBB', '#FFFFA4', '#B0AAD1', '#F7695F', '#6EA1C9', '#FBA550', '#A5DA56', '#AD68AF'))
 
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\photosynthetic_pathway.png', width=8, height=8, units='in', dpi=300, bg='white')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\7_photosynthetic_pathway.png', width=8, height=8, units='in', dpi=300, bg='white')
 
 # lifespan
 lifespan <- categoricalTraits %>% 
@@ -145,7 +145,7 @@ ggplot(lifespan, aes(x="", y=proportion, fill=lifespan)) +
   coord_polar(theta="y") +
   scale_fill_manual(values=c('#7DCBBB', '#FFFFA4', '#B0AAD1', '#F7695F', '#6EA1C9', '#FBA550', '#A5DA56', '#AD68AF'))
 
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\lifespan.png', width=8, height=8, units='in', dpi=300, bg='white')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\2_lifespan.png', width=8, height=8, units='in', dpi=300, bg='white')
 
 # clonal
 clonal <- categoricalTraits %>% 
@@ -161,7 +161,7 @@ ggplot(clonal, aes(x="", y=proportion, fill=clonal)) +
   coord_polar(theta="y") +
   scale_fill_manual(values=c('#7DCBBB', '#FFFFA4', '#B0AAD1', '#F7695F', '#6EA1C9', '#FBA550', '#A5DA56', '#AD68AF'))
 
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\clonal.png', width=8, height=8, units='in', dpi=300, bg='white')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\3_clonal.png', width=8, height=8, units='in', dpi=300, bg='white')
 
 # mycorrhizal type
 mycorrhizalType <- categoricalTraits %>% 
@@ -177,7 +177,7 @@ ggplot(mycorrhizalType, aes(x="", y=proportion, fill=mycorrhizal_type)) +
   coord_polar(theta="y") +
   scale_fill_manual(values=c('#7DCBBB', '#FFFFA4', '#B0AAD1', '#F7695F', '#6EA1C9', '#FBA550', '#A5DA56', '#AD68AF'))
 
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\mycorrhizal_type.png', width=8, height=8, units='in', dpi=300, bg='white')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\8_mycorrhizal_type.png', width=8, height=8, units='in', dpi=300, bg='white')
 
 # n fixation type
 nFixationType <- categoricalTraits %>% 
@@ -193,7 +193,7 @@ ggplot(nFixationType, aes(x="", y=proportion, fill=n_fixation_type)) +
   coord_polar(theta="y") +
   scale_fill_manual(values=c('#7DCBBB', '#FFFFA4', '#B0AAD1', '#F7695F', '#6EA1C9', '#FBA550', '#A5DA56', '#AD68AF'))
 
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\n_fixation_type.png', width=8, height=8, units='in', dpi=300, bg='white')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\9_n_fixation_type.png', width=8, height=8, units='in', dpi=300, bg='white')
 
 
 
