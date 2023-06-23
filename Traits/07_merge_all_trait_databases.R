@@ -83,7 +83,6 @@ growthForm <- read.csv("CleanedData\\Traits\\complete categorical traits\\sCoRRE
 # Bind all together
 allTraits <- rbind(TRY, AusTraits, BIEN, TiP, CPTD2) %>% 
   left_join(growthForm) %>% 
-  filter(!(growth_form %in% c('fern', 'lycophyte'))) %>% 
   select(DatabaseID, DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue)
 
 allTraits_wide <- allTraits %>% 
@@ -177,23 +176,23 @@ test <- allTraits %>%
   group_by(species_matched, CleanTraitName, StdValue, DatabaseID) %>% 
   summarize(n=length(StdValue)) %>% 
   ungroup() %>% 
-  filter(n>9)
+  filter(n>1)
 
 sum(test[,'n'])
 
-## all databases have repeats - 117,940 across all data
+## all databases have repeats - 118,597 across all data
 ## 12,769 are the same values repeated 10 or more times and were designated as keepers from cleaning code
 
 sppLength <- talltraits %>% 
   select(species_matched) %>% 
   unique()
-# 3193 species
+# 3220 species
 
-multiTraitInd <- allTraits_sub %>% 
+multiTraitInd <- allTraits %>% 
   group_by(DatabaseID, DatasetID, ObservationID, species_matched) %>% 
   summarise(num_traits=length(CleanTraitName)) %>% 
   ungroup() # %>%
-  # filter(num_traits>8)
+  # filter(num_traits>1)
 # 253,224 individuals measured (some have more than 1 trait measured on the same individual)
 # 68,649 individuals have more than 1 trait measured on the same individual
 
@@ -205,7 +204,7 @@ ggplot(data=multiTraitInd, aes(x=num_traits)) +
 # ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 2_traits per individual histogram_20230623.png', width=8, height=8, units='in', dpi=300, bg='white')
 
 # Which families have very little observed data going into the gap filling methods?
-traitMeasured <- allTraits_sub %>% 
+traitMeasured <- allTraits %>% 
   mutate(present=1) %>% 
   group_by(DatabaseID, DatasetID, ObservationID, family, genus, species_matched) %>%
   pivot_wider(names_from=CleanTraitName, names_prefix="X", values_from=present, values_fill=0) %>% 
