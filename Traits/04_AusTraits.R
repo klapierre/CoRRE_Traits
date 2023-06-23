@@ -6,6 +6,7 @@
 
 #kim's
 setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data\\')
+
 #meghan's
 setwd('C:\\Users\\mavolio2\\Dropbox\\CoRRE_database\\Data\\OriginalData\\Traits')
 
@@ -23,38 +24,39 @@ traits <- summarise_austraits(austraits, "trait_name")
 
 #doesn't have seed number, stem specific density, rooting depth
 data <- extract_trait(austraits, c('leaf_area',
-                                   'leaf_C_per_dry_mass', 
-                                   'leaf_CN_ratio',
-                                   'leaf_dark_respiration_per_dry_mass',
-                                   'leaf_density',
+                                   # 'leaf_C_per_dry_mass', 
+                                   # 'leaf_CN_ratio',
+                                   # 'leaf_dark_respiration_per_dry_mass',
+                                   # 'leaf_density',
                                    'leaf_dry_mass', 
                                    'leaf_dry_matter_content', 
-                                   'leaf_K_per_area',
-                                   'leaf_K_per_dry_mass',
-                                   'leaf_lifespan',
+                                   # 'leaf_K_per_area',
+                                   # 'leaf_K_per_dry_mass',
+                                   # 'leaf_lifespan',
                                    'leaf_mass_per_area', #need to inverse this
-                                   'leaf_N_per_dry_mass', 'leaf_N_per_area',
-                                   'leaf_NP_ratio',
-                                   'leaf_P_per_dry_mass', 'leaf_P_per_area',
-                                   'leaf_photosynthesis_Jmax_per_area',
-                                   'leaf_photosynthesis_Jmax_per_mass',
-                                   'leaf_photosynthesis_Vcmax_per_area',
-                                   'leaf_photosynthesis_Vcmax_per_mass',
-                                   'leaf_stomatal_conductance_per_area_ambient',
-                                   'leaf_thickness',
-                                   'leaf_transpiration',
-                                   'leaf_water_content_per_dry_mass',
-                                   'leaf_water_content_per_saturated_mass',
-                                   'leaf_width',
+                                   'leaf_N_per_dry_mass', 
+                                   # 'leaf_N_per_area',
+                                   # 'leaf_NP_ratio',
+                                   # 'leaf_P_per_dry_mass', 'leaf_P_per_area',
+                                   # 'leaf_photosynthesis_Jmax_per_area',
+                                   # 'leaf_photosynthesis_Jmax_per_mass',
+                                   # 'leaf_photosynthesis_Vcmax_per_area',
+                                   # 'leaf_photosynthesis_Vcmax_per_mass',
+                                   # 'leaf_stomatal_conductance_per_area_ambient',
+                                   # 'leaf_thickness',
+                                   # 'leaf_transpiration',
+                                   # 'leaf_water_content_per_dry_mass',
+                                   # 'leaf_water_content_per_saturated_mass',
+                                   # 'leaf_width',
                                    'plant_height', 
-                                   'root_C_per_dry_mass',
-                                   'root_diameter',
-                                   'root_N_per_dry_mass',
-                                   'root_P_per_dry_mass',
-                                   'root_shoot_ratio',
+                                   # 'root_C_per_dry_mass',
+                                   # 'root_diameter',
+                                   # 'root_N_per_dry_mass',
+                                   # 'root_P_per_dry_mass',
+                                   # 'root_shoot_ratio',
                                    'root_specific_root_length', 
-                                   'seed_dry_mass',
-                                   'seed_length'
+                                   'seed_dry_mass'
+                                   # 'seed_length',
                                    #, 'leaf_water_content_per_area', 'leaf_water_content_per_fresh_mass', 'leaf_water_content_per_saturated_mass'
                                    ))
 
@@ -106,32 +108,32 @@ traitDataCoRRE <- traitData %>%
 
 
 traitDataCoRRE$CleanTraitName <- recode(traitDataCoRRE$trait_name, 
-                                        'leaf_C_per_dry_mass'='leaf_C', 
-                                        'leaf_CN_ratio'='leaf_C:N',
-                                        'leaf_dark_respiration_per_dry_mass'='dark_resp_rate',
+                                        # 'leaf_C_per_dry_mass'='leaf_C', 
+                                        # 'leaf_CN_ratio'='leaf_C:N',
+                                        # 'leaf_dark_respiration_per_dry_mass'='dark_resp_rate',
                                         'leaf_dry_matter_content'='LDMC', 
-                                        'leaf_K_per_area'='52',
-                                        'leaf_K_per_dry_mass'='leaf_K',
-                                        'leaf_lifespan'='leaf_longevity',
+                                        # 'leaf_K_per_area'='52',
+                                        # 'leaf_K_per_dry_mass'='leaf_K',
+                                        # 'leaf_lifespan'='leaf_longevity',
                                         'specific_leaf_area'='SLA', 
                                         'leaf_N_per_dry_mass'='leaf_N', 
-                                        'leaf_N_per_area'='50',
-                                        'leaf_NP_ratio'='leaf_N:P',
-                                        'leaf_P_per_dry_mass'='leaf_P', 
-                                        'leaf_P_per_area'='51',
-                                        'leaf_photosynthesis_Jmax_per_area'='J_max',
-                                        'leaf_photosynthesis_Jmax_per_mass'='270',
-                                        'leaf_photosynthesis_Vcmax_per_area'='Vc_max',
-                                        'leaf_photosynthesis_Vcmax_per_mass'='185',
-                                        'leaf_stomatal_conductance_per_area_ambient'='stomatal_conductance',
-                                        'leaf_transpiration'='leaf_transp_rate',
-                                        'leaf_water_content_per_dry_mass'='water_content',
-                                        'leaf_water_content_per_saturated_mass'='3122',
+                                        # 'leaf_N_per_area'='50',
+                                        # 'leaf_NP_ratio'='leaf_N:P',
+                                        # 'leaf_P_per_dry_mass'='leaf_P', 
+                                        # 'leaf_P_per_area'='51',
+                                        # 'leaf_photosynthesis_Jmax_per_area'='J_max',
+                                        # 'leaf_photosynthesis_Jmax_per_mass'='270',
+                                        # 'leaf_photosynthesis_Vcmax_per_area'='Vc_max',
+                                        # 'leaf_photosynthesis_Vcmax_per_mass'='185',
+                                        # 'leaf_stomatal_conductance_per_area_ambient'='stomatal_conductance',
+                                        # 'leaf_transpiration'='leaf_transp_rate',
+                                        # 'leaf_water_content_per_dry_mass'='water_content',
+                                        # 'leaf_water_content_per_saturated_mass'='3122',
                                         'plant_height'='plant_height_vegetative', 
-                                        'root_C_per_dry_mass'='root_C',
-                                        'root_N_per_dry_mass'='root_N',
-                                        'root_P_per_dry_mass'='root_P',
-                                        'root_shoot_ratio'='root:shoot',
+                                        # 'root_C_per_dry_mass'='root_C',
+                                        # 'root_N_per_dry_mass'='root_N',
+                                        # 'root_P_per_dry_mass'='root_P',
+                                        # 'root_shoot_ratio'='root:shoot',
                                         'root_specific_root_length'='SRL')
 
 
@@ -139,4 +141,4 @@ spp <- traitDataCoRRE %>%
   select(species_matched) %>%
   unique()
 
-# write.csv(traitDataCoRRE, 'OriginalData\\Traits\\AusTraits_2022\\AusTraits_CoRRE_May2023.csv')
+# write.csv(traitDataCoRRE, 'OriginalData\\Traits\\AusTraits_2022\\AusTraits_CoRRE_June2023.csv')

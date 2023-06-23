@@ -62,7 +62,8 @@ photo <- read.csv("OriginalData\\Traits\\ChinaPlant2\\Photosynthetic traits.csv"
 traits <- rbind(chem, photo) %>% 
   mutate(DatabaseID='CPTD2') %>% 
   rename(DatasetID=Site.ID,
-         ObservationID=SAMPLE.ID)
+         ObservationID=SAMPLE.ID) %>% 
+  filter(CleanTraitName %in% c('LDMC', 'leaf_area', 'leaf_N', 'SLA'))
 
 
-# write.csv(traits, 'OriginalData\\Traits\\ChinaPlant2\\CPTD2_May2023.csv', row.names=F)
+# write.csv(traits, 'OriginalData\\Traits\\ChinaPlant2\\CPTD2_June2023.csv', row.names=F)
