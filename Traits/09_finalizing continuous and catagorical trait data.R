@@ -209,7 +209,7 @@ mossKey <- read.csv("CleanedData\\Traits\\complete categorical traits\\sCoRRE ca
 
 # Read in imputed trait data and bind on species information
 ## this is trait data without replacement (all imputed)
-imputedRaw <- read.csv("CleanedData\\Traits\\gap filled continuous traits\\20230608\\imputed_traits_mice.csv") %>%
+imputedRaw <- read.csv("CleanedData\\Traits\\gap filled continuous traits\\20230623_final\\imputed_traits_mice.csv") %>%
   bind_cols(read.csv('OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_June2023.csv')[,c('DatabaseID', 'DatasetID', 'ObservationID', 'family', 'genus', 'species_matched')]) %>%   
   left_join(mossKey) %>% 
   filter(moss!="moss") %>%
@@ -316,7 +316,7 @@ meanSDSpecies <- allContinuous %>%
   summarize(across('imputed_value', .fns=list(species_mean=mean, species_sd=sd, species_length=length))) %>% 
   ungroup()
 
-
+##### START HERE: check if the code to make the plot header categories is working across this and the pivot step below
 cleanContinuous <- allContinuous %>% 
   #calculate z-scores (error risk) for continuous traits 
   left_join(meanSD) %>% 
@@ -324,22 +324,32 @@ cleanContinuous <- allContinuous %>%
   mutate(error_risk_overall=(imputed_value-imputed_value_mean)/imputed_value_sd) %>% 
   mutate(error_risk_species=(imputed_value-imputed_value_species_mean)/imputed_value_species_sd) %>% 
   filter(error_risk_overall<4) %>%  #drops 4369 observations (0.5% of data)
-  filter(error_risk_species<4 & error_risk_species>(-4)) #drops an additional 7626 observations (0.9% of data), all of which were from species with at least 20 observations for the given trait value being dropped
-
+  filter(error_risk_species<4 & error_risk_species>(-4)) %>% #drops an additional 7626 observations (0.9% of data), all of which were from species with at least 20 observations for the given trait value being dropped 
+  mutate(trait2=ifelse(trait=='leaf_area', 'Leaf Area (leaf, +petiole)',
+                         ifelse(trait=='SLA', 'Specific Leaf Area (+petiole)', 
+                         ifelse(trait=='SRL', 'Specific Root Length (all root)',
+                         ifelse(trait=='leaf_N', 'Leaf N Content',
+                         ifelse(trait=='plant_height_vegetative', 'Plant Vegetative Height',
+                         ifelse(trait=='seed_dry_mass', 'Seed Dry Mass',
+                         ifelse(trait=='leaf_dry_mass', 'Leaf Dry Mass',
+                         ifelse(trait=='LDMC', 'Leaf Dry Matter Content',
+                                trait)))))))))
 
 cleanContinousWide <- cleanContinuous %>% 
   pivot_longer(cols=c('original_value', 'imputed_value'), names_to='data_type', values_to='trait_value') %>% 
   mutate(data_type2=ifelse(data_type=='original_value', DatabaseID, data_type)) %>% 
   na.omit()
 
+cleanContinousWide$trait2 = factor(cleanContinousWide$trait2, levels=c('Leaf Area (leaf, +petiole)', 'Leaf Dry Mass', 'Leaf Dry Matter Content', 'Specific Leaf Area (+petiole)', 'Leaf N Content', 'Plant Vegetative Height', 'Specific Root Length (all root)', 'Seed Dry Mass'))
+
 # Look at boxplots for each trait
 ggplot(data=cleanContinousWide, aes(x=as.factor(data_type2), y=trait_value)) +
   # geom_jitter(aes(color=data_type)) +
   geom_boxplot(aes(color=data_type2)) +
-  facet_wrap(~trait, scales='free_y') +
+  facet_wrap(~trait2, scales='free_y', ncol=3, labeller=label_wrap_gen(width=25)) +
   scale_x_discrete(breaks=c("AusTraits", "BIEN", "CPTD2", "TIPleaf", "TRY", "imputed_value"),
                    limits=c("AusTraits", "BIEN", "CPTD2", "TIPleaf", "TRY", "imputed_value"),
-                   labels=c("A", "B", "C", "TIP", "TRY", "imp.")) +
+                   labels=c("Au", "BN", "C2", "TP", "TRY", "imp.")) +
   scale_color_manual(values=c('#4E3686', '#5DA4D9', '#80D87F', 'darkgrey', '#FED23F', '#EE724C')) +
   theme_bw() +
   theme(panel.grid.major=element_blank(),
@@ -347,36 +357,39 @@ ggplot(data=cleanContinousWide, aes(x=as.factor(data_type2), y=trait_value)) +
         legend.position='top') +
   xlab('Data Type') + ylab('Trait Value')  +
   scale_y_continuous(trans='log10')
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 4_boxplots of original and imputed_20230608.png', width=8, height=8, units='in', dpi=300, bg='white')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 4_boxplots of original and imputed_20230608.png', width=14, height=15, units='in', dpi=300, bg='white')
 
 # Look at boxplots for each trait
 ggplot(data=subset(cleanContinousWide, species_matched %in% c('Helianthus maximiliani', 'Potentilla anserina', 'Clintonia borealis')), aes(x=species_matched, y=trait_value)) +
   geom_boxplot(aes(color=data_type)) +
-  facet_wrap(~trait, scales='free')
+  facet_wrap(~trait2, scales='free')
 
 ggplot(data=subset(cleanContinousWide, species_matched=='Andropogon gerardii'), aes(x=data_type, y=trait_value)) +
   geom_boxplot() +
-  facet_wrap(~trait, scales='free')
+  facet_wrap(~trait2, scales='free')
 
 
 # Look at boxplots for each trait
 ggplot(data=subset(cleanContinuousFamilyRisk, family %in% c('Asteraceae', 'Frankeniaceae', 'Cactaceae', 'Malpighiaceae', 'Liliaceae')), aes(x=family, y=imputed_value)) +
   geom_boxplot() +
-  facet_wrap(~trait, scales='free') +
+  facet_wrap(~trait2, scales='free') +
   scale_x_discrete(breaks=c("Asteraceae", "Frankeniaceae", "Cactaceae", "Malpighiaceae", "Liliaceae"),
                    limits=c("Asteraceae", "Frankeniaceae", "Cactaceae", "Malpighiaceae", "Liliaceae"),
                    labels=c("A", "F", "C", "M", "L")) 
 
 
 
+cleanContinuous$trait2 = factor(cleanContinuous$trait2, levels=c('Leaf Area (leaf, +petiole)', 'Leaf Dry Mass', 'Leaf Dry Matter Content', 'Specific Leaf Area (+petiole)', 'Leaf N Content', 'Plant Vegetative Height', 'Specific Root Length (all root)', 'Seed Dry Mass'))
+
+
 # Compare cleaned imputed and original data
 ggplot(data=na.omit(cleanContinuous), aes(x=original_value, y=imputed_value)) +
   geom_point() +
   geom_abline(slope=1) +
-  facet_wrap(~trait, scales='free') +
+  facet_wrap(~trait2, scales='free', ncol=3, labeller=label_wrap_gen(width=25)) +
   xlab('Original Value') + ylab('Imputed Value') +
   theme(strip.text.x = element_text(size = 12)) 
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 3_original v imputed_20230608.png', width=12, height=12, units='in', dpi=300, bg='white')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 5_original v imputed_20230608.png', width=12, height=12, units='in', dpi=300, bg='white')
 
 
 # look up some values for species that we know and make sure they are right
