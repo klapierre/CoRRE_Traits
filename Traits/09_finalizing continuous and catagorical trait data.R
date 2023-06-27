@@ -363,7 +363,6 @@ cleanContinuousNRMSE <- cleanContinuous %>%
 #### Boxplots for each trait ####
 cleanContinousWide$trait2 = factor(cleanContinousWide$trait2, levels=c('Leaf Area (leaf, +petiole)', 'Leaf Dry Mass', 'Leaf Dry Matter Content', 'Specific Leaf Area (+petiole)', 'Leaf N Content', 'Plant Vegetative Height', 'Specific Root Length (all root)', 'Seed Dry Mass'))
 
-
 ggplot(data=cleanContinousWide, aes(x=as.factor(data_type2), y=trait_value)) +
   geom_jitter(aes(color=data_type2)) +
   geom_boxplot(color='black', alpha=0) +
@@ -622,6 +621,10 @@ ggplot(data=na.omit(meanCleanContinuousErrorRisk), aes(x=original_value_mean, y=
 
 meanCleanContinuousWide <- meanCleanContinuousErrorRisk %>% 
   pivot_longer(cols=c('original_value_mean', 'trait_value'))
+
+sppnum <- meanCleanContinuousWide %>% 
+  select(species_matched, family) %>% 
+  unique()
 
 ggplot(data=na.omit(meanCleanContinuousWide), aes(x=name, y=value)) +
   geom_boxplot() +
