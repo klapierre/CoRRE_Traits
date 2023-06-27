@@ -4,6 +4,8 @@
 ##  Authors: Kimberly Komatsu, Meghan Avolio
 ################################################################################
 
+
+library(scales)
 library(tidyverse)
 library(ggbreak) 
 
@@ -134,15 +136,19 @@ ggplot(data=label, aes(x=DatabaseID, y=length, label=round(percent,1), fill=Data
   geom_bar(stat='identity', position=position_dodge()) +
   geom_hline(yintercept=253224*.2) + # 20% of observations missing any given trait
   geom_hline(yintercept=253224*.1, color='red') + # 10% of observations missing any given trait
-  geom_text(vjust = -0.25, size=5) +
+  geom_text(vjust = -0.25, size=6) +
   facet_wrap(~CleanTraitName2, ncol=5, labeller=label_wrap_gen(width=25)) +
+  scale_y_continuous(labels = label_comma()) +
   scale_x_discrete(breaks=c("AusTraits", "BIEN", "CPTD2", "TIPleaf", "TRY", "total"),
                    limits=c("AusTraits", "BIEN", "CPTD2", "TIPleaf", "TRY", "total"),
-                   labels=c("Au", "BN", "C2", "TP", "TRY", 'all')) +
-  scale_fill_manual(values=c('#4E3686', '#5DA4D9', '#80D87F', '#FED23F','darkgrey', '#EE724C')) +
-  theme(legend.position='none', strip.text.x = element_text(size = 15)) +
+                   labels=c("Au", "BN", "C2", "TP", "TY", 'all')) +
+  scale_fill_manual(values=c('#4E3686', '#5DA4D9', '#80D87F', '#FED23F','darkgrey', '#EE724C'))+
+  theme(strip.text.x = element_text(size = 18),
+        axis.title.x=element_text(size=24, vjust=-0.35, margin=margin(t=15)), axis.text.x=element_text(size=22),
+        axis.title.y=element_text(size=24, angle=90, vjust=0.5, margin=margin(r=15)), axis.text.y=element_text(size=22),
+        legend.position='none') +
   ylab('Number of Observations') + xlab('Database ID')
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 3_input percent complete_20230623.png', width=14, height=15, units='in', dpi=300, bg='white')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 3_input percent complete_20230623.png', width=17, height=19, units='in', dpi=300, bg='white')
 
 # Are there any outlier datasets for each trait?
 ggplot(data=allTraits, aes(x=DatabaseID, y=StdValue)) +
@@ -151,7 +157,7 @@ ggplot(data=allTraits, aes(x=DatabaseID, y=StdValue)) +
   geom_boxplot(color='black', alpha=0) +
   facet_wrap(~CleanTraitName, scales='free_y', ncol=4) +
   scale_x_discrete(breaks=c("AusTraits", "BIEN", "CPTD2", "TIPleaf", "TRY"),
-                   labels=c("A", "B", "C", "TIP", "TRY")) +
+                   labels=c("A", "B", "C", "TIP", "TY")) +
   scale_color_manual(values=c('#4E3686', '#5DA4D9', '#80D87F', '#FED23F', '#EE724C')) +
   theme_bw() +
   theme(panel.grid.major=element_blank(),
