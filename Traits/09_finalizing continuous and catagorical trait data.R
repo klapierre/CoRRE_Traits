@@ -341,9 +341,29 @@ cleanContinousWide <- cleanContinuous %>%
   mutate(data_type2=ifelse(data_type=='original_value', DatabaseID, data_type)) %>% 
   na.omit()
 
+
+#### Root mean square error ####
+cleanContinuousNRMSEtrait <- cleanContinuous %>% 
+  select(trait, original_value, imputed_value) %>% 
+  na.omit() %>% 
+  mutate(sq_diff=(imputed_value-original_value)^2) %>% 
+  group_by(trait) %>% 
+  summarise(sum=sum(sq_diff), n=length(trait), min=min(original_value), max=max(original_value), mean=mean(original_value)) %>% 
+  ungroup() %>% 
+  mutate(NRMSE=sqrt(sum/n)/mean)
+
+cleanContinuousNRMSE <- cleanContinuous %>% 
+  select(original_value, imputed_value) %>% 
+  na.omit() %>% 
+  mutate(sq_diff=(imputed_value-original_value)^2) %>% 
+  summarise(sum=sum(sq_diff), n=length(sq_diff), min=min(original_value), max=max(original_value), mean=mean(original_value)) %>% 
+  mutate(NRMSE=sqrt(sum/n)/(mean))
+
+
+#### Boxplots for each trait ####
 cleanContinousWide$trait2 = factor(cleanContinousWide$trait2, levels=c('Leaf Area (leaf, +petiole)', 'Leaf Dry Mass', 'Leaf Dry Matter Content', 'Specific Leaf Area (+petiole)', 'Leaf N Content', 'Plant Vegetative Height', 'Specific Root Length (all root)', 'Seed Dry Mass'))
 
-# Look at boxplots for each trait
+
 ggplot(data=cleanContinousWide, aes(x=as.factor(data_type2), y=trait_value)) +
   geom_jitter(aes(color=data_type2)) +
   geom_boxplot(color='black', alpha=0) +
@@ -362,7 +382,6 @@ ggplot(data=cleanContinousWide, aes(x=as.factor(data_type2), y=trait_value)) +
   xlab('Data Type') + ylab('Trait Value')  +
   scale_y_continuous(trans='log10', labels=label_comma())
 # ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 4_boxplots of original and imputed_20230623_jitter.png', width=14, height=15, units='in', dpi=300, bg='white')
-
 
 
 #Look at boxplots for each trait -- means by species
@@ -636,7 +655,7 @@ sppNames <- rbind(correSpecies, GExSpecies) %>%
   select(-drop)
 
 longCategorical <- categoricalTraits %>%
-  pivot_longer(growth_form:n_fixation, names_to="trait", values_to="trait_value") %>% 
+  pivot_longer(leaf_type:n_fixation_type, names_to="trait", values_to="trait_value") %>% 
   mutate(error_risk_overall=NA,
          error_risk_family=NA,
          error_risk_genus=NA) %>% 
