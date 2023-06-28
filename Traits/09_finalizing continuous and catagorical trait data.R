@@ -645,38 +645,38 @@ correSpecies <- read.csv("CompiledData\\Species_lists\\FullList_Nov2021.csv") %>
   select(family, species_matched) %>% 
   unique()
 
-# Import GEx species names
-GExSpecies <- read.csv('OriginalData\\Traits\\GEx_species_tree_complete.csv') %>% 
-  select(family, species_matched) %>% 
-  unique()
-
-sppNames <- rbind(correSpecies, GExSpecies) %>% 
-  unique() %>% 
-  mutate(drop=ifelse(species_matched=='Dianella longifolia'&family=='Xanthorrhoeaceae', 1, 
-                     ifelse(species_matched=='Lancea tibetica'&family=='Phrymaceae', 1, 0))) %>% 
-  filter(drop==0) %>% 
-  select(-drop)
+# # Import GEx species names
+# GExSpecies <- read.csv('OriginalData\\Traits\\GEx_species_tree_complete.csv') %>% 
+#   select(family, species_matched) %>% 
+#   unique()
+# 
+# sppNames <- rbind(correSpecies, GExSpecies) %>% 
+#   unique() %>% 
+#   mutate(drop=ifelse(species_matched=='Dianella longifolia'&family=='Xanthorrhoeaceae', 1, 
+#                      ifelse(species_matched=='Lancea tibetica'&family=='Phrymaceae', 1, 0))) %>% 
+#   filter(drop==0) %>% 
+#   select(-drop)
 
 longCategorical <- categoricalTraits %>%
   pivot_longer(leaf_type:n_fixation_type, names_to="trait", values_to="trait_value") %>% 
   mutate(error_risk_overall=NA,
          error_risk_family=NA,
          error_risk_genus=NA) %>% 
-  left_join(sppNames)
+  left_join(correSpecies)
 
 
 #### START HERE: need GEx categorical to bind onto continuous data ####
 traitsAll <- meanCleanContinuousErrorRisk %>%
-  select(-original_value_sd, -original_value_mean, -imputed_value_sd) %>% 
+  select(family, species_matched, trait, trait_value, error_risk_overall, error_risk_family, error_risk_genus) %>% 
   rbind(longCategorical)
 
-# write.csv(traitsAll, 'CleanedData\\Traits\\CoRRE_allTraitData_June2023.csv')
+# write.csv(traitsAll, 'CleanedData\\Traits\\CoRRE_allTraitData_June2023.csv', row.names=F)
 
 traitsWide <- traitsAll %>% 
   select(-error_risk_overall, -error_risk_family, -error_risk_genus) %>% 
   pivot_wider(names_from=trait, values_from=trait_value)
 
-# write.csv(traitsWide, 'CleanedData\\Traits\\CoRRE_allTraitData_wide_June2023.csv')
+# write.csv(traitsWide, 'CleanedData\\Traits\\CoRRE_allTraitData_wide_June2023.csv', row.names=F)
 
 
 # #### testing if imputation runs are different ####
