@@ -430,6 +430,8 @@ cleanContinuous$trait2 = factor(cleanContinuous$trait2, levels=c('Leaf Area (lea
 with(subset(cleanContinuous, trait=='leaf_area'), hist(log10(original_value)))
 with(subset(cleanContinuous, trait=='leaf_area'), hist(log10(imputed_value)))
 
+with(subset(cleanContinuous, trait=='leaf_area'), cor.test(original_value, imputed_value,method = "pearson", use = "complete.obs"))
+# r 0.9710058 
 summary(leaf_area <- lm(log10(imputed_value)~log10(original_value), data=subset(cleanContinuous, trait=='leaf_area'&!is.na(original_value))))
 confint(leaf_area)
 # slope:  0.9741485,  SE: 0.0009489, CI: 0.00185984
@@ -444,6 +446,8 @@ confint(leaf_area)
 with(subset(cleanContinuous, trait=='leaf_dry_mass'), hist(log10(original_value)))
 with(subset(cleanContinuous, trait=='leaf_dry_mass'), hist(log10(imputed_value)))
 
+with(subset(cleanContinuous, trait=='leaf_dry_mass'), cor.test(original_value, imputed_value,method = "pearson", use = "complete.obs"))
+# r 0.9577364 
 summary(leaf_dry_mass <- lm(log10(imputed_value)~log10(original_value), data=subset(cleanContinuous, trait=='leaf_dry_mass'&!is.na(original_value))))
 confint(leaf_dry_mass)
 # slope:  0.9700605  ,  SE: 0.0009431, CI: 0.001848476
@@ -458,6 +462,8 @@ confint(leaf_dry_mass)
 with(subset(cleanContinuous, trait=='LDMC'), hist(log10(original_value)))
 with(subset(cleanContinuous, trait=='LDMC'), hist(log10(imputed_value)))
 
+with(subset(cleanContinuous, trait=='LDMC'), cor.test(original_value, imputed_value,method = "pearson", use = "complete.obs"))
+# r 0.9787819  
 summary(LDMC <- lm(log10(imputed_value)~log10(original_value), data=subset(cleanContinuous, trait=='LDMC'&!is.na(original_value))))
 confint(LDMC)
 # slope:  0.9541052,  SE: 0.0004651,  CI: 0.000911596
@@ -472,6 +478,8 @@ confint(LDMC)
 with(subset(cleanContinuous, trait=='SLA'), hist(log10(original_value)))
 with(subset(cleanContinuous, trait=='SLA'), hist(log10(imputed_value)))
 
+with(subset(cleanContinuous, trait=='SLA'), cor.test(original_value, imputed_value,method = "pearson", use = "complete.obs"))
+# r 0.955878   
 summary(SLA <- lm(log10(imputed_value)~log10(original_value), data=subset(cleanContinuous, trait=='SLA'&!is.na(original_value))))
 confint(SLA)
 # slope:  0.912210   SE: 0.002140   CI: 0.0041944
@@ -486,6 +494,8 @@ confint(SLA)
 with(subset(cleanContinuous, trait=='leaf_N'), hist(log10(original_value)))
 with(subset(cleanContinuous, trait=='leaf_N'), hist(log10(imputed_value)))
 
+with(subset(cleanContinuous, trait=='leaf_N'), cor.test(original_value, imputed_value,method = "pearson", use = "complete.obs"))
+# r 0.9627765    
 summary(leaf_N <- lm(log10(imputed_value)~log10(original_value), data=subset(cleanContinuous, trait=='leaf_N'&!is.na(original_value))))
 confint(leaf_N)
 # slope:  0.939524      SE: 0.001490     CI: 0.0029204
@@ -500,6 +510,8 @@ confint(leaf_N)
 with(subset(cleanContinuous, trait=='plant_height_vegetative'), hist(log10(original_value)))
 with(subset(cleanContinuous, trait=='plant_height_vegetative'), hist(log10(imputed_value)))
 
+with(subset(cleanContinuous, trait=='plant_height_vegetative'), cor.test(original_value, imputed_value,method = "pearson", use = "complete.obs"))
+# r 0.9471077     
 summary(plant_height_vegetative <- lm(log10(imputed_value)~log10(original_value), data=subset(cleanContinuous, trait=='plant_height_vegetative'&!is.na(original_value))))
 confint(plant_height_vegetative)
 # slope:  0.9217863        SE: 0.0009958       CI: 0.001951768
@@ -514,6 +526,8 @@ confint(plant_height_vegetative)
 with(subset(cleanContinuous, trait=='SRL'), hist(log10(original_value)))
 with(subset(cleanContinuous, trait=='SRL'), hist(log10(imputed_value)))
 
+with(subset(cleanContinuous, trait=='SRL'), cor.test(original_value, imputed_value,method = "pearson", use = "complete.obs"))
+# r 0.9002603      
 summary(SRL <- lm(log10(imputed_value)~log10(original_value), data=subset(cleanContinuous, trait=='SRL'&!is.na(original_value))))
 confint(SRL)
 # slope:  0.916581          SE: 0.005051         CI: 0.00989996
@@ -528,6 +542,8 @@ confint(SRL)
 with(subset(cleanContinuous, trait=='seed_dry_mass'), hist(log10(original_value)))
 with(subset(cleanContinuous, trait=='seed_dry_mass'), hist(log10(imputed_value)))
 
+with(subset(cleanContinuous, trait=='seed_dry_mass'), cor.test(original_value, imputed_value,method = "pearson", use = "complete.obs"))
+# r 0.9930513       
 summary(seed_dry_mass <- lm(log10(imputed_value)~log10(original_value), data=subset(cleanContinuous, trait=='seed_dry_mass'&!is.na(original_value))))
 confint(seed_dry_mass)
 # slope:  0.9888753            SE: 0.0002790          CI: 0.00054684
