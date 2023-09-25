@@ -11,6 +11,7 @@
 library(PerformanceAnalytics)
 # library(ggforce)
 library(scales)
+library(ggpubr)
 library(tidyverse)
 
 setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data') #Kim's
@@ -19,23 +20,46 @@ setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE
 theme_set(theme_bw())
 theme_update(axis.title.x=element_text(size=30, vjust=-0.35, margin=margin(t=15)), axis.text.x=element_text(size=26),
              axis.title.y=element_text(size=30, angle=90, vjust=0.5, margin=margin(r=15)), axis.text.y=element_text(size=26),
-             plot.title = element_text(size=34, vjust=2),
+             plot.title = element_text(size=54, vjust=2),
              panel.grid.major=element_blank(), panel.grid.minor=element_blank(),
              legend.title=element_blank(), legend.text=element_text(size=30))
 
 
 #### Categorical trait data ####
-categoricalTraits <- read.csv("CleanedData\\Traits\\complete categorical traits\\sCoRRE categorical trait data_12142022.csv") %>%
+categoricalTraitsCoRRE <- read.csv("CleanedData\\Traits\\complete categorical traits\\sCoRRE categorical trait data_12142022.csv")
+
+categoricalTraitsGEx <- read.csv("CleanedData\\Traits\\complete categorical traits\\GEx categorical trait data_20230925.csv")
+
+categoricalTraits <- rbind(categoricalTraitsCoRRE, categoricalTraitsGEx) %>% 
+  filter(species_matched!='') %>% 
   dplyr::select(family, species_matched, leaf_type, leaf_compoundness, stem_support, growth_form, photosynthetic_pathway, lifespan,  clonal, mycorrhizal_type, n_fixation, rhizobial, actinorhizal) %>%
   mutate(photosynthetic_pathway = replace(photosynthetic_pathway, grep("possible", photosynthetic_pathway), NA)) %>%
   mutate(clonal = replace(clonal, clonal=="uncertain", NA)) %>%
-  mutate(mycorrhizal_type = replace(mycorrhizal_type, mycorrhizal_type=="uncertain", NA)) %>%
+  mutate(mycorrhizal_type = replace(mycorrhizal_type, mycorrhizal_type %in% c("arbuscular", "facultative_AM"), "AM"),
+         mycorrhizal_type = replace(mycorrhizal_type, mycorrhizal_type %in% c("double_AM_EcM", "EcM-AM", "facultative_AM_EcM", "NM-AM", "NM-AM, rarely EcM", "species-specific: AM or rarely EcM-AM or AM"), "multiple"),
+         mycorrhizal_type = replace(mycorrhizal_type, mycorrhizal_type=="ecto", "EcM"),
+         mycorrhizal_type = replace(mycorrhizal_type, mycorrhizal_type=="ericaceous", "ErM"),
+         mycorrhizal_type = replace(mycorrhizal_type, mycorrhizal_type=="orchidaceous", "OM"),
+         mycorrhizal_type = replace(mycorrhizal_type, mycorrhizal_type=="Thysanothus", "TM"),
+         mycorrhizal_type = replace(mycorrhizal_type, mycorrhizal_type=="NM", "none"),
+         mycorrhizal_type = replace(mycorrhizal_type, is.na(mycorrhizal_type), "uncertain")) %>%
   mutate(lifespan = replace(lifespan, lifespan=="uncertain", NA)) %>%
   mutate(n_fixation_type=ifelse(rhizobial=='yes', 'rhizobial',
                          ifelse(actinorhizal=='yes', 'actinorhizal', 'none'))) %>% 
   filter(lifespan != "moss") %>% 
-  select(-family, -n_fixation, -rhizobial, -actinorhizal)
+  select(-n_fixation, -rhizobial, -actinorhizal)
 
+categoricalTraitsFamilies <- rbind(categoricalTraitsCoRRE, categoricalTraitsGEx) %>% 
+  filter(lifespan != "moss") %>% 
+  filter(species_matched!='') %>% 
+  select(family) %>% 
+  unique()
+
+categoricalTraitsError <-  rbind(categoricalTraitsCoRRE, categoricalTraitsGEx) %>% 
+  filter(lifespan != "moss") %>% 
+  filter(species_matched!='') %>% 
+  select(species_matched, growth_form_error, photosynthetic_pathway_error, lifespan_error, stem_support_error, clonal_error) %>% 
+  filter(growth_form_error!='')
 
 # #### Testing out stream graphs ####
 # categoricalTraitsGather <- categoricalTraits %>%
@@ -61,12 +85,21 @@ leafType <- categoricalTraits %>%
   arrange(proportion) %>%
   mutate(labels=scales::percent(proportion))
 
-ggplot(leafType, aes(x="", y=proportion, fill=leaf_type)) +
+leafTypeFig <- ggplot(leafType, aes(x="", y=proportion, fill=leaf_type)) +
   geom_col() +
   coord_polar(theta="y") +
-  scale_fill_manual(values=c('#7DCBBB', '#FFFFA4', '#B0AAD1', '#F7695F', '#6EA1C9', '#FBA550', '#A5DA56', '#AD68AF'))
+  scale_fill_manual(values=c('#7DCBBB', '#FFFFA4', '#B0AAD1', '#F7695F', '#6EA1C9', '#FBA550', '#A5DA56', '#AD68AF'))  +
+  ggtitle('(d) Leaf Type') +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid  = element_blank(),
+        plot.title = element_text(vjust = 0.5),
+        legend.position = 'none')
 
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\4_leaf_type.png', width=8, height=8, units='in', dpi=300, bg='white')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\4_leaf_type_nolegend.png', width=8, height=8, units='in', dpi=300, bg='white')
 
 # leaf compoundness
 leafCompoundness <- categoricalTraits %>% 
@@ -77,12 +110,21 @@ leafCompoundness <- categoricalTraits %>%
   arrange(proportion) %>%
   mutate(labels=scales::percent(proportion))
 
-ggplot(leafCompoundness, aes(x="", y=proportion, fill=leaf_compoundness)) +
+leafCompoundnessFig <- ggplot(leafCompoundness, aes(x="", y=proportion, fill=leaf_compoundness)) +
   geom_col() +
   coord_polar(theta="y") +
-  scale_fill_manual(values=c('#7DCBBB', '#FFFFA4', '#B0AAD1', '#F7695F', '#6EA1C9', '#FBA550', '#A5DA56', '#AD68AF'))
+  scale_fill_manual(values=c('#7DCBBB', '#FFFFA4', '#B0AAD1', '#F7695F', '#6EA1C9', '#FBA550', '#A5DA56', '#AD68AF'))  +
+  ggtitle('(e) Leaf Compoundness') +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid  = element_blank(),
+        plot.title = element_text(vjust = 0.5),
+        legend.position = 'none')
 
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\5_leaf_compoundness.png', width=8, height=8, units='in', dpi=300, bg='white')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\5_leaf_compoundness_nolegend.png', width=8, height=8, units='in', dpi=300, bg='white')
 
 # stem support
 stemSupport <- categoricalTraits %>% 
@@ -93,12 +135,21 @@ stemSupport <- categoricalTraits %>%
   arrange(proportion) %>%
   mutate(labels=scales::percent(proportion))
 
-ggplot(stemSupport, aes(x="", y=proportion, fill=stem_support)) +
+stemSupportFig <- ggplot(stemSupport, aes(x="", y=proportion, fill=stem_support)) +
   geom_col() +
   coord_polar(theta="y") +
-  scale_fill_manual(values=c('#7DCBBB', '#FFFFA4', '#B0AAD1', '#F7695F', '#6EA1C9', '#FBA550', '#A5DA56', '#AD68AF'))
+  scale_fill_manual(values=c('#7DCBBB', '#FFFFA4', '#B0AAD1', '#F7695F', '#6EA1C9', '#FBA550', '#A5DA56', '#AD68AF'))  +
+  ggtitle('(f) Stem Support') +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid  = element_blank(),
+        plot.title = element_text(vjust = 0.5),
+        legend.position = 'none')
 
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\6_stem_support.png', width=8, height=8, units='in', dpi=300, bg='white')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\6_stem_support_nolegend.png', width=8, height=8, units='in', dpi=300, bg='white')
 
 # growth form
 growthForm <- categoricalTraits %>% 
@@ -109,12 +160,21 @@ growthForm <- categoricalTraits %>%
   arrange(proportion) %>%
   mutate(labels=scales::percent(proportion))
 
-ggplot(growthForm, aes(x="", y=proportion, fill=growth_form)) +
+growthFormFig <- ggplot(growthForm, aes(x="", y=proportion, fill=growth_form)) +
   geom_col() +
   coord_polar(theta="y") +
-  scale_fill_manual(values=c('#7DCBBB', '#FFFFA4', '#B0AAD1', '#F7695F', '#6EA1C9', '#FBA550', '#A5DA56', '#AD68AF'))
+  scale_fill_manual(values=c('#7DCBBB', '#FFFFA4', '#B0AAD1', '#F7695F', '#6EA1C9', '#FBA550', '#A5DA56', '#AD68AF')) +
+  ggtitle('(a) Growth Form') +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid  = element_blank(),
+        plot.title = element_text(vjust = 0.5),
+        legend.position = 'none')
 
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\1_growth_form.png', width=8, height=8, units='in', dpi=300, bg='white')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\1_growth_form_nolegend.png', width=8, height=8, units='in', dpi=300, bg='white')
 
 # photosynthetic pathway
 photosyntheticPathway <- categoricalTraits %>% 
@@ -125,12 +185,21 @@ photosyntheticPathway <- categoricalTraits %>%
   arrange(proportion) %>%
   mutate(labels=scales::percent(proportion))
 
-ggplot(photosyntheticPathway, aes(x="", y=proportion, fill=photosynthetic_pathway)) +
+photoPathFig <- ggplot(photosyntheticPathway, aes(x="", y=proportion, fill=photosynthetic_pathway)) +
   geom_col() +
   coord_polar(theta="y") +
-  scale_fill_manual(values=c('#7DCBBB', '#FFFFA4', '#B0AAD1', '#F7695F', '#6EA1C9', '#FBA550', '#A5DA56', '#AD68AF'))
+  scale_fill_manual(values=c('#7DCBBB', '#FFFFA4', '#B0AAD1', '#F7695F', '#6EA1C9', '#FBA550', '#A5DA56', '#AD68AF'))  +
+  ggtitle('(g) Photosynthetic Path') +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid  = element_blank(),
+        plot.title = element_text(vjust = 0.5),
+        legend.position = 'none')
 
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\7_photosynthetic_pathway.png', width=8, height=8, units='in', dpi=300, bg='white')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\7_photosynthetic_pathway_nolegend.png', width=8, height=8, units='in', dpi=300, bg='white')
 
 # lifespan
 lifespan <- categoricalTraits %>% 
@@ -141,12 +210,21 @@ lifespan <- categoricalTraits %>%
   arrange(proportion) %>%
   mutate(labels=scales::percent(proportion))
 
-ggplot(lifespan, aes(x="", y=proportion, fill=lifespan)) +
+lifespanFig <- ggplot(lifespan, aes(x="", y=proportion, fill=lifespan)) +
   geom_col() +
   coord_polar(theta="y") +
-  scale_fill_manual(values=c('#7DCBBB', '#FFFFA4', '#B0AAD1', '#F7695F', '#6EA1C9', '#FBA550', '#A5DA56', '#AD68AF'))
+  scale_fill_manual(values=c('#7DCBBB', '#FFFFA4', '#B0AAD1', '#F7695F', '#6EA1C9', '#FBA550', '#A5DA56', '#AD68AF'))  +
+  ggtitle('(b) Lifespan') +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid  = element_blank(),
+        plot.title = element_text(vjust = 0.5),
+        legend.position = 'none')
 
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\2_lifespan.png', width=8, height=8, units='in', dpi=300, bg='white')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\2_lifespan_nolegend.png', width=8, height=8, units='in', dpi=300, bg='white')
 
 # clonal
 clonal <- categoricalTraits %>% 
@@ -157,12 +235,21 @@ clonal <- categoricalTraits %>%
   arrange(proportion) %>%
   mutate(labels=scales::percent(proportion))
 
-ggplot(clonal, aes(x="", y=proportion, fill=clonal)) +
+clonalFig <- ggplot(clonal, aes(x="", y=proportion, fill=clonal)) +
   geom_col() +
   coord_polar(theta="y") +
-  scale_fill_manual(values=c('#7DCBBB', '#FFFFA4', '#B0AAD1', '#F7695F', '#6EA1C9', '#FBA550', '#A5DA56', '#AD68AF'))
+  scale_fill_manual(values=c('#7DCBBB', '#FFFFA4', '#B0AAD1', '#F7695F', '#6EA1C9', '#FBA550', '#A5DA56', '#AD68AF')) +
+  ggtitle('(c) Clonality') +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid  = element_blank(),
+        plot.title = element_text(vjust = 0.5),
+        legend.position = 'none')
 
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\3_clonal.png', width=8, height=8, units='in', dpi=300, bg='white')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\3_clonal_nolegend.png', width=8, height=8, units='in', dpi=300, bg='white')
 
 # mycorrhizal type
 mycorrhizalType <- categoricalTraits %>% 
@@ -173,12 +260,21 @@ mycorrhizalType <- categoricalTraits %>%
   arrange(proportion) %>%
   mutate(labels=scales::percent(proportion))
 
-ggplot(mycorrhizalType, aes(x="", y=proportion, fill=mycorrhizal_type)) +
+mycorrFig <- ggplot(mycorrhizalType, aes(x="", y=proportion, fill=mycorrhizal_type)) +
   geom_col() +
   coord_polar(theta="y") +
-  scale_fill_manual(values=c('#7DCBBB', '#FFFFA4', '#B0AAD1', '#F7695F', '#6EA1C9', '#FBA550', '#A5DA56', '#AD68AF'))
+  scale_fill_manual(values=c('#7DCBBB', '#FFFFA4', '#B0AAD1', '#F7695F', '#6EA1C9', '#FBA550', '#A5DA56', '#AD68AF')) +
+  ggtitle('(h) Mycorrhizal Type') +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid  = element_blank(),
+        plot.title = element_text(vjust = 0.5),
+        legend.position = 'none')
 
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\8_mycorrhizal_type.png', width=8, height=8, units='in', dpi=300, bg='white')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\8_mycorrhizal_type_nolegend.png', width=8, height=8, units='in', dpi=300, bg='white')
 
 # n fixation type
 nFixationType <- categoricalTraits %>% 
@@ -189,14 +285,29 @@ nFixationType <- categoricalTraits %>%
   arrange(proportion) %>%
   mutate(labels=scales::percent(proportion))
 
-ggplot(nFixationType, aes(x="", y=proportion, fill=n_fixation_type)) +
+nFixFig <- ggplot(nFixationType, aes(x="", y=proportion, fill=n_fixation_type)) +
   geom_col() +
   coord_polar(theta="y") +
-  scale_fill_manual(values=c('#7DCBBB', '#FFFFA4', '#B0AAD1', '#F7695F', '#6EA1C9', '#FBA550', '#A5DA56', '#AD68AF'))
+  scale_fill_manual(values=c('#7DCBBB', '#FFFFA4', '#B0AAD1', '#F7695F', '#6EA1C9', '#FBA550', '#A5DA56', '#AD68AF'))  +
+  ggtitle('(i) N Fixation Type') +
+  theme(axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank(),
+        axis.ticks = element_blank(),
+        panel.grid  = element_blank(),
+        plot.title = element_text(vjust = 0.5),
+        legend.position = 'none')
 
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\9_n_fixation_type.png', width=8, height=8, units='in', dpi=300, bg='white')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\9_n_fixation_type_nolegend.png', width=8, height=8, units='in', dpi=300, bg='white')
 
+#groupped figure
+ggarrange(growthFormFig, lifespanFig, clonalFig,
+          leafTypeFig, leafCompoundnessFig, stemSupportFig,
+          photoPathFig, mycorrFig, nFixFig,
+          ncol = 3, nrow = 3)
 
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\all_categorical_20230925.png', width=26, height=26, units='in', dpi=300, bg='white')
 
 
 #### Continuous traits ####
@@ -378,7 +489,7 @@ ggplot(data=cleanContinousWide, aes(x=as.factor(data_type2), y=trait_value)) +
         strip.text.x = element_text(size = 20),
         axis.title.x=element_text(size=22, vjust=-0.35, margin=margin(t=15)), axis.text.x=element_text(size=22),
         axis.title.y=element_text(size=22, angle=90, vjust=0.5, margin=margin(r=15)), axis.text.y=element_text(size=22)) +
-  xlab('Data Type') + ylab('Trait Value')  +
+  xlab('Data Type') + ylab(expression(log[10]("Trait Value")))  +
   scale_y_continuous(trans='log10', labels=label_comma())
 # ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 4_boxplots of original and imputed_20230623_jitter.png', width=14, height=15, units='in', dpi=300, bg='white')
 
@@ -389,6 +500,7 @@ cleanContinuousWideBoxplot <- cleanContinousWide %>%
   summarise(trait_value_mean=trait_value) %>% 
   ungroup()
 
+#logged
 ggplot(data=cleanContinuousWideBoxplot, aes(x=as.factor(data_type2), y=trait_value_mean)) +
   geom_jitter(aes(color=data_type2)) +
   geom_boxplot(color='black', alpha=0) +
@@ -404,11 +516,28 @@ ggplot(data=cleanContinuousWideBoxplot, aes(x=as.factor(data_type2), y=trait_val
         strip.text.x = element_text(size = 20),
         axis.title.x=element_text(size=22, vjust=-0.35, margin=margin(t=15)), axis.text.x=element_text(size=22),
         axis.title.y=element_text(size=22, angle=90, vjust=0.5, margin=margin(r=15)), axis.text.y=element_text(size=22)) +
-  xlab('Data Type') + ylab('Trait Value')  +
+  xlab('Data Type') + ylab(expression(log[10]("Trait Value")))  +
   scale_y_continuous(trans='log10', labels=label_comma())
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 4_boxplots of original and imputed_20230623_jitter_means.png', width=14, height=15, units='in', dpi=300, bg='white')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 4_boxplots of original and imputed_20230925_jitter_log_means.png', width=14, height=15, units='in', dpi=300, bg='white')
 
-
+#not logged
+ggplot(data=cleanContinuousWideBoxplot, aes(x=as.factor(data_type2), y=trait_value_mean)) +
+  geom_jitter(aes(color=data_type2)) +
+  geom_boxplot(color='black', alpha=0) +
+  facet_wrap(~trait2, scales='free_y', ncol=3, labeller=label_wrap_gen(width=25)) +
+  scale_x_discrete(breaks=c("AusTraits", "BIEN", "CPTD2", "TIPleaf", "TRY", "imputed_value"),
+                   limits=c("AusTraits", "BIEN", "CPTD2", "TIPleaf", "TRY", "imputed_value"),
+                   labels=c("Au", "BN", "C2", "TP", "TY", "imp")) +
+  scale_color_manual(values=c('#4E3686', '#5DA4D9', '#80D87F', 'darkgrey', '#FED23F', '#EE724C')) +
+  theme_bw() +
+  theme(panel.grid.major=element_blank(),
+        panel.grid.minor=element_blank(),
+        legend.position='none',
+        strip.text.x = element_text(size = 20),
+        axis.title.x=element_text(size=22, vjust=-0.35, margin=margin(t=15)), axis.text.x=element_text(size=22),
+        axis.title.y=element_text(size=22, angle=90, vjust=0.5, margin=margin(r=15)), axis.text.y=element_text(size=22)) +
+  xlab('Data Type') + ylab("Trait Value")
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 4_boxplots of original and imputed_20230925_jitter_means.png', width=14, height=15, units='in', dpi=300, bg='white')
 
 # Look at boxplots for each trait
 ggplot(data=subset(cleanContinousWide, species_matched %in% c('Helianthus maximiliani', 'Potentilla anserina', 'Clintonia borealis')), aes(x=species_matched, y=trait_value)) +
