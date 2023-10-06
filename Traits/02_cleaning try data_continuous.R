@@ -84,7 +84,7 @@ dat3 <- dat2 %>%
                         47, #LDMC
                         3115, 3116, 3117, #SLA
                         14, #leaf N
-                        1080, #SRL
+                        1080, 614, #SRL
                         26)) %>% #seed dry mass
   mutate(CleanTraitName=ifelse(TraitID==14, 'leaf_N',
                         ifelse(TraitID==26, 'seed_dry_mass', 
@@ -200,7 +200,7 @@ cont_traits2 <- cont_traits %>%
 cont_traits3 <- cont_traits2 %>%
   select(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue, ErrorRisk, Reference) %>%
   mutate(ErrorRisk2=ifelse(is.na(ErrorRisk), 0, ErrorRisk)) %>%
-  filter(ErrorRisk2<3) %>% #removes all observations that are greater than 3 sd from full database mean: drops 36,103 observations
+  filter(ErrorRisk2<3) %>% #removes all observations that are greater than 3 sd from full database mean: drops 28,806 observations
   select(-ErrorRisk, -ErrorRisk2) %>% 
   filter(StdValue>0) #removing negative and 0 values (drops 22 observations)
 
