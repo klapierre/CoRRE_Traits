@@ -1,5 +1,5 @@
 ################################################################################
-##  DeterminingTrees.R: Figuring out which species are trees to remove from database.
+##  DeterminingTrees.R: Figuring out which species are trees from the GEx database to remove for trait collection.
 ##
 ##  Authors: Meghan Avolio
 ################################################################################
@@ -33,6 +33,3 @@ gex_tree<-gex %>%
   select(species_matched, family, tree.non.tree)
 
 write.csv(gex_tree, "C://Users\\mavolio2\\Dropbox\\CoRRE_database\\Data\\OriginalData\\Traits\\GEx_tree_list_tofill.csv", row.names=F)
-
-
-
