@@ -30,20 +30,6 @@ setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE
 # TRY data
 dat <- fread("OriginalData\\Traits\\TRY\\TRY_Traits_Downloaded_April2023.txt",sep = "\t",data.table = FALSE,stringsAsFactors = FALSE,strip.white = TRUE)
 
-# trylist<-read.csv("OriginalData\\Traits\\TRY\\TryAccSpecies_2023.csv")  %>% 
-#   extract("AccSpeciesName", c("genus", "species"), "([[:alpha:] ]+) ([[:alpha:] ]+)") %>% 
-#   filter(species!='sp') %>% 
-#   mutate(AccSpeciesName=paste(genus, species, sep=' '))
-#   
-# #get list of species names
-# TRYsplist<-trylist
-# 
-# TRYsplist$family <- tax_name(trylist$AccSpeciesName, get = 'family', db='itis')$family
-
-# #link to family
-# WFO.file<-read.delim("CompiledData/Species_lists/WFO_Backbone/classification.txt")
-# 
-# familyinfo<-WFO.family(taxon=TRYsplist$genus, WFO.data = WFO.file)
 
 # generate list of units for ALL TRY traits
 units <- dat %>%
@@ -89,173 +75,28 @@ dat2 <- dat %>%
 
 #### Selecting desired continuous traits ####
 
-# tests <- dat3 %>%
-#   filter(TraitID %in% c(3109)) %>%
-#   #select(TraitID, OrigUnitStr, UnitName) %>%
-#   #unique() %>% 
-#   select(TraitID, UnitName, OrigUnitStr, OriglName, TraitName) %>%
-#   #filter(UnitName!="g/m2/d") %>%
-#   group_by(TraitID, UnitName, OrigUnitStr, OriglName, TraitName) %>%
-#   summarize(n=length(TraitID))
-
-# Subsetting out traits we want and replacing the numbers with names
+# Subsetting only the traits we want and replacing the numbers with names
 # if origlname or unit is blank but there are no duplicates, then we are keeping it
 dat3 <- dat2 %>%
-  filter(TraitID %in% c(4, 6, 9, 12, 13, 14, 15, 26, 27, 40, 41, 44, 45, 46, 47, 48, 50, 51, 52, 53, 55, 56, 57, 58, 66, 77, 80, 82, 83, 84, 106, 111, 138, 145, 146, 185, 186, 269, 270, 363, 475, 570, 614, 683, 1080, 1104, 1781, 3106, 3107, 3108, 3109, 3110, 3111, 3112, 3113, 3114, 3115, 3116, 3117, 3121, 3122)) %>%
-  mutate(remove=ifelse(TraitID==48 & UnitName=='', 1, 
-                ifelse(TraitID==3107 & UnitName=='cm', 1, 
-                ifelse(TraitID==53 & UnitName=='g/m2/d', 1, 
-                ifelse(TraitID==4 & UnitName=='', 1, 
-                ifelse(TraitID==3116 & UnitName=='', 1, 
-                ifelse(TraitID==3122 & OriglName=='WCt', 1, 
-                ifelse(TraitID==3121 & OriglName=='WCs', 1,
-                ifelse(TraitID==77 & OriglName=="Ra", 1, 
-                ifelse(TraitID==77 & OriglName=="RGRh relative growth rate in height)", 1, 
-                ifelse(TraitID==106 & OriglName=="", 1,	
-                ifelse(TraitID==1781 & OriglName=="Min_Root tissue density (RTD)", 1,
-                ifelse(TraitID==1781 & OriglName=="Max_Root tissue density (RTD)", 1,
-                ifelse(TraitID==1781 & OriglName=="Upper quartile_Root tissue density (RTD)", 1,
-                ifelse(TraitID==1781 & OriglName=="Lower quartile_Root tissue density (RTD)", 1,
-                ifelse(TraitID==185 & OriglName=="", 1, 
-                ifelse(TraitID==3109 & OriglName=="Area (dry) cm2", 1, 
-                ifelse(TraitID==3109 & OriglName=="Dry.area.cm2", 1,
-                ifelse(TraitID==3117 & OriglName=="LMA", 1,
-                ifelse(TraitID==40 & OriglName=="A500 mass", 1,
-                ifelse(TraitID==614 & OriglName=="Min_Specific root length (SRL)", 1,
-                ifelse(TraitID==614 & OriglName=="Max_Specific root length (SRL)", 1, 
-                ifelse(TraitID==41 & OriglName=="Rdarkm_25C_FixedQ10", 1,
-                ifelse(TraitID==41 & OriglName=="Rdarkm_25C_varQ10", 1,
-                ifelse(TraitID==41 & OriglName=="Rdarkm_MeasMonth.T_varQ10", 1,
-                ifelse(TraitID==41 & OriglName=="Rdarkm_TWQ.T_varQ10", 1, 
-                ifelse(TraitID==41 & OriglName=="Leaf Rdark mass 18C", 1,
-                ifelse(TraitID==41 & OriglName=="Rm_adj_gst", 1, 
-                ifelse(TraitID==41 & OriglName=="Rm25", 1, 
-                ifelse(TraitID==41 & OriglName=="Rm_amb", 1, 
-                ifelse(TraitID==41 & OriglName=="Leaf Rdark mass 28C", 1, 
-                ifelse(TraitID==269 & OriglName=="Jmax25_Bern", 1, 
-                ifelse(TraitID==269 & OriglName=="Jmax_25_Rog", 1,
-                ifelse(TraitID==269 & OriglName=="Jmax_reported", 1, 
-                ifelse(TraitID==47 & OriglName=="LDMC_min", 1, 
-                ifelse(TraitID==47 & OriglName=="LDMC_max", 1, 
-                ifelse(TraitID==47 & OriglName=="WCf", 1,
-                ifelse(TraitID==47 & OriglName=="Leaf dry matter concentration predicted from NIRS", 1,
-                ifelse(TraitID==3110 & OriglName=="Leaf_area_min", 1, 
-                ifelse(TraitID==3110 & OriglName=="Leaf_area_max", 1, 
-                ifelse(TraitID==13 & OriglName=="C amount%", 1, 
-                ifelse(TraitID==13 & OriglName=="C_senesced_leaf", 1, 
-                ifelse(TraitID==55 & OriglName=="WLfMass", 1, 
-                ifelse(TraitID==55 & OriglName=="Mass_senesced_leaf", 1,
-                ifelse(TraitID==44 & OriglName=="K_senesced_leaf", 1, 
-                ifelse(TraitID==14 & OriglName=="N amount%", 1, 
-                ifelse(TraitID==14 & OriglName=="N_senesced_leaf", 1,
-                ifelse(TraitID==15 & OriglName=="P_senesced_leaf", 1, 
-                ifelse(TraitID==111 & OriglName=="Asat_E  (mmol/m2/s)", 1, 
-                ifelse(TraitID==145 & OriglName=="LaminaWidthMaxExtremeCm", 1, 0)))))))))))))))))))))))))))))))))))))))))))))))))) %>%
-  mutate(remove2=ifelse(TraitID==145 & OriglName=="LaminaWidthMinCm", 1,
-                 ifelse(TraitID==145 & OriglName=="LaminaWidthMinExtremeCm", 1,
-                 ifelse(TraitID==145 & OriglName=="LeafWidth_max", 1,
-                 ifelse(TraitID==53 & OriglName=="A500 area", 1, 
-                 ifelse(TraitID==53 & OriglName=="Net photosynthesis at turgor loss point", 1, 
-                 ifelse(TraitID==53 & OriglName=="Asat_Photo (umol/m2/s)", 1, 
-                 ifelse(TraitID==3107 & OriglName=="Plant_height_generative_max", 1,
-                 ifelse(TraitID==3108 & OriglName=="Flowering plant height, heighest leaf elongated", 1, 
-                 ifelse(TraitID==3108 & OriglName=="Flowering plant height, heighest leaf not elongated", 1, 
-                 ifelse(TraitID==3106 & OriglName=="Flowering plant height, heighest leaf elongated", 1, 
-                 ifelse(TraitID==3106 & OriglName=="Flowering plant height, heighest leaf not elongated", 1, 
-                 ifelse(TraitID==3106 & OriglName=="Height at 20 Years", 1, 
-                 ifelse(TraitID==3106 & OriglName=="MaximumHeightMinM", 1, 
-                 ifelse(TraitID==3106 & OriglName=="MaximumHeightExtremeM", 1, 
-                 ifelse(TraitID==3106 & OriglName=="Maximum Height", 1, 
-                 ifelse(TraitID==3106 & OriglName=="Plant_height_vegetative_min", 1, 
-                 ifelse(TraitID==3106 & OriglName=="Plant_height_vegetative_mean", 1,
-                 ifelse(TraitID==3106 & OriglName=="Length (aquatic)", 1, 
-                 ifelse(TraitID==3106 & OriglName=="Height (seedling)", 1,
-                 ifelse(TraitID==3106 & OriglName=="Height max (m)", 1,
-                 ifelse(TraitID==3106 & OriglName=="strechedPlantHight", 1,
-                 ifelse(TraitID==3106 & OriglName=="MaximumHeightM", 1,
-                 ifelse(TraitID==9 & OriglName=="Root / shoot ratio seedlings", 1, 
-                 ifelse(TraitID==363 & OriglName=="Root dry mass below 15 cm", 1,
-                 ifelse(TraitID==363 & OriglName=="Root dry mass 0-15 cm", 1,
-                 ifelse(TraitID==80 & OriglName=="Upper quartile_Root N content", 1,
-                 ifelse(TraitID==80 & OriglName=="Lower quartile_Root N content", 1,
-                 ifelse(TraitID==80 & OriglName=="Min_Root N content", 1,
-                 ifelse(TraitID==80 & OriglName=="Max_Root N content", 1,
-                 ifelse(TraitID==66 & OriglName=="single value [m/s^2]", 1,
-                 ifelse(TraitID==66 & OriglName=="maximum TV [m/s^2]", 1,
-                 ifelse(TraitID==66 & OriglName=="minimum TV [m/s^2]", 1,
-                 ifelse(TraitID==66 & OriglName=="median TV [m/s^2]", 1,
-                 ifelse(TraitID==26 & OriglName=="original seed mass (mg)", 1,
-                 ifelse(TraitID==26 & OriglName=="OriginalSeedMassMean", 1,
-                 ifelse(TraitID==6 & OriglName=="Rooting depth_min", 1,
-                 ifelse(TraitID==27 & OriglName=="SeedsCurvedLength", 1, 
-                 ifelse(TraitID==3116 & OriglName=="SLA_min", 1, 
-                 ifelse(TraitID==3116 & OriglName=="SLA_max", 1, 
-                 ifelse(TraitID==1080 & OriglName=="SRL roots >2mm diam (cm/g)", 1,
-                 ifelse(TraitID==45 & OriglName=="LeafConductivityDorsal", 1, 
-                 ifelse(TraitID==45 & OriglName=="LeadConductivityVentral", 1,
-                 ifelse(TraitID==45 & OriglName=="Minimal stomatal conductance", 1, 
-                 ifelse(TraitID==45 & OriglName=="Asat_Gs (mol/m2/s)", 1, 
-                 ifelse(TraitID==186 & OriglName=="Vcmax25_Bern", 1,
-                 ifelse(TraitID==186 & OriglName=="Vcmax_25_Rog", 1,
-                 ifelse(TraitID==186 & OriglName=="Vcmax_reported", 1,
-                 ifelse(TraitID==186 & OriglName=="", 1,
-                 ifelse(TraitID==186 & OriglName=="Vcmax_a_25", 1, 0)))))))))))))))))))))))))))))))))))))))))))))))))) %>%
-  mutate(remove3=ifelse(TraitID==186 & OriglName=="Vcmax25Rog", 1,
-                 ifelse(TraitID==3120 & OrigUnitStr=="mmol/g", 1, 
-                 ifelse(TraitID==26 & OriglName=="SeedMassMax" | OriglName=="SeedMassMin",1, 0)))) %>% # remove problem data where there are replicates for ObservationID
-  filter(remove==0, remove2==0, remove3==0) %>%
-  select(-remove, -remove2, -remove3) %>%
-  mutate(CleanTraitName=ifelse(TraitID==4, 'stem_spec_density', 
-                        ifelse(TraitID==6, 'rooting_depth', 
-                        ifelse(TraitID==9, 'root:shoot', 
-                        ifelse(TraitID==12, 'leaf_longevity', 
-                        ifelse(TraitID==13, 'leaf_C',
-                        ifelse(TraitID==14, 'leaf_N',
-                        ifelse(TraitID==15, 'leaf_P',
+  filter(TraitID %in% c(3106,  #vegetative height
+                        3109, 3110, 3114, #leaf area
+                        55, #leaf dry mass
+                        47, #LDMC
+                        3115, 3116, 3117, #SLA
+                        14, #leaf N
+                        1080, #SRL
+                        26)) %>% #seed dry mass
+  mutate(CleanTraitName=ifelse(TraitID==14, 'leaf_N',
                         ifelse(TraitID==26, 'seed_dry_mass', 
-                        ifelse(TraitID==27, 'seed_length', 
-                        ifelse(TraitID==41, 'dark_resp_rate',
-                        ifelse(TraitID==44, 'leaf_K',
-                        ifelse(TraitID==45, 'stomatal_conductance',
-                        ifelse(TraitID==46, 'leaf_thickness', 
                         ifelse(TraitID==47, 'LDMC', 
-                        ifelse(TraitID==48, 'leaf_density', 
-                        ifelse(TraitID==53, 'photosynthesis_rate',
                         ifelse(TraitID==55, 'leaf_dry_mass', 
-                        ifelse(TraitID==56, 'leaf_N:P', 
-                        ifelse(TraitID==66, 'seed_terminal_velocity',
-                        ifelse(TraitID==77, 'RGR', 
-                        ifelse(TraitID==80, 'root_N', 
-                        ifelse(TraitID==82, 'root_density', 
-                        ifelse(TraitID==83, 'root_diameter', 
-                        ifelse(TraitID==84, 'root_C', 
-                        ifelse(TraitID==111, 'leaf_transp_rate',
-                        ifelse(TraitID==138, 'seed_number',
-                        ifelse(TraitID==145, 'leaf_width', 
-                        ifelse(TraitID==146, 'leaf_C:N', 
-                        ifelse(TraitID==186, 'Vc_max',
-                        ifelse(TraitID==269, 'J_max',
-                        ifelse(TraitID==363, 'root_dry_mass',
-                        ifelse(TraitID==683, 'root_P', 
                         ifelse(TraitID==1080, 'SRL',
                         ifelse(TraitID==3106, 'plant_height_vegetative', 
-                        ifelse(TraitID==3107, 'plant_height_generative',
                         ifelse(TraitID==3116, 'SLA', 
                         ifelse(TraitID==3110, 'leaf_area',
-                        TraitID)))))))))))))))))))))))))))))))))))))) %>%
+                        TraitID))))))))) %>%
   filter(!is.na(StdValue)) %>% 
-  filter(CleanTraitName!='plant_height_generative') #removing this trait because it doesn't make sense when compared to plant height vegetative
-
-#testing consistent units for each trait and ranking traits by priority
-# priority <- read.csv("OriginalData\\Traits\\TRY\\trait_priority.csv") %>%
-#   rename(TraitID=TRY.trait.ID)
-
-# Traits_Units <- dat3 %>%
-#   select(TraitID, TraitName, CleanTraitName, UnitName) %>%
-#   unique() %>%
-#   mutate(Units=ifelse(CleanTraitName==3121, "g(W)/g(DM)", ifelse(CleanTraitName==3122, "g(W)/g(DM)", UnitName))) %>%
-#   select(-UnitName) %>%
-#   left_join(priority)
+  filter(is.na(OrigObsDataID))
 
 # write.csv(Traits_Units, "OriginalData\\Traits\\TRY\\TRYCoRREMerge\\ContTraitUnits.csv", row.names = F)
 
@@ -345,22 +186,21 @@ cont_traits <- dat3 %>%
   mutate(remove=ifelse(tree.non.tree=="non-tree", 0, 1)) %>%
   filter(remove==0) %>%
   select(-tree.non.tree, -AccSpeciesName.y, -remove) %>%
-  rename(AccSpeciesName=AccSpeciesName.x) # drops 196,547 observations
+  rename(AccSpeciesName=AccSpeciesName.x) # drops 54,077 observations
 
 
-#### Add taxonomic information for each species and filter to traits we are settling on for successful gap filling ####
+#### Add taxonomic information for each species ####
 cont_traits2 <- cont_traits %>%
-  select(DatasetID, ObservationID, family, species_matched, CleanTraitName, StdValue, ErrorRisk) %>%
+  select(DatasetID, ObservationID, family, species_matched, CleanTraitName, StdValue, ErrorRisk, Reference) %>%
   separate(remove = F, species_matched, into = c("genus", "species"), sep=" ") %>%
-  select(-species) %>% 
-  filter(CleanTraitName %in% c('SLA', 3115, 3117, 'LDMC', 'leaf_area', 3109, 3114, 'leaf_dry_mass', 'seed_dry_mass', 'plant_height_vegetative', 'SRL', 614, 'leaf_N')) 
+  select(-species)
 
 
 #### Removing trait outliers based on TRY's Error Risk designation ####
 cont_traits3 <- cont_traits2 %>%
-  select(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue, ErrorRisk) %>%
+  select(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue, ErrorRisk, Reference) %>%
   mutate(ErrorRisk2=ifelse(is.na(ErrorRisk), 0, ErrorRisk)) %>%
-  filter(ErrorRisk2<3) %>% #removes all observations that are greater than 3 sd from full database mean: drops 34,699 observations
+  filter(ErrorRisk2<3) %>% #removes all observations that are greater than 3 sd from full database mean: drops 36,103 observations
   select(-ErrorRisk, -ErrorRisk2) %>% 
   filter(StdValue>0) #removing negative and 0 values (drops 22 observations)
 
@@ -374,7 +214,7 @@ cont_traits3 <- cont_traits2 %>%
 # Problem: Three observations per plant (same ObservationID). Probably three leaves per plant, but no way to link leaves. Solution: Average.
 d453 <- cont_traits3 %>%
   filter(DatasetID==453) %>%
-  group_by(DatasetID, ObservationID, species_matched, CleanTraitName, family, genus) %>%
+  group_by(DatasetID, ObservationID, species_matched, CleanTraitName, family, genus, Reference) %>%
   summarise(StdValue=mean(StdValue)) %>% 
   ungroup()
 
@@ -382,7 +222,7 @@ d453 <- cont_traits3 %>%
 # Solution: Taking largest value.
 d428 <- cont_traits3 %>% 
   filter(DatasetID==428 & CleanTraitName=="plant_height_vegetative" | DatasetID==428 & CleanTraitName=="root_P") %>%
-  group_by(DatasetID, ObservationID, species_matched, CleanTraitName, family, genus) %>%
+  group_by(DatasetID, ObservationID, species_matched, CleanTraitName, family, genus, Reference) %>%
   summarise(StdValue=max(StdValue)) %>% 
   ungroup()
 
@@ -390,7 +230,7 @@ d428 <- cont_traits3 %>%
 # Solution: Take the average and make them all unique observations (loses linking of data on same individuals, but this seems better than keeping so many repeats).
 d415 <- cont_traits3 %>% 
   filter(DatasetID==415) %>% 
-  group_by(DatasetID, species_matched, CleanTraitName, family, genus)%>%
+  group_by(DatasetID, species_matched, CleanTraitName, family, genus, Reference)%>%
   summarise(StdValue=mean(StdValue)) %>% 
   ungroup() %>% 
   mutate(ObservationID=row_number())
@@ -399,7 +239,7 @@ d415 <- cont_traits3 %>%
 # Solution: Take the average and make them all unique observations (loses linking of data on same individuals, but this seems better than keeping so many repeats).
 d25 <- cont_traits3 %>% 
   filter(DatasetID==25) %>% 
-  group_by(DatasetID, species_matched, CleanTraitName, family, genus) %>%
+  group_by(DatasetID, species_matched, CleanTraitName, family, genus, Reference) %>%
   summarise(StdValue=mean(StdValue)) %>% 
   ungroup() %>% 
   mutate(ObservationID=row_number())
@@ -459,7 +299,7 @@ d1 <- cont_traits3 %>%
 # Solution: Take the average for each individual for each trait. For each species, find if there is repeated data for all traits collected on an individual.
 d412 <- cont_traits3 %>% 
   filter(DatasetID==412) %>% 
-  group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName) %>% 
+  group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, Reference) %>% 
   summarize(StdValue=mean(StdValue)) %>% 
   ungroup()
 
@@ -473,7 +313,7 @@ d412 <- cont_traits3 %>%
 # Solution: Drop rooting depth data from this dataset. Also trait 614 (measure of SRL) three values for a few observations. Solution 2: just average across traits
 d339 <- cont_traits3 %>% 
   filter(DatasetID==339) %>% 
-  group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName) %>% 
+  group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, Reference) %>% 
   summarize(StdValue=mean(StdValue)) %>% 
   ungroup()
   
@@ -481,7 +321,7 @@ d339 <- cont_traits3 %>%
 # Solution: keep the maximum height. Also only has one value for roots
 d201 <- cont_traits3 %>% 
   filter(DatasetID==201) %>% 
-  group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName) %>% 
+  group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, Reference) %>% 
   summarize(StdValue=max(StdValue)) %>% 
   ungroup()
 
@@ -489,7 +329,7 @@ d201 <- cont_traits3 %>%
 # Solution: keep the max Has only one value for all other traits
 d96 <- cont_traits3 %>% 
   filter(DatasetID==96) %>% 
-  group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName) %>% 
+  group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, Reference) %>% 
   summarize(StdValue=max(StdValue)) %>% 
   ungroup()
 
@@ -497,7 +337,7 @@ d96 <- cont_traits3 %>%
 # Solution: keep the mean
 d355 <- cont_traits3 %>% 
   filter(DatasetID==355) %>% 
-  group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName) %>% 
+  group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, Reference) %>% 
   summarize(StdValue=mean(StdValue)) %>% 
   ungroup()
 
@@ -505,7 +345,7 @@ d355 <- cont_traits3 %>%
 # Solution: Take the max of all traits as all other traits only in there 1x.
 d45 <- cont_traits3 %>% 
   filter(DatasetID==45) %>% 
-  group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName) %>% 
+  group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, Reference) %>% 
   summarize(StdValue=max(StdValue)) %>% 
   ungroup()
 
@@ -513,7 +353,7 @@ d45 <- cont_traits3 %>%
 # Solution: Take the mean of all traits as all other traits only in there 1x.
 d87 <- cont_traits3 %>% 
   filter(DatasetID==87) %>% 
-  group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName) %>% 
+  group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, Reference) %>% 
   summarize(StdValue=mean(StdValue)) %>% 
   ungroup()
 
@@ -521,7 +361,7 @@ d87 <- cont_traits3 %>%
 # Solution: Take the max of all traits as all other traits only in there 1x.
 d299 <- cont_traits3 %>% 
   filter(DatasetID==299) %>% 
-  group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName) %>% 
+  group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, Reference) %>% 
   summarize(StdValue=max(StdValue)) %>% 
   ungroup()
 
@@ -529,7 +369,7 @@ d299 <- cont_traits3 %>%
 # Solution: Take the mean of all traits as all other traits only in there 1x.
 d477 <- cont_traits3 %>% 
   filter(DatasetID==477) %>% 
-  group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName) %>% 
+  group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, Reference) %>% 
   summarize(StdValue=mean(StdValue)) %>% 
   ungroup()
 
@@ -537,7 +377,7 @@ d477 <- cont_traits3 %>%
 # Solution: Take the max of all traits as all other traits only in there 1x.
 d520 <- cont_traits3 %>% 
   filter(DatasetID==520) %>% 
-  group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName) %>% 
+  group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, Reference) %>% 
   summarize(StdValue=max(StdValue)) %>% 
   ungroup()
 
@@ -545,7 +385,7 @@ d520 <- cont_traits3 %>%
 # Solution: Take the max of all traits as all other traits only in there 1x.
 d655 <- cont_traits3 %>% 
   filter(DatasetID==655) %>% 
-  group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName) %>% 
+  group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, Reference) %>% 
   summarize(StdValue=max(StdValue)) %>% 
   ungroup()
 
@@ -553,7 +393,7 @@ d655 <- cont_traits3 %>%
 # Solution: Take the mean of all traits as all other traits are in there 1x.
 d486 <- cont_traits3 %>% 
   filter(DatasetID==486) %>% 
-  group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName) %>% 
+  group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, Reference) %>% 
   summarize(StdValue=mean(StdValue)) %>% 
   ungroup()
 
@@ -561,21 +401,21 @@ d486 <- cont_traits3 %>%
 # Solution: Only keep 10 repeats, which is likely real data (measurement precision problems again), but not meaningful.
 d468sub <- cont_traits3 %>% 
   filter(DatasetID==468) %>% 
-  group_by(DatasetID, family, genus, species_matched, CleanTraitName, StdValue) %>% 
+  group_by(DatasetID, family, genus, species_matched, CleanTraitName, StdValue, Reference) %>% 
   summarize(n=length(StdValue)) %>% 
   filter(n>10) %>% 
   ungroup()
 
 d468todrop <- d468sub %>% 
   filter(DatasetID==468) %>% 
-  select(species_matched, CleanTraitName, StdValue) %>%
+  select(species_matched, CleanTraitName, StdValue, Reference) %>%
   unique() %>% 
   mutate(drop=1)
  
 d468sub1 <- cont_traits3 %>% 
   filter(DatasetID==468) %>% 
   right_join(d468sub) %>% 
-  group_by(DatasetID, family, genus, species_matched, CleanTraitName, StdValue) %>% 
+  group_by(DatasetID, family, genus, species_matched, CleanTraitName, StdValue, Reference) %>% 
   mutate(number=row_number()) %>% 
   filter(number< max(10, length(StdValue)*0.05)) %>% 
   select(-n, -number) %>% 
@@ -592,7 +432,7 @@ d468 <- cont_traits3 %>%
 # Solution: Take the mean of all traits.
 d231 <- cont_traits3 %>% 
   filter(DatasetID==231) %>% 
-  group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName) %>% 
+  group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, Reference) %>% 
   summarize(StdValue=mean(StdValue)) %>% 
   ungroup()
 
@@ -625,17 +465,20 @@ cont_traits4 <- cont_traits3 %>%
   bind_rows(d655) %>%
   bind_rows(d486) %>%
   bind_rows(d468) %>%
-  bind_rows(d231)
+  bind_rows(d231) %>% 
+  group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName) %>% 
+  summarise(StdValue=mean(StdValue)) %>% #average across remaining duplicate values (3 or fewer duplicates)
+  ungroup()
 
 # Making sure there is just one measurement per variable.  
 cont_traits5 <- cont_traits4 %>%
   mutate(present=1) %>%
-  group_by(DatasetID, ObservationID, species_matched, CleanTraitName) %>%
+  group_by(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName) %>%
   summarise(n=sum(present)) %>% 
   ungroup()
 
 # Finding problem data (repeats)
-# Remaining data with repeats were determined to either be real data (see above) or below the threshold to investigate (<3 repeats).
+# Remaining data with repeats were determined to either be real data (see above) or below the threshold to investigate (3 repeats or less).
 repeats <- cont_traits4 %>% 
   group_by(species_matched, CleanTraitName, StdValue) %>%
   summarize(n=length(StdValue)) %>%
@@ -643,9 +486,19 @@ repeats <- cont_traits4 %>%
   filter(n>1)
 
 ttraits <- cont_traits4 %>%
+  select(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue) %>% 
   group_by(DatasetID, ObservationID, family, genus, species_matched) %>%
   spread(CleanTraitName, StdValue, fill=NA)
   
 
-# write.csv(ttraits, "OriginalData\\Traits\\TRY\\TRY_trait_data_continuous_June2023.csv", row.names = F)
-# write.csv(cont_traits4, "OriginalData\\Traits\\TRY\\TRY_trait_data_continuous_long_June2023.csv", row.names = F)
+# write.csv(ttraits, "OriginalData\\Traits\\TRY\\TRY_trait_data_continuous_Oct2023.csv", row.names = F)
+# write.csv(cont_traits4, "OriginalData\\Traits\\TRY\\TRY_trait_data_continuous_long_Oct2023.csv", row.names = F)
+
+#### References ####
+references <- cont_traits4 %>% 
+  select(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue) %>% 
+  left_join(cont_traits) %>% 
+  select(Reference) %>% 
+  unique()
+
+# write.csv(references, "OriginalData\\Traits\\TRY\\TRY_references_Oct2023.csv", row.names = F)
