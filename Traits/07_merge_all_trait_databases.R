@@ -55,11 +55,11 @@ AusTraits <- read.csv('OriginalData\\Traits\\AusTraits_2022\\AusTraits_CoRRE_Jun
   filter(StdValue>0)
 
 # TRY
-TRY <- read.csv('OriginalData\\Traits\\TRY\\TRY_trait_data_continuous_long_June2023.csv') %>% 
+TRY <- read.csv('OriginalData\\Traits\\TRY\\TRY_trait_data_continuous_long_Oct2023.csv') %>% 
   mutate(DatabaseID="TRY") %>% 
   filter(StdValue>0)
 
-# BIEN - NOTE: photosynthetic rate, stomatal conductence, stem specific density were dropped in the BIEN cleaning file because they were out of line with the TRY trait values
+# BIEN - NOTE: photosynthetic rate, stomatal conductance, stem specific density were dropped in the BIEN cleaning file because they were out of line with the TRY trait values
 BIEN <- read.csv('OriginalData\\Traits\\BIEN\\BIEN_for_scorre_20230623.csv') %>% 
   left_join(names) %>%
   select(DatabaseID, DatasetID, ObservationID, family, species_matched, genus, CleanTraitName, StdValue) %>% 
@@ -78,7 +78,7 @@ CPTD2 <- read.csv('OriginalData\\Traits\\ChinaPlant2\\CPTD2_June2023.csv') %>%
   select(DatabaseID, DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue) %>% 
   filter(StdValue>0)
 
-#find ferns and lycophytes
+# find ferns and lycophytes
 growthForm <- read.csv("CleanedData\\Traits\\complete categorical traits\\sCoRRE categorical trait data_12142022.csv") %>% 
   select(species_matched, growth_form)
 
@@ -96,6 +96,7 @@ total <- nrow(allTraits_wide)*ntraits
 miss/total*100
 
 spnum <- length(unique(allTraits_wide$species_matched))
+famnum <- length(unique(allTraits_wide$family))
 # originally were missing 96.6% of data for all species, now with only traits of interest we are missing 88.16% of data
 
 label <- allTraits %>%
@@ -148,7 +149,7 @@ ggplot(data=label, aes(x=DatabaseID, y=length, label=round(percent,1), fill=Data
         axis.title.y=element_text(size=24, angle=90, vjust=0.5, margin=margin(r=15)), axis.text.y=element_text(size=22),
         legend.position='none') +
   ylab('Number of Observations') + xlab('Database ID')
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 3_input percent complete_20230623.png', width=17, height=19, units='in', dpi=300, bg='white')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 3_input percent complete_20231006.png', width=17, height=19, units='in', dpi=300, bg='white')
 
 # Are there any outlier datasets for each trait?
 ggplot(data=allTraits, aes(x=DatabaseID, y=StdValue)) +
@@ -173,41 +174,41 @@ talltraits <- allTraits %>%
   pivot_wider(names_from=CleanTraitName, values_from=StdValue, values_fill=NA) %>% 
   ungroup()
 
-# write.csv(allTraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_June2023_long.csv', row.names = F)
+# write.csv(allTraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_Oct2023_long.csv', row.names = F)
 
-# write.csv(talltraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_June2023.csv', row.names = F)
+# write.csv(talltraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_Oct2023.csv', row.names = F)
 
 ##checking traits
 test <- allTraits %>% 
   group_by(species_matched, CleanTraitName, StdValue, DatabaseID) %>% 
   summarize(n=length(StdValue)) %>% 
   ungroup() %>% 
-  filter(n>1)
+  filter(n>9)
 
 sum(test[,'n'])
 
-## all databases have repeats - 118,597 across all data
-## 12,769 are the same values repeated 10 or more times and were designated as keepers from cleaning code
+## all databases have repeats - 41,743 across all data
+## 1634 are the same values repeated 10 or more times and were designated as keepers from cleaning code
 
 sppLength <- talltraits %>% 
   select(species_matched) %>% 
   unique()
-# 3220 species
+# 3218 species
 
 multiTraitInd <- allTraits %>% 
   group_by(DatabaseID, DatasetID, ObservationID, species_matched) %>% 
   summarise(num_traits=length(CleanTraitName)) %>% 
   ungroup() # %>%
-  # filter(num_traits>1)
-# 253,224 individuals measured (some have more than 1 trait measured on the same individual)
-# 68,649 individuals have more than 1 trait measured on the same individual
+  # filter(num_traits==1)
+# 208,480 individuals measured (some have more than 1 trait measured on the same individual)
+# 56,353 individuals have more than 1 trait measured on the same individual
 
 ggplot(data=multiTraitInd, aes(x=num_traits)) +
   geom_histogram(binwidth = 1) +
   xlab('Number of Traits per Individual') + ylab('Number of Individuals') +
-  scale_y_break(c(40000, 160000), ticklabels=c(170000, 180000))
+  scale_y_break(c(40000, 130000), ticklabels=c(140000, 150000))
 
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 2_traits per individual histogram_20230623.png', width=8, height=8, units='in', dpi=300, bg='white')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 2_traits per individual histogram_20231006.png', width=8, height=8, units='in', dpi=300, bg='white')
 
 # Which families have very little observed data going into the gap filling methods?
 traitMeasured <- allTraits %>% 
