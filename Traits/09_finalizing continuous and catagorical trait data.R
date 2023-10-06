@@ -26,9 +26,9 @@ theme_update(axis.title.x=element_text(size=30, vjust=-0.35, margin=margin(t=15)
 
 
 #### Categorical trait data ####
-categoricalTraitsCoRRE <- read.csv("CleanedData\\Traits\\complete categorical traits\\sCoRRE categorical trait data_12142022.csv")
+categoricalTraitsCoRRE <- read.csv("CleanedData\\Traits\\complete categorical traits\\sCoRRE categorical trait data_20231006.csv")
 
-categoricalTraitsGEx <- read.csv("CleanedData\\Traits\\complete categorical traits\\GEx categorical trait data_20230925.csv")
+categoricalTraitsGEx <- read.csv("CleanedData\\Traits\\complete categorical traits\\GEx categorical trait data_20231006.csv")
 
 categoricalTraits <- rbind(categoricalTraitsCoRRE, categoricalTraitsGEx) %>% 
   filter(species_matched!='') %>% 
