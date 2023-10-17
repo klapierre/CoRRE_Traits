@@ -258,7 +258,7 @@ d453 <- cont_traits3 %>%
   summarise(StdValue=mean(StdValue)) %>% 
   ungroup()
 
-# Problem: Two height values per plant (maybe temporal observations). Additionally, some plants have two identical values for root_P.
+# Problem: Two height values per plant (maybe temporal observations).
 # Solution: Taking largest value.
 d428 <- cont_traits3 %>% 
   filter(DatasetID==428 & CleanTraitName=="plant_height_vegetative") %>%
