@@ -18,7 +18,7 @@ setwd('C:\\Users\\mavolio2\\Dropbox\\CoRRE_database\\Data\\OriginalData\\Traits'
 library(austraits)
 library(tidyverse)
 
-austraits <- load_austraits(version = "4.1.0", path = "austraits")
+austraits <- load_austraits(version = "4.1.0", path = "data/austraits")
 
 traits <- summarise_austraits(austraits, "trait_name")
 
@@ -105,7 +105,6 @@ traitDataCoRRE <- traitData %>%
               ifelse(trait_name=='seed_dry_mass' & StdValue>600, 1, 0))) %>% 
   filter(drop==0) %>% 
   select(-drop)
-
 
 traitDataCoRRE$CleanTraitName <- recode(traitDataCoRRE$trait_name, 
                                         # 'leaf_C_per_dry_mass'='leaf_C', 
