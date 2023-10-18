@@ -57,6 +57,7 @@ AusTraits <- read.csv('OriginalData\\Traits\\AusTraits_2022\\AusTraits_CoRRE_Jun
 # TRY
 TRY <- read.csv('OriginalData\\Traits\\TRY\\TRY_trait_data_continuous_long_Oct2023.csv') %>% 
   mutate(DatabaseID="TRY") %>% 
+  select(DatabaseID, DatasetID, ObservationID, family, species_matched, genus, CleanTraitName, StdValue) %>% 
   filter(StdValue>0)
 
 # BIEN - NOTE: photosynthetic rate, stomatal conductance, stem specific density were dropped in the BIEN cleaning file because they were out of line with the TRY trait values
@@ -97,7 +98,7 @@ miss/total*100
 
 spnum <- length(unique(allTraits_wide$species_matched))
 famnum <- length(unique(allTraits_wide$family))
-# originally were missing 96.6% of data for all species, now with only traits of interest we are missing 88.16% of data
+# originally were missing 96.6% of data for all species, now with only traits of interest we are missing 88.54% of data
 
 label <- allTraits %>%
   group_by(CleanTraitName, DatabaseID) %>%
@@ -164,7 +165,6 @@ ggplot(data=allTraits, aes(x=DatabaseID, y=StdValue)) +
   theme(panel.grid.major=element_blank(),
         panel.grid.minor=element_blank(),
         legend.position='top') 
-
 # ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig x_input traits histograms.png', width=7.5, height=10, units='in', dpi=300, bg='white')
 
 
@@ -183,25 +183,17 @@ test <- allTraits %>%
   group_by(species_matched, CleanTraitName, StdValue, DatabaseID) %>% 
   summarize(n=length(StdValue)) %>% 
   ungroup() %>% 
-  filter(n>9)
+  filter(n>1)
 
 sum(test[,'n'])
-
-## all databases have repeats - 41,743 across all data
-## 1634 are the same values repeated 10 or more times and were designated as keepers from cleaning code
-
-sppLength <- talltraits %>% 
-  select(species_matched) %>% 
-  unique()
-# 3218 species
 
 multiTraitInd <- allTraits %>% 
   group_by(DatabaseID, DatasetID, ObservationID, species_matched) %>% 
   summarise(num_traits=length(CleanTraitName)) %>% 
   ungroup() # %>%
-  # filter(num_traits==1)
-# 208,480 individuals measured (some have more than 1 trait measured on the same individual)
-# 56,353 individuals have more than 1 trait measured on the same individual
+  # filter(num_traits>1)
+# 205,923 individuals measured (some have more than 1 trait measured on the same individual)
+# 51,172 individuals have more than 1 trait measured on the same individual
 
 ggplot(data=multiTraitInd, aes(x=num_traits)) +
   geom_histogram(binwidth = 1) +
