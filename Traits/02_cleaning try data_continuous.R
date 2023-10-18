@@ -135,10 +135,20 @@ dat3 <- dat2 %>%
                         ifelse(TraitID==3110, 'leaf_area',
                         TraitID))))))))) %>%
   filter(!is.na(StdValue)) %>% 
-  filter(is.na(OrigObsDataID))# this drops known repeats in TRY
+  filter(is.na(OrigObsDataID)) %>% # this drops known repeats in TRY
+  filter(UncertaintyName!="Range"&UncertaintyName!="Class range")# this drops 1190 observations that were range estimates for leaf area, plant vegtative height and seed mass. Led to repeats in the data
+
+# Old_Newpriority <- read.csv("OriginalData\\Traits\\TRY\\trait_priority.csv") %>%
+#   rename(TraitID=TRY.trait.ID)
+
+# Traits_Units <- dat3 %>%
+#   select(TraitID, TraitName, CleanTraitName, UnitName) %>%
+#   unique() %>%
+#   mutate(Units=ifelse(CleanTraitName==3121, "g(W)/g(DM)", ifelse(CleanTraitName==3122, "g(W)/g(DM)", UnitName))) %>%
+#   select(-UnitName) %>%
+#   left_join(Old_Newpriority)
 
 # write.csv(Traits_Units, "OriginalData\\Traits\\TRY\\TRYCoRREMerge\\ContTraitUnits.csv", row.names = F)
-
 
 #### Removing observations that do not meet our criteria ####
 
@@ -448,7 +458,7 @@ repeats <- cont_traits4 %>%
   group_by(species_matched, CleanTraitName, StdValue) %>%
   summarize(n=length(StdValue)) %>%
   ungroup() %>% 
-  filter(n>1)
+  filter(n>2)
 
 ttraits <- cont_traits4 %>%
   select(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue) %>% 
