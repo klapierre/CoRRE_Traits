@@ -21,8 +21,7 @@ correSpecies <- read.csv("CompiledData\\Species_lists\\FullList_Nov2021.csv") %>
   unique()
 
 # Import GEx species names
-GExSpecies <- read.csv('OriginalData\\Traits\\GEx_species_tree_complete.csv') %>% 
-  filter(tree.non.tree=='non-tree') %>% 
+GExSpecies <- read.csv('OriginalData\\Traits\\GEx_species_family_May2023.csv') %>% 
   select(family, species_matched) %>% 
   unique()
 
@@ -60,4 +59,4 @@ tip$CleanTraitName <- recode(tip$trait_name,
                              # 'LPC'='leaf_P'
                              )
 
-# write.csv(tip, 'OriginalData\\Traits\\TiP_leaf\\TiP_leaf_June2023.csv', row.names=F)
+# write.csv(tip, 'OriginalData\\Traits\\TiP_leaf\\TiP_leaf_Oct2023.csv', row.names=F)

@@ -34,7 +34,7 @@ correSpecies <- read.csv("CompiledData\\Species_lists\\FullList_Nov2021.csv") %>
   unique()
 
 # Import GEx species names
-GExSpecies <- read.csv('OriginalData\\Traits\\GEx_species_tree_complete.csv') %>% 
+GExSpecies <- read.csv('OriginalData\\Traits\\GEx_species_family_May2023.csv') %>% 
   select(family, species_matched) %>% 
   unique()
 
@@ -46,7 +46,7 @@ names <- rbind(correSpecies, GExSpecies) %>%
   select(-drop)
 
 # AusTraits
-AusTraits <- read.csv('OriginalData\\Traits\\AusTraits_2022\\AusTraits_CoRRE_June2023.csv') %>%
+AusTraits <- read.csv('OriginalData\\Traits\\AusTraits_2022\\AusTraits_CoRRE_Oct2023.csv') %>%
   left_join(names) %>%
   mutate(species_matched2=species_matched)%>%
   separate(species_matched2, into=c('genus', 'species'))%>%
@@ -67,7 +67,7 @@ BIEN <- read.csv('OriginalData\\Traits\\BIEN\\BIEN_for_scorre_20230623.csv') %>%
   filter(StdValue>0)
 
 # TiP leaf
-TiP <- read.csv('OriginalData\\Traits\\TiP_leaf\\TiP_leaf_June2023.csv') %>% 
+TiP <- read.csv('OriginalData\\Traits\\TiP_leaf\\TiP_leaf_Oct2023.csv') %>% 
   separate(col=species_matched, into=c('genus', 'species'), sep=' ', remove=F) %>% 
   left_join(names) %>% 
   select(DatabaseID, DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue) %>% 

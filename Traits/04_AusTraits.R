@@ -18,7 +18,7 @@ setwd('C:\\Users\\mavolio2\\Dropbox\\CoRRE_database\\Data\\OriginalData\\Traits'
 library(austraits)
 library(tidyverse)
 
-austraits <- load_austraits(version = "4.1.0", path = "data/austraits")
+austraits <- load_austraits(version = "4.1.0", path = "austraits")
 
 traits <- summarise_austraits(austraits, "trait_name")
 
@@ -83,8 +83,7 @@ correSpecies <- read.csv("CompiledData\\Species_lists\\FullList_Nov2021.csv") %>
   unique()
 
 # Import GEx species names
-GExSpecies <- read.csv('OriginalData\\Traits\\GEx_species_tree_complete.csv') %>% 
-  filter(tree.non.tree=='non-tree') %>% 
+GExSpecies <- read.csv('OriginalData\\Traits\\GEx_species_family_May2023.csv') %>% 
   select(species_matched) %>% 
   unique()
 
@@ -140,4 +139,4 @@ spp <- traitDataCoRRE %>%
   select(species_matched) %>%
   unique()
 
-# write.csv(traitDataCoRRE, 'OriginalData\\Traits\\AusTraits_2022\\AusTraits_CoRRE_June2023.csv')
+# write.csv(traitDataCoRRE, 'OriginalData\\Traits\\AusTraits_2022\\AusTraits_CoRRE_Oct2023.csv')
