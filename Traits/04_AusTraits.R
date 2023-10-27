@@ -83,8 +83,7 @@ correSpecies <- read.csv("CompiledData\\Species_lists\\FullList_Nov2021.csv") %>
   unique()
 
 # Import GEx species names
-GExSpecies <- read.csv('OriginalData\\Traits\\GEx_species_tree_complete.csv') %>% 
-  filter(tree.non.tree=='non-tree') %>% 
+GExSpecies <- read.csv('OriginalData\\Traits\\GEx_species_family_May2023.csv') %>% 
   select(species_matched) %>% 
   unique()
 
@@ -105,7 +104,6 @@ traitDataCoRRE <- traitData %>%
               ifelse(trait_name=='seed_dry_mass' & StdValue>600, 1, 0))) %>% 
   filter(drop==0) %>% 
   select(-drop)
-
 
 traitDataCoRRE$CleanTraitName <- recode(traitDataCoRRE$trait_name, 
                                         # 'leaf_C_per_dry_mass'='leaf_C', 
@@ -141,4 +139,4 @@ spp <- traitDataCoRRE %>%
   select(species_matched) %>%
   unique()
 
-# write.csv(traitDataCoRRE, 'OriginalData\\Traits\\AusTraits_2022\\AusTraits_CoRRE_June2023.csv')
+# write.csv(traitDataCoRRE, 'OriginalData\\Traits\\AusTraits_2022\\AusTraits_CoRRE_Oct2023.csv')

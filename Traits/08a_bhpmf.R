@@ -95,7 +95,7 @@ write.table(back_trans_pars, "CleanedData\\Traits\\gap filled continuous traits\
 tmp.dir <- dirname("CleanedData\\Traits\\gap filled continuous traits\\20231006_final\\tmp")
 
 #set parameters
-smpl <- 911:1000
+smpl <- 900:1000
 fold <- c(rep(10:20, 8), 10, 11)
 
 #set number of iterations:
