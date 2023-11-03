@@ -73,50 +73,6 @@ categoricalTraitsError <-  rbind(categoricalTraitsCoRRE, categoricalTraitsGEx) %
   select(species_matched, growth_form_error, photosynthetic_pathway_error, lifespan_error, stem_support_error, clonal_error) %>% 
   filter(growth_form_error!='')
 
-# #### Comparing to TRY data ####
-# TRYcategorical <- read.csv('CleanedData/Traits/complete categorical traits/TRY_Categorical_Traits_Lookup_Table_2012_03_17_TestRelease.csv') %>% 
-#   rename(species_matched=AccSpeciesName) %>% 
-#   select(species_matched, PlantGrowthForm, Succulent, climber, Parasitic, Epiphyte, LeafType, PhotosyntheticPathway, Woodiness, LeafCompoundness) %>% 
-#   right_join(categoricalTraits) %>% 
-#   mutate(LeafType=ifelse(LeafType=='broadleaved', 'broad',
-#                   ifelse(LeafType=='needleleaved', 'needle',
-#                   ifelse(LeafType=='microphylle', 'microphyll',
-#                   ifelse(LeafType=='scale-shaped', 'scale',
-#                   LeafType)))),
-#          leaf_type_match=ifelse(leaf_type==LeafType, 1, 0)) %>% 
-#   mutate(leaf_compoundness_match=ifelse(leaf_compoundness==LeafCompoundness, 1, 0)) %>% 
-#   mutate(PlantGrowthForm=ifelse(PlantGrowthForm=='herb', 'forb',
-#                          ifelse(PlantGrowthForm %in% c('herb/shrub', 'shrub', 'shrub/tree', 'tree'), 'woody',
-#                          PlantGrowthForm)),
-#          growth_form_match=ifelse(growth_form==PlantGrowthForm, 1, 0)) %>% 
-#   mutate(photosynthetic_pathway_match=ifelse(PhotosyntheticPathway==photosynthetic_pathway, 1, 0)) %>% 
-#   mutate(StemSupport=ifelse(climber=='climber', 'climbing',
-#                      ifelse(Epiphyte=='epiphyte', 'epiphyte',
-#                      NA)),
-#          stem_support_match=ifelse(StemSupport==stem_support, 1, 0)) %>% 
-#   select(species_matched,
-#          leaf_type_match, LeafType, leaf_type, 
-#          leaf_compoundness_match, LeafCompoundness, leaf_compoundness,
-#          growth_form_match, PlantGrowthForm, Succulent, Woodiness, growth_form,
-#          photosynthetic_pathway_match, PhotosyntheticPathway, Parasitic, photosynthetic_pathway,
-#          lifespan,
-#          stem_support_match, climber, Epiphyte, stem_support,
-#          clonal)
-
-
-# #### Testing out stream graphs ####
-# categoricalTraitsGather <- categoricalTraits %>%
-#   # filter(clonal!='NA') %>%
-#   group_by(growth_form, leaf_type, leaf_compoundness) %>%
-#   summarise(value=length(species_matched)) %>%
-#   ungroup() %>%
-#   gather_set_data(c(1:3))
-# 
-# ggplot(categoricalTraitsGather, aes(x, id = id, split = y, value = value)) +
-#   geom_parallel_sets(aes(fill = growth_form), alpha = 0.3, axis.width = 0.1) +
-#   geom_parallel_sets_axes(axis.width = 0.1) +
-#   geom_parallel_sets_labels(colour = 'white')
-
 
 #### Pie Charts for each categorical trait ####
 # leaf type
