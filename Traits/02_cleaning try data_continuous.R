@@ -215,7 +215,7 @@ cont_traits2 <- cont_traits %>%
 cont_traits3a <- cont_traits2 %>%
   select(DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue, ErrorRisk, Reference, UnitName, OriglName, TraitID) %>%
   mutate(ErrorRisk2=ifelse(is.na(ErrorRisk), 0, ErrorRisk)) %>%
-  filter(ErrorRisk2<3) %>% #removes all observations that are greater than 3 sd from full database mean: drops 28,794 observations
+  filter(ErrorRisk2<3) %>% #removes all observations that are greater than 3 sd from full database mean: drops 28,571 observations
   select(-ErrorRisk, -ErrorRisk2) %>% 
   filter(StdValue>0) #removing negative and 0 values (drops 26 observations)
 
