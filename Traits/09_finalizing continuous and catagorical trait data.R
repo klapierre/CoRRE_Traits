@@ -39,7 +39,7 @@ categoricalTraitsGEx <- read.csv("CleanedData\\Traits\\complete categorical trai
 
 categoricalTraits <- rbind(categoricalTraitsCoRRE, categoricalTraitsGEx) %>% 
   filter(species_matched!='') %>% 
-  dplyr::select(family, species_matched, leaf_type, leaf_compoundness, stem_support, growth_form, photosynthetic_pathway, lifespan,  clonal, mycorrhizal_type, n_fixation, rhizobial, actinorhizal) %>%
+  dplyr::select(family, species_matched, leaf_type, leaf_compoundness, stem_support, growth_form, photosynthetic_pathway, lifespan,  clonal, mycorrhizal_type, n_fixation, rhizobial, actinorhizal, leaf_type_source, leaf_compoundness_source, growth_form_source, photosynthetic_pathway_source, lifespan_source, stem_support_source, clonal_source, mycorrhizal_source, n_fixation_source) %>%
   mutate(photosynthetic_pathway = replace(photosynthetic_pathway, grep("possible", photosynthetic_pathway), "uncertain")) %>%
   # mutate(clonal = replace(clonal, clonal=="uncertain", NA)) %>%
   mutate(mycorrhizal_type = replace(mycorrhizal_type, mycorrhizal_type %in% c("arbuscular", "facultative_AM"), "AM"),
@@ -55,6 +55,11 @@ categoricalTraits <- rbind(categoricalTraitsCoRRE, categoricalTraitsGEx) %>%
                          ifelse(actinorhizal=='yes', 'actinorhizal', 'none'))) %>% 
   filter(lifespan != "moss") %>% 
   select(-n_fixation, -rhizobial, -actinorhizal)
+
+categorical_TRY <- categoricalTraits %>% 
+  select(leaf_type_source, leaf_compoundness_source, growth_form_source, photosynthetic_pathway_source, lifespan_source, stem_support_source, clonal_source, mycorrhizal_source, n_fixation_source) %>% 
+  pivot_longer(leaf_type_source:n_fixation_source, names_to='trait', values_to='source') %>% 
+  filter(grepl("TRY", source))
 
 categoricalTraitsFamilies <- rbind(categoricalTraitsCoRRE, categoricalTraitsGEx) %>% 
   filter(lifespan != "moss") %>% 
@@ -345,7 +350,7 @@ ggarrange(growthFormFig, lifespanFig, clonalFig,
           photoPathFig, mycorrFig, nFixFig,
           ncol = 3, nrow = 3)
 
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\all_categorical_20231026.png', width=26, height=26, units='in', dpi=300, bg='white')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\pie chart\\all_categorical_20231103.png', width=26, height=26, units='in', dpi=300, bg='white')
 
 
 #### Continuous traits ####
