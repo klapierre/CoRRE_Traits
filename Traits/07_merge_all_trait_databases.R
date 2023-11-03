@@ -39,43 +39,47 @@ GExSpecies <- read.csv('OriginalData\\Traits\\GEx_species_family_May2023.csv') %
 
 names <- rbind(correSpecies, GExSpecies) %>% 
   unique() %>% 
-  mutate(drop=ifelse(species_matched=='Dianella longifolia'&family=='Xanthorrhoeaceae', 1, 
-              ifelse(species_matched=='Lancea tibetica'&family=='Phrymaceae', 1, 0))) %>% 
+  mutate(drop=ifelse(species_matched=='Dianella longifolia' & family=='Xanthorrhoeaceae', 1, 
+              ifelse(species_matched=='Lancea tibetica' & family=='Phrymaceae', 1, 0))) %>% 
   filter(drop==0) %>% 
   select(-drop)
 
 # AusTraits
 AusTraits <- read.csv('OriginalData\\Traits\\AusTraits_2022\\AusTraits_CoRRE_Oct2023.csv') %>%
   left_join(names) %>%
-  mutate(species_matched2=species_matched)%>%
-  separate(species_matched2, into=c('genus', 'species'))%>%
-  mutate(DatabaseID='AusTraits')%>%
-  select(DatabaseID, DatasetID, ObservationID, family, species_matched, genus, CleanTraitName, StdValue) %>% 
+  mutate(species_matched2=species_matched) %>%
+  separate(species_matched2, into=c('genus', 'species')) %>%
+  mutate(DatabaseID='AusTraits',
+         Reference=DatasetID) %>%
+  select(DatabaseID, DatasetID, ObservationID, family, species_matched, genus, CleanTraitName, StdValue, Reference) %>% 
   filter(StdValue>0)
 
 # TRY
 TRY <- read.csv('OriginalData\\Traits\\TRY\\TRY_trait_data_continuous_long_Oct2023.csv') %>% 
   mutate(DatabaseID="TRY") %>% 
-  select(DatabaseID, DatasetID, ObservationID, family, species_matched, genus, CleanTraitName, StdValue) %>% 
+  select(DatabaseID, DatasetID, ObservationID, family, species_matched, genus, CleanTraitName, StdValue, Reference) %>% 
   filter(StdValue>0)
 
 # BIEN - NOTE: photosynthetic rate, stomatal conductance, stem specific density were dropped in the BIEN cleaning file because they were out of line with the TRY trait values
 BIEN <- read.csv('OriginalData\\Traits\\BIEN\\BIEN_for_scorre_202310263.csv') %>% 
   left_join(names) %>%
-  select(DatabaseID, DatasetID, ObservationID, family, species_matched, genus, CleanTraitName, StdValue) %>% 
+  mutate(Reference=DatasetID) %>% 
+  select(DatabaseID, DatasetID, ObservationID, family, species_matched, genus, CleanTraitName, StdValue, Reference) %>% 
   filter(StdValue>0)
 
 # TiP leaf
 TiP <- read.csv('OriginalData\\Traits\\TiP_leaf\\TiP_leaf_Oct2023.csv') %>% 
   separate(col=species_matched, into=c('genus', 'species'), sep=' ', remove=F) %>% 
   left_join(names) %>% 
-  select(DatabaseID, DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue) %>% 
+  mutate(Reference='TipLeaf Database') %>% 
+  select(DatabaseID, DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue, Reference) %>% 
   filter(StdValue>0)
 
 # China Plant Trait Database 2
 CPTD2 <- read.csv('OriginalData\\Traits\\ChinaPlant2\\CPTD2_Oct2023.csv') %>% 
   separate(col=species_matched, into=c('genus', 'species'), sep=' ', remove=F) %>% 
-  select(DatabaseID, DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue) %>% 
+  mutate(Reference='China Plant Trait Database 2') %>% 
+  select(DatabaseID, DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue, Reference) %>% 
   filter(StdValue>0)
 
 # find ferns and lycophytes
@@ -85,9 +89,10 @@ growthForm <- read.csv("CleanedData\\Traits\\complete categorical traits\\sCoRRE
 # Bind all together
 allTraits <- rbind(TRY, AusTraits, BIEN, TiP, CPTD2) %>% 
   left_join(growthForm) %>% 
-  select(DatabaseID, DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue)
+  select(DatabaseID, DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue, Reference)
 
 allTraits_wide <- allTraits %>% 
+  select(-Reference) %>% 
   pivot_wider(names_from = CleanTraitName, values_from = StdValue, values_fill=NA)
 
 ntraits <- length(unique(allTraits$CleanTraitName))
