@@ -65,4 +65,4 @@ traits <- rbind(chem, photo) %>%
   filter(CleanTraitName %in% c('LDMC', 'leaf_area', 'leaf_N', 'SLA'))
 
 
-# write.csv(traits, 'OriginalData\\Traits\\ChinaPlant2\\CPTD2_June2023.csv', row.names=F)
+# write.csv(traits, 'OriginalData\\Traits\\ChinaPlant2\\CPTD2_Oct2023.csv', row.names=F)

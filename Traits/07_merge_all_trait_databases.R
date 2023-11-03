@@ -4,7 +4,6 @@
 ##  Authors: Kimberly Komatsu, Meghan Avolio
 ################################################################################
 
-
 library(scales)
 library(tidyverse)
 library(ggbreak) 
@@ -74,7 +73,7 @@ TiP <- read.csv('OriginalData\\Traits\\TiP_leaf\\TiP_leaf_Oct2023.csv') %>%
   filter(StdValue>0)
 
 # China Plant Trait Database 2
-CPTD2 <- read.csv('OriginalData\\Traits\\ChinaPlant2\\CPTD2_June2023.csv') %>% 
+CPTD2 <- read.csv('OriginalData\\Traits\\ChinaPlant2\\CPTD2_Oct2023.csv') %>% 
   separate(col=species_matched, into=c('genus', 'species'), sep=' ', remove=F) %>% 
   select(DatabaseID, DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue) %>% 
   filter(StdValue>0)
@@ -89,7 +88,7 @@ allTraits <- rbind(TRY, AusTraits, BIEN, TiP, CPTD2) %>%
   select(DatabaseID, DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue)
 
 allTraits_wide <- allTraits %>% 
-  pivot_wider(names_from = CleanTraitName, values_from = StdValue, values_fill =NA)
+  pivot_wider(names_from = CleanTraitName, values_from = StdValue, values_fill=NA)
 
 ntraits <- length(unique(allTraits$CleanTraitName))
 miss <- sum(is.na(allTraits_wide))
@@ -150,7 +149,7 @@ ggplot(data=label, aes(x=DatabaseID, y=length, label=round(percent,1), fill=Data
         axis.title.y=element_text(size=24, angle=90, vjust=0.5, margin=margin(r=15)), axis.text.y=element_text(size=22),
         legend.position='none') +
   ylab('Number of Observations') + xlab('Database ID')
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 3_input percent complete_20231006.png', width=17, height=19, units='in', dpi=300, bg='white')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 3_input percent complete_20231103.png', width=17, height=19, units='in', dpi=300, bg='white')
 
 # Are there any outlier datasets for each trait?
 ggplot(data=allTraits, aes(x=DatabaseID, y=StdValue)) +
@@ -190,17 +189,17 @@ sum(test[,'n'])
 multiTraitInd <- allTraits %>% 
   group_by(DatabaseID, DatasetID, ObservationID, species_matched) %>% 
   summarise(num_traits=length(CleanTraitName)) %>% 
-  ungroup() # %>%
+  ungroup() #%>%
   # filter(num_traits>1)
-# 205,923 individuals measured (some have more than 1 trait measured on the same individual)
-# 51,172 individuals have more than 1 trait measured on the same individual
+# 206,113 individuals measured (some have more than 1 trait measured on the same individual)
+# 51,177 individuals have more than 1 trait measured on the same individual
 
 ggplot(data=multiTraitInd, aes(x=num_traits)) +
   geom_histogram(binwidth = 1) +
   xlab('Number of Traits per Individual') + ylab('Number of Individuals') +
   scale_y_break(c(40000, 130000), ticklabels=c(140000, 150000))
 
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 2_traits per individual histogram_20231006.png', width=8, height=8, units='in', dpi=300, bg='white')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 2_traits per individual histogram_20231103.png', width=8, height=8, units='in', dpi=300, bg='white')
 
 # Which families have very little observed data going into the gap filling methods?
 traitMeasured <- allTraits %>% 
