@@ -61,7 +61,7 @@ TRY <- read.csv('OriginalData\\Traits\\TRY\\TRY_trait_data_continuous_long_Oct20
   filter(StdValue>0)
 
 # BIEN - NOTE: photosynthetic rate, stomatal conductance, stem specific density were dropped in the BIEN cleaning file because they were out of line with the TRY trait values
-BIEN <- read.csv('OriginalData\\Traits\\BIEN\\BIEN_for_scorre_20230623.csv') %>% 
+BIEN <- read.csv('OriginalData\\Traits\\BIEN\\BIEN_for_scorre_202310263.csv') %>% 
   left_join(names) %>%
   select(DatabaseID, DatasetID, ObservationID, family, species_matched, genus, CleanTraitName, StdValue) %>% 
   filter(StdValue>0)
