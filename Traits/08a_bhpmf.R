@@ -6,6 +6,7 @@
 
 # install development version from github
 
+library(tidyverse)
 library(devtools)
 # install_github("fisw10/BHPMF")
 library(BHPMF)
@@ -16,7 +17,8 @@ library(mice)
 ##### read original trait matrix for imputation #####
 setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data')
 
-traits <- read.table("OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_Oct2023.csv", row.names=NULL, sep=",", header=T)
+traits <- read.table("OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_Oct2023.csv", row.names=NULL, sep=",", header=T) %>% 
+  select(-Reference)
 
 # traits <- traits[1:100000,]
 
