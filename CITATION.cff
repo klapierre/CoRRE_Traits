@@ -1,0 +1,11 @@
+cff-version: 1.0.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-name: Komatsu
+  given-name: Kimberly
+- family-name: Avolio
+  given-name: Meghan
+orcid: https://orcid.org/0000-0001-7056-4547
+title: CoRRE Traits
+version: v1.0.0
+date-released: 2023-11-08
