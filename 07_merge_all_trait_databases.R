@@ -182,6 +182,13 @@ talltraits <- allTraits %>%
 
 # write.csv(talltraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_Oct2023.csv', row.names = F)
 
+# References
+references <- allTraits %>% 
+  select(Reference) %>% 
+  unique()
+# write.csv(references, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_references_Oct2023.csv', row.names = F)
+
+
 ##checking traits
 test <- allTraits %>% 
   group_by(species_matched, CleanTraitName, StdValue, DatabaseID) %>% 
