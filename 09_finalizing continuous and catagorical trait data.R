@@ -721,7 +721,7 @@ coverage <- meanCleanContinuousErrorRisk %>%
 # 6 NAs across entire dataframe = 0.000256% of data missing; 99.97% complete for these 2927 species
 
 
-##### Combine continuous and categorical traits #####
+##### Prepare data for EDI #####
 correSpecies <- read.csv("CompiledData\\Species_lists\\FullList_Nov2021.csv") %>%  #species names are standardized
   left_join(read.csv("CompiledData\\Species_lists\\species_families_trees_2021.csv")) %>% 
   filter(tree.non.tree != "tree") %>% #Remove trees
@@ -762,10 +762,19 @@ longCategorical <- categoricalTraits %>%
                             ifelse(trait=='lifespan', 0.033,
                             ifelse(trait=='photosynthetic_pathway', 0.017,
                             ifelse(trait=='stem_support', 0.033, 
-                                   NA))))))),
-         error_risk_family=NA,
-         error_risk_genus=NA)
+                                   NA)))))))) %>% 
+  rename(species=species_matched)
 
+# write.csv(longCategorical, 'CleanedData\\Traits\\CoRRE_categoricalTraitData_Nov2023.csv', row.names=F)
+
+longContinuous <- meanCleanContinuousErrorRisk %>%
+  mutate(source='Imputed Value') %>% 
+  select(family, species_matched, trait, trait_value, error_risk_overall, error_risk_family, error_risk_genus, source) %>% 
+  rename(species=species_matched)
+
+# write.csv(longContinuous, 'CleanedData\\Traits\\CoRRE_continuousTraitData_Nov2023.csv', row.names=F)
+
+#combine continuous and categorical
 traitsAll <- meanCleanContinuousErrorRisk %>%
   mutate(source=NA) %>% 
   select(family, species_matched, trait, trait_value, error_risk_overall, error_risk_family, error_risk_genus, source) %>% 
