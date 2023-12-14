@@ -320,8 +320,8 @@ mossKey <- read.csv("CleanedData\\Traits\\complete categorical traits\\sCoRRE ca
 
 # Read in imputed trait data and bind on species information
 ## this is trait data without replacement (all imputed)
-imputedRaw <- read.csv("CleanedData\\Traits\\gap filled continuous traits\\20231006_final\\imputed_traits_mice.csv") %>%
-  bind_cols(read.csv('OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_Oct2023.csv')[,c('DatabaseID', 'DatasetID', 'ObservationID', 'family', 'genus', 'species_matched')]) %>%   
+imputedRaw <- read.csv("CleanedData\\Traits\\gap filled continuous traits\\20231213\\imputed_traits_mice.csv") %>%
+  bind_cols(read.csv('OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_Dec2023.csv')[,c('DatabaseID', 'DatasetID', 'ObservationID', 'family', 'genus', 'species_matched')]) %>%   
   left_join(mossKey) %>% 
   mutate(moss2=ifelse(moss %in% c('non-moss', NA), 1, 0)) %>%  #accounts for all GEx spp being non-moss
   filter(moss2==1) %>%
@@ -331,7 +331,7 @@ imputedLong <- imputedRaw %>%
   pivot_longer(names_to='trait', values_to='imputed_value', seed_dry_mass:SRL)
 
 # Read original trait data and join with imputed data
-originalRaw <- read.csv('OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_Oct2023.csv') %>%
+originalRaw <- read.csv('OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_Dec2023.csv') %>%
   pivot_longer(names_to='trait', values_to='original_value', seed_dry_mass:SRL) %>%
   na.omit() %>% 
   select(-Reference)
@@ -361,7 +361,7 @@ speciesCount <- meanContinuous %>%
   unique() %>% 
   group_by(family) %>% 
   summarize(num_species=length(family)) %>% 
-  ungroup() #147 families
+  ungroup() #147 families, 3079 species
 
 sum(speciesCount$num_species)
 
@@ -385,12 +385,12 @@ transformed <- allContinuous %>%
 
 meanSD <- transformed %>% 
   group_by(trait) %>% 
-  summarise(across('log', .fns=list(mean=mean, sd=sd))) %>% 
+  summarise_at('log', .funs=list(mean=mean, sd=sd)) %>% 
   ungroup()
 
 meanSDSpecies <- transformed %>%  
   group_by(trait, species_matched) %>% 
-  summarize(across('log', .fns=list(species_mean=mean, species_sd=sd, species_length=length))) %>% 
+  summarize_at('log', .funs=list(species_mean=mean, species_sd=sd, species_length=length)) %>% 
   ungroup()
 
 cleanContinuous <- allContinuous %>% 
@@ -398,8 +398,8 @@ cleanContinuous <- allContinuous %>%
   left_join(transformed) %>% 
   left_join(meanSD) %>% 
   left_join(meanSDSpecies) %>% 
-  mutate(error_risk_overall=(log-log_mean)/log_sd) %>% 
-  mutate(error_risk_species=(log-log_species_mean)/log_species_sd) %>% 
+  mutate(error_risk_overall=(log-mean)/sd) %>% 
+  mutate(error_risk_species=(log-species_mean)/species_sd) %>% 
   filter(error_risk_overall<abs(4)) %>%  #drops 590 observations (0.00036% of data)
   filter(error_risk_species<abs(4)) %>% #drops an additional 8138 observations (0.0053% of data), all of which were from species with at least 18 observations for the given trait value being dropped 
   mutate(trait2=ifelse(trait=='leaf_area', 'Leaf Area (leaf, +petiole)',
@@ -461,13 +461,13 @@ ggplot(data=cleanContinousWide, aes(x=as.factor(data_type2), y=trait_value)) +
         axis.title.y=element_text(size=22, angle=90, vjust=0.5, margin=margin(r=15)), axis.text.y=element_text(size=22)) +
   xlab('Data Type') + ylab(expression(log[10]("Trait Value")))  +
   scale_y_continuous(trans='log10', labels=label_comma())
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 4_boxplots of original and imputed_20231108_jitter.png', width=14, height=15, units='in', dpi=300, bg='white')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 4_boxplots of original and imputed_20231214_jitter.png', width=14, height=15, units='in', dpi=300, bg='white')
 
 
 #Look at boxplots for each trait -- means by species
-cleanContinuousWideBoxplot <- cleanContinousWide %>% 
+cleanContinuousWideBoxplot <- cleanContinousWide %>%
   group_by(DatabaseID, data_type2, species_matched, trait, trait2) %>% 
-  summarise(trait_value_mean=trait_value) %>% 
+  summarise(trait_value_mean=mean(trait_value)) %>% 
   ungroup()
 
 #logged
@@ -488,7 +488,7 @@ ggplot(data=cleanContinuousWideBoxplot, aes(x=as.factor(data_type2), y=trait_val
         axis.title.y=element_text(size=22, angle=90, vjust=0.5, margin=margin(r=15)), axis.text.y=element_text(size=22)) +
   xlab('Data Type') + ylab(expression(log[10]("Trait Value")))  +
   scale_y_continuous(trans='log10', labels=label_comma())
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 5_boxplots of original and imputed_20231108_jitter_log_means.png', width=14, height=15, units='in', dpi=300, bg='white')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 5_boxplots of original and imputed_20231214_jitter_log_means.png', width=14, height=15, units='in', dpi=300, bg='white')
 
 #not logged
 ggplot(data=cleanContinuousWideBoxplot, aes(x=as.factor(data_type2), y=trait_value_mean)) +
@@ -507,7 +507,7 @@ ggplot(data=cleanContinuousWideBoxplot, aes(x=as.factor(data_type2), y=trait_val
         axis.title.x=element_text(size=22, vjust=-0.35, margin=margin(t=15)), axis.text.x=element_text(size=22),
         axis.title.y=element_text(size=22, angle=90, vjust=0.5, margin=margin(r=15)), axis.text.y=element_text(size=22)) +
   xlab('Data Type') + ylab("Trait Value")
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 4_boxplots of original and imputed_20231108_jitter_means.png', width=14, height=15, units='in', dpi=300, bg='white')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 4_boxplots of original and imputed_20231214_jitter_means.png', width=14, height=15, units='in', dpi=300, bg='white')
 
 cleanContinuous$trait2 = factor(cleanContinuous$trait2, levels=c('Leaf Area (leaf, +petiole)', 'Leaf Dry Mass', 'Leaf Dry Matter Content', 'Specific Leaf Area (+petiole)', 'Leaf N Content', 'Plant Vegetative Height', 'Specific Root Length (all root)', 'Seed Dry Mass'))
 
@@ -655,7 +655,7 @@ ggplot(data=na.omit(cleanContinuous), aes(x=original_value, y=imputed_value)) +
   theme(strip.text.x = element_text(size = 28),
         axis.title.x=element_text(size=32, vjust=-0.35, margin=margin(t=15)), axis.text.x=element_text(size=32),
         axis.title.y=element_text(size=32, angle=90, vjust=0.5, margin=margin(r=15)), axis.text.y=element_text(size=32)) 
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 6_original v imputed_20231108.png', width=20, height=16, units='in', dpi=300, bg='white')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 6_original v imputed_20231214.png', width=20, height=16, units='in', dpi=300, bg='white')
 
 
 
@@ -718,7 +718,9 @@ meanCleanContinuousErrorRisk <- meanCleanContinuous %>%
 coverage <- meanCleanContinuousErrorRisk %>% 
   select(family, species_matched, trait, trait_value) %>% 
   pivot_wider(names_from=trait, values_from=trait_value)
-# 6 NAs across entire dataframe = 0.000256% of data missing; 99.97% complete for these 2927 species
+
+summary(coverage)
+# 0 NAs across entire dataframe = 0% of data missing, 100% complete for these 2802 species
 
 
 ##### Prepare data for EDI #####
@@ -765,25 +767,25 @@ longCategorical <- categoricalTraits %>%
                                    NA)))))))) %>% 
   rename(species=species_matched)
 
-# write.csv(longCategorical, 'CleanedData\\Traits\\CoRRE_categoricalTraitData_Nov2023.csv', row.names=F)
+# write.csv(longCategorical, 'CleanedData\\Traits\\CoRRE_categoricalTraitData_Dec2023.csv', row.names=F)
 
 longContinuous <- meanCleanContinuousErrorRisk %>%
   mutate(source='Imputed Value') %>% 
   select(family, species_matched, trait, trait_value, error_risk_overall, error_risk_family, error_risk_genus, source) %>% 
   rename(species=species_matched)
 
-# write.csv(longContinuous, 'CleanedData\\Traits\\CoRRE_continuousTraitData_Nov2023.csv', row.names=F)
+# write.csv(longContinuous, 'CleanedData\\Traits\\CoRRE_continuousTraitData_Dec2023.csv', row.names=F)
 
-#combine continuous and categorical
-traitsAll <- meanCleanContinuousErrorRisk %>%
-  mutate(source=NA) %>% 
-  select(family, species_matched, trait, trait_value, error_risk_overall, error_risk_family, error_risk_genus, source) %>% 
-  rbind(longCategorical)
-
-# write.csv(traitsAll, 'CleanedData\\Traits\\CoRRE_allTraitData_Nov2023.csv', row.names=F)
-
-traitsWide <- traitsAll %>% 
-  select(-error_risk_overall, -error_risk_family, -error_risk_genus, -source) %>% 
-  pivot_wider(names_from=trait, values_from=trait_value)
-
-# write.csv(traitsWide, 'CleanedData\\Traits\\CoRRE_allTraitData_wide_Nov2023.csv', row.names=F)
+# #combine continuous and categorical
+# traitsAll <- meanCleanContinuousErrorRisk %>%
+#   mutate(source=NA) %>% 
+#   select(family, species_matched, trait, trait_value, error_risk_overall, error_risk_family, error_risk_genus, source) %>% 
+#   rbind(longCategorical)
+# 
+# # write.csv(traitsAll, 'CleanedData\\Traits\\CoRRE_allTraitData_Nov2023.csv', row.names=F)
+# 
+# traitsWide <- traitsAll %>% 
+#   select(-error_risk_overall, -error_risk_family, -error_risk_genus, -source) %>% 
+#   pivot_wider(names_from=trait, values_from=trait_value)
+# 
+# # write.csv(traitsWide, 'CleanedData\\Traits\\CoRRE_allTraitData_wide_Nov2023.csv', row.names=F)

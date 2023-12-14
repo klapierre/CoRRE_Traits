@@ -87,7 +87,7 @@ growthForm <- read.csv("CleanedData\\Traits\\complete categorical traits\\sCoRRE
   select(species_matched, growth_form)
 
 # Bind all together
-allTraits <- rbind(TRY, AusTraits, BIEN, TiP, CPTD2) %>% 
+allTraits <- rbind(TRY, AusTraits, CPTD2) %>% 
   left_join(growthForm) %>% 
   select(DatabaseID, DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue, Reference)
 
@@ -178,15 +178,15 @@ talltraits <- allTraits %>%
   pivot_wider(names_from=CleanTraitName, values_from=StdValue, values_fill=NA) %>% 
   ungroup()
 
-# write.csv(allTraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_Oct2023_long.csv', row.names = F)
+# write.csv(allTraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_Dec2023_long.csv', row.names = F)
 
-# write.csv(talltraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_Oct2023.csv', row.names = F)
+# write.csv(talltraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_Dec2023.csv', row.names = F)
 
 # References
 references <- allTraits %>% 
   select(Reference) %>% 
   unique()
-# write.csv(references, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_references_Oct2023.csv', row.names = F)
+# write.csv(references, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_references_Dec2023.csv', row.names = F)
 
 
 ##checking traits
