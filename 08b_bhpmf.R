@@ -1,7 +1,7 @@
 ################################################################################
-##  08a_bhpmf.R: Continuous trait imputation: training and validation.
+##  08b_bhpmf.R: Continuous trait imputation: all data.
 ##
-##  Authors: Kimberly Komatsu, Franzisca Schrodt, Josep Padulles Cubino
+##  Authors: Franzisca Schrodt, Josep Padulles Cubino, Kimberly Komatsu
 ################################################################################
 
 # install development version from github
