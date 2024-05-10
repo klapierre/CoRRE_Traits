@@ -89,7 +89,7 @@ for(i in 1:ncol(trait.info)){
   trait.info[,i] <- x
 }
 
-write.table(back_trans_pars, "CleanedData\\Traits\\gap filled continuous traits\\20231213\\back_trans_pars.csv")
+# write.table(back_trans_pars, "CleanedData\\Traits\\gap filled continuous traits\\20231213\\back_trans_pars.csv")
 
 
 ##### gap-filling #####
@@ -114,7 +114,8 @@ for(i in 1:repe) { #loop for each trait (column)
 
 
 ##### load imputed traits and clean-up table #####
-mean.trait<-list()
+mean.trait <- list()
+std.trait <- list()
 for(i in 1:repe) { #loop for each trait (column)
   print(i)
   trt <- read.table(paste0("CleanedData\\Traits\\gap filled continuous traits\\20231213\\mean_gap_filled_",i,".txt"), row.names=NULL, header=T)
@@ -132,16 +133,17 @@ for(i in 1:repe) { #loop for each trait (column)
   }
   
   mean.trait[[i]] <- trt
+  std.trait[[i]] <- std
 }
 
-#get mean across them all:
+
+#### get mean across all means ####
 mean.trait <- abind(mean.trait, along=3)
 mean.trait <- apply(mean.trait, c(1,2), mean, na.rm=T)
 mean.trait[is.nan(mean.trait)] <- NA
 
 #data for back transforming output
 back <- read.table("CleanedData\\Traits\\gap filled continuous traits\\20231213\\back_trans_pars.csv")
-
 
 #don't replace original values:
 trait.info.noreplacement <- as.data.frame(mean.trait)
@@ -168,16 +170,52 @@ for(i in 1:ncol(trait.info.noreplacement)){
   o <- o+3
 }
 
+#save output
+# write.csv(trait.info.noreplacement, "CleanedData\\Traits\\gap filled continuous traits\\20231213\\imputed_traits.csv", row.names=F)
+
+
+#### get mean across all std ####
+std.trait <- abind(std.trait, along=3)
+std.trait <- apply(std.trait, c(1,2), mean, na.rm=T)
+std.trait[is.nan(std.trait)] <- NA
+
+#don't replace original values:
+trait.std.noreplacement <- as.data.frame(std.trait)
+
+o <- 1 #to select the appropriate columns:
+for(i in 1:ncol(trait.std.noreplacement)){
+  
+  #recover values:
+  min_x <- back[1,o]
+  mlogx <- back[1,o+1]
+  slogx <- back[1,o+2]
+  
+  #back transform:
+  x <- trait.std.noreplacement[,i] # goes through the columns
+  logx <- (x*slogx) + mlogx
+  b <- 10^logx
+  
+  #for negative values
+  if(min_x < 0.00000000001){
+    b <- b + min_x - 1 # make this optional if min x is neg
+  }
+  
+  trait.std.noreplacement[,i] <- b
+  o <- o+3
+}
 
 #save output
-write.csv(trait.info.noreplacement, "CleanedData\\Traits\\gap filled continuous traits\\20231213\\imputed_traits.csv", row.names=F)
+# write.csv(trait.std.noreplacement, "CleanedData\\Traits\\gap filled continuous traits\\20231213\\imputed_traits_std.csv", row.names=F)
 
 
 
 ##### Impute missing values with "mice" #####
-trait.info.mice <- complete(mice(trait.info.noreplacement, method="cart"))
+trait.info.mice <- complete(mice(trait.info.noreplacement, method="cart"), action = "long")
+trait.info.mice.mean <- aggregate(. ~ .id, data = trait.info.mice[, -1], FUN = mean) #mean values: the final output
+trait.info.mice.sd <- aggregate(. ~ .id, data = trait.info.mice[, -1], FUN = sd) #SDs per observation
 
-write.csv(trait.info.mice, "CleanedData\\Traits\\gap filled continuous traits\\20231213\\imputed_traits_mice.csv", row.names=F)
+# write.csv(trait.info.mice.mean, "CleanedData\\Traits\\gap filled continuous traits\\20231213\\imputed_traits_mice.csv", row.names=F)
+# write.csv(trait.info.mice.sd, "CleanedData\\Traits\\gap filled continuous traits\\20231213\\imputed_traits_mice_std.csv", row.names=F)
 
 #clean-up:
 # rm(list = ls())
