@@ -19,7 +19,7 @@ library(mice)
 ##### read original trait matrix for imputation #####
 setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data')
 
-traits <- read.table("OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_Jan2024.csv", row.names=NULL, sep=",", header=T) %>% 
+traits <- read.table("OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_Apr2024.csv", row.names=NULL, sep=",", header=T) %>% 
   select(-Reference) %>% 
   pivot_longer(cols=seed_dry_mass:SRL, names_to='trait', values_to='values') %>% 
   arrange(family, genus, species_matched, trait) %>%
@@ -100,12 +100,12 @@ for(i in 1:ncol(trait.info)){
   trait.info[,i] <- x
 }
 
-write.table(back_trans_pars, "CleanedData\\Traits\\gap filled continuous traits\\20240423_trainingValidation\\20240423_trainingValidation_12\\back_trans_pars.csv")
+write.table(back_trans_pars, "CleanedData\\Traits\\gap filled continuous traits\\20240510_trainingValidation\\20240510_trainingValidation_12\\back_trans_pars.csv")
 
 
 # gap-filling
 #set-directory
-tmp.dir <- dirname("CleanedData\\Traits\\gap filled continuous traits\\20240423_trainingValidation\\20240423_trainingValidation_12\\tmp")
+tmp.dir <- dirname("CleanedData\\Traits\\gap filled continuous traits\\20240510_trainingValidation\\20240510_trainingValidation_12\\tmp")
 
 #set parameters
 smpl <- 900:1000
@@ -128,8 +128,8 @@ for(i in 1:repe) { #loop for each trait (column)
 mean.trait<-list()
 for(i in 1:repe) { #loop for each trait (column)
   print(i)
-  trt <- read.table(paste0("CleanedData\\Traits\\gap filled continuous traits\\20240423_trainingValidation\\20240423_trainingValidation_12\\mean_gap_filled_",i,".txt"), row.names=NULL, header=T)
-  std <- read.table(paste0("CleanedData\\Traits\\gap filled continuous traits\\20240423_trainingValidation\\20240423_trainingValidation_12\\std_gap_filled_",i,".txt"), row.names=NULL, header=T)
+  trt <- read.table(paste0("CleanedData\\Traits\\gap filled continuous traits\\20240510_trainingValidation\\20240510_trainingValidation_12\\mean_gap_filled_",i,".txt"), row.names=NULL, header=T)
+  std <- read.table(paste0("CleanedData\\Traits\\gap filled continuous traits\\20240510_trainingValidation\\20240510_trainingValidation_12\\std_gap_filled_",i,".txt"), row.names=NULL, header=T)
 
   #Return to NA those values with SD > 1:
   for(j in 1:ncol(trt)) {
@@ -151,7 +151,7 @@ mean.trait <- apply(mean.trait, c(1,2), mean, na.rm=T)
 mean.trait[is.nan(mean.trait)] <- NA
 
 #data for back transforming output
-back <- read.table("CleanedData\\Traits\\gap filled continuous traits\\20240423_trainingValidation\\20240423_trainingValidation_12\\back_trans_pars.csv")
+back <- read.table("CleanedData\\Traits\\gap filled continuous traits\\20240510_trainingValidation\\20240510_trainingValidation_12\\back_trans_pars.csv")
 
 
 #don't replace original values:
@@ -181,15 +181,15 @@ for(i in 1:ncol(trait.info.noreplacement)){
 
 
 #save output
-write.csv(trait.info.noreplacement, "CleanedData\\Traits\\gap filled continuous traits\\20240423_trainingValidation\\imputed_traits_12.csv", row.names=F)
+write.csv(trait.info.noreplacement, "CleanedData\\Traits\\gap filled continuous traits\\20240510_trainingValidation\\imputed_traits_12.csv", row.names=F)
 
 # Impute missing values with "mice"
 trait.info.mice <- complete(mice(trait.info.noreplacement, method="cart"))
 
-write.csv(trait.info.mice, "CleanedData\\Traits\\gap filled continuous traits\\20240423_trainingValidation\\imputed_traits_mice_12.csv", row.names=F)
+write.csv(trait.info.mice, "CleanedData\\Traits\\gap filled continuous traits\\20240510_trainingValidation\\imputed_traits_mice_12.csv", row.names=F)
 
 #clean-up:
-rm(list = ls())
+# rm(list = ls())
 
 
 ##### training with sets 1 and 3; validation of set 2 #####
@@ -251,12 +251,12 @@ for(i in 1:ncol(trait.info)){
   trait.info[,i] <- x
 }
 
-write.table(back_trans_pars, "CleanedData\\Traits\\gap filled continuous traits\\20240423_trainingValidation\\20240423_trainingValidation_13\\back_trans_pars.csv")
+write.table(back_trans_pars, "CleanedData\\Traits\\gap filled continuous traits\\20240510_trainingValidation\\20240510_trainingValidation_13\\back_trans_pars.csv")
 
 
 # gap-filling
 #set-directory
-tmp.dir <- dirname("CleanedData\\Traits\\gap filled continuous traits\\20240423_trainingValidation\\20240423_trainingValidation_13\\tmp")
+tmp.dir <- dirname("CleanedData\\Traits\\gap filled continuous traits\\20240510_trainingValidation\\20240510_trainingValidation_13\\tmp")
 
 #set parameters
 smpl <- 900:1000
@@ -279,8 +279,8 @@ for(i in 1:repe) { #loop for each trait (column)
 mean.trait<-list()
 for(i in 1:repe) { #loop for each trait (column)
   print(i)
-  trt <- read.table(paste0("CleanedData\\Traits\\gap filled continuous traits\\20240423_trainingValidation\\20240423_trainingValidation_13\\mean_gap_filled_",i,".txt"), row.names=NULL, header=T)
-  std <- read.table(paste0("CleanedData\\Traits\\gap filled continuous traits\\20240423_trainingValidation\\20240423_trainingValidation_13\\std_gap_filled_",i,".txt"), row.names=NULL, header=T)
+  trt <- read.table(paste0("CleanedData\\Traits\\gap filled continuous traits\\20240510_trainingValidation\\20240510_trainingValidation_13\\mean_gap_filled_",i,".txt"), row.names=NULL, header=T)
+  std <- read.table(paste0("CleanedData\\Traits\\gap filled continuous traits\\20240510_trainingValidation\\20240510_trainingValidation_13\\std_gap_filled_",i,".txt"), row.names=NULL, header=T)
   
   #Return to NA those values with SD > 1:
   for(j in 1:ncol(trt)) {
@@ -302,7 +302,7 @@ mean.trait <- apply(mean.trait, c(1,2), mean, na.rm=T)
 mean.trait[is.nan(mean.trait)] <- NA
 
 #data for back transforming output
-back <- read.table("CleanedData\\Traits\\gap filled continuous traits\\20240423_trainingValidation\\20240423_trainingValidation_13\\back_trans_pars.csv")
+back <- read.table("CleanedData\\Traits\\gap filled continuous traits\\20240510_trainingValidation\\20240510_trainingValidation_13\\back_trans_pars.csv")
 
 
 #don't replace original values:
@@ -332,15 +332,15 @@ for(i in 1:ncol(trait.info.noreplacement)){
 
 
 #save output
-write.csv(trait.info.noreplacement, "CleanedData\\Traits\\gap filled continuous traits\\20240423_trainingValidation\\imputed_traits_13.csv", row.names=F)
+write.csv(trait.info.noreplacement, "CleanedData\\Traits\\gap filled continuous traits\\20240510_trainingValidation\\imputed_traits_13.csv", row.names=F)
 
 # Impute missing values with "mice"
 trait.info.mice <- complete(mice(trait.info.noreplacement, method="cart"))
 
-write.csv(trait.info.mice, "CleanedData\\Traits\\gap filled continuous traits\\20240423_trainingValidation\\imputed_traits_mice_13.csv", row.names=F)
+write.csv(trait.info.mice, "CleanedData\\Traits\\gap filled continuous traits\\20240510_trainingValidation\\imputed_traits_mice_13.csv", row.names=F)
 
 # clean-up:
-rm(list = ls())
+# rm(list = ls())
 
 
 
@@ -404,12 +404,12 @@ for(i in 1:ncol(trait.info)){
   trait.info[,i] <- x
 }
 
-write.table(back_trans_pars, "CleanedData\\Traits\\gap filled continuous traits\\20240423_trainingValidation\\20240423_trainingValidation_23\\back_trans_pars.csv")
+write.table(back_trans_pars, "CleanedData\\Traits\\gap filled continuous traits\\20240510_trainingValidation\\20240510_trainingValidation_23\\back_trans_pars.csv")
 
 
 # gap-filling
 #set-directory
-tmp.dir <- dirname("CleanedData\\Traits\\gap filled continuous traits\\20240423_trainingValidation\\20240423_trainingValidation_23\\tmp")
+tmp.dir <- dirname("CleanedData\\Traits\\gap filled continuous traits\\20240510_trainingValidation\\20240510_trainingValidation_23\\tmp")
 
 #set parameters
 smpl <- 900:1000
@@ -431,8 +431,8 @@ for(i in 1:repe) { #loop for each trait (column)
 mean.trait<-list()
 for(i in 1:repe) { #loop for each trait (column)
   print(i)
-  trt <- read.table(paste0("CleanedData\\Traits\\gap filled continuous traits\\20240423_trainingValidation\\20240423_trainingValidation_23\\mean_gap_filled_",i,".txt"), row.names=NULL, header=T)
-  std <- read.table(paste0("CleanedData\\Traits\\gap filled continuous traits\\20240423_trainingValidation\\20240423_trainingValidation_23\\std_gap_filled_",i,".txt"), row.names=NULL, header=T)
+  trt <- read.table(paste0("CleanedData\\Traits\\gap filled continuous traits\\20240510_trainingValidation\\20240510_trainingValidation_23\\mean_gap_filled_",i,".txt"), row.names=NULL, header=T)
+  std <- read.table(paste0("CleanedData\\Traits\\gap filled continuous traits\\20240510_trainingValidation\\20240510_trainingValidation_23\\std_gap_filled_",i,".txt"), row.names=NULL, header=T)
   
   #Return to NA those values with SD > 1:
   for(j in 1:ncol(trt)) {
@@ -454,7 +454,7 @@ mean.trait <- apply(mean.trait, c(1,2), mean, na.rm=T)
 mean.trait[is.nan(mean.trait)] <- NA
 
 #data for back transforming output
-back <- read.table("CleanedData\\Traits\\gap filled continuous traits\\20240423_trainingValidation\\20240423_trainingValidation_23\\back_trans_pars.csv")
+back <- read.table("CleanedData\\Traits\\gap filled continuous traits\\20240510_trainingValidation\\20240510_trainingValidation_23\\back_trans_pars.csv")
 
 
 #don't replace original values:
@@ -484,12 +484,12 @@ for(i in 1:ncol(trait.info.noreplacement)){
 
 
 #save output
-write.csv(trait.info.noreplacement, "CleanedData\\Traits\\gap filled continuous traits\\20240423_trainingValidation\\imputed_traits_23.csv", row.names=F)
+write.csv(trait.info.noreplacement, "CleanedData\\Traits\\gap filled continuous traits\\20240510_trainingValidation\\imputed_traits_23.csv", row.names=F)
 
 # Impute missing values with "mice"
 trait.info.mice <- complete(mice(trait.info.noreplacement, method="cart"))
 
-write.csv(trait.info.mice, "CleanedData\\Traits\\gap filled continuous traits\\20240423_trainingValidation\\imputed_traits_mice_23.csv", row.names=F)
+write.csv(trait.info.mice, "CleanedData\\Traits\\gap filled continuous traits\\20240510_trainingValidation\\imputed_traits_mice_23.csv", row.names=F)
 
 #clean-up:
 rm(list = ls())
@@ -510,7 +510,7 @@ theme_update(axis.title.x=element_text(size=30, vjust=-0.35, margin=margin(t=15)
 traits12long <- traits12 %>% 
   pivot_longer(cols=seed_dry_mass:X614, names_to='trait', values_to='original_value')
 
-trial12 <- read.csv('CleanedData\\Traits\\gap filled continuous traits\\20240423_trainingValidation\\imputed_traits_mice_12.csv') %>%
+trial12 <- read.csv('CleanedData\\Traits\\gap filled continuous traits\\20240510_trainingValidation\\imputed_traits_mice_12.csv') %>%
   bind_cols(traits12[,c('DatabaseID', 'DatasetID', 'ObservationID', 'family', 'genus', 'species_matched')]) %>% 
   mutate(validate=3) %>% 
   pivot_longer(cols=seed_dry_mass:X614, names_to='trait', values_to='imputed_value') %>% 
@@ -522,7 +522,7 @@ trial12 <- read.csv('CleanedData\\Traits\\gap filled continuous traits\\20240423
 traits13long <- traits13 %>% 
   pivot_longer(cols=seed_dry_mass:X614, names_to='trait', values_to='original_value')
 
-trial13 <- read.csv('CleanedData\\Traits\\gap filled continuous traits\\20240423_trainingValidation\\imputed_traits_mice_13.csv') %>%
+trial13 <- read.csv('CleanedData\\Traits\\gap filled continuous traits\\20240510_trainingValidation\\imputed_traits_mice_13.csv') %>%
   bind_cols(traits13[,c('DatabaseID', 'DatasetID', 'ObservationID', 'family', 'genus', 'species_matched')]) %>% 
   mutate(validate=2) %>% 
   pivot_longer(cols=seed_dry_mass:X614, names_to='trait', values_to='imputed_value') %>% 
@@ -534,7 +534,7 @@ trial13 <- read.csv('CleanedData\\Traits\\gap filled continuous traits\\20240423
 traits23long <- traits23 %>% 
   pivot_longer(cols=seed_dry_mass:X614, names_to='trait', values_to='original_value')
 
-trial23 <- read.csv('CleanedData\\Traits\\gap filled continuous traits\\20240423_trainingValidation\\imputed_traits_mice_23.csv') %>%
+trial23 <- read.csv('CleanedData\\Traits\\gap filled continuous traits\\20240510_trainingValidation\\imputed_traits_mice_23.csv') %>%
   bind_cols(traits23[,c('DatabaseID', 'DatasetID', 'ObservationID', 'family', 'genus', 'species_matched')]) %>% 
   mutate(validate=1) %>% 
   pivot_longer(cols=seed_dry_mass:X614, names_to='trait', values_to='imputed_value') %>% 

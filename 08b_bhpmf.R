@@ -17,8 +17,8 @@ library(mice)
 ##### read original trait matrix for imputation #####
 setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data')
 
-traits <- read.table("OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_Jan2024.csv", row.names=NULL, sep=",", header=T) %>% 
-  select(-Reference)
+traits <- read.table("OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_Apr2024.csv", row.names=NULL, sep=",", header=T) %>% 
+  select(-Reference, -ReferenceID)
 
 # traits <- traits[1:100000,]
 
@@ -89,12 +89,12 @@ for(i in 1:ncol(trait.info)){
   trait.info[,i] <- x
 }
 
-# write.table(back_trans_pars, "CleanedData\\Traits\\gap filled continuous traits\\20231213\\back_trans_pars.csv")
+# write.table(back_trans_pars, "CleanedData\\Traits\\gap filled continuous traits\\20231006_final\\back_trans_pars.csv")
 
 
 ##### gap-filling #####
 #set-directory
-tmp.dir <- dirname("CleanedData\\Traits\\gap filled continuous traits\\20231213\\tmp")
+tmp.dir <- dirname("CleanedData\\Traits\\gap filled continuous traits\\20231006_final\\tmp")
 
 #set parameters
 smpl <- 900:1000
@@ -118,8 +118,8 @@ mean.trait <- list()
 std.trait <- list()
 for(i in 1:repe) { #loop for each trait (column)
   print(i)
-  trt <- read.table(paste0("CleanedData\\Traits\\gap filled continuous traits\\20231213\\mean_gap_filled_",i,".txt"), row.names=NULL, header=T)
-  std <- read.table(paste0("CleanedData\\Traits\\gap filled continuous traits\\20231213\\std_gap_filled_",i,".txt"), row.names=NULL, header=T)
+  trt <- read.table(paste0("CleanedData\\Traits\\gap filled continuous traits\\20231006_final\\mean_gap_filled_",i,".txt"), row.names=NULL, header=T)
+  std <- read.table(paste0("CleanedData\\Traits\\gap filled continuous traits\\20231006_final\\std_gap_filled_",i,".txt"), row.names=NULL, header=T)
 
   #Return to NA those values with SD > 1:
   for(j in 1:ncol(trt)) {
@@ -143,7 +143,7 @@ mean.trait <- apply(mean.trait, c(1,2), mean, na.rm=T)
 mean.trait[is.nan(mean.trait)] <- NA
 
 #data for back transforming output
-back <- read.table("CleanedData\\Traits\\gap filled continuous traits\\20231213\\back_trans_pars.csv")
+back <- read.table("CleanedData\\Traits\\gap filled continuous traits\\20231006_final\\back_trans_pars.csv")
 
 #don't replace original values:
 trait.info.noreplacement <- as.data.frame(mean.trait)
@@ -171,7 +171,7 @@ for(i in 1:ncol(trait.info.noreplacement)){
 }
 
 #save output
-# write.csv(trait.info.noreplacement, "CleanedData\\Traits\\gap filled continuous traits\\20231213\\imputed_traits.csv", row.names=F)
+# write.csv(trait.info.noreplacement, "CleanedData\\Traits\\gap filled continuous traits\\20231006_final\\imputed_traits.csv", row.names=F)
 
 
 #### get mean across all std ####
@@ -205,7 +205,7 @@ for(i in 1:ncol(trait.std.noreplacement)){
 }
 
 #save output
-# write.csv(trait.std.noreplacement, "CleanedData\\Traits\\gap filled continuous traits\\20231213\\imputed_traits_std.csv", row.names=F)
+# write.csv(trait.std.noreplacement, "CleanedData\\Traits\\gap filled continuous traits\\20231006_final\\imputed_traits_std.csv", row.names=F)
 
 
 
@@ -214,8 +214,8 @@ trait.info.mice <- complete(mice(trait.info.noreplacement, method="cart"), actio
 trait.info.mice.mean <- aggregate(. ~ .id, data = trait.info.mice[, -1], FUN = mean) #mean values: the final output
 trait.info.mice.sd <- aggregate(. ~ .id, data = trait.info.mice[, -1], FUN = sd) #SDs per observation
 
-# write.csv(trait.info.mice.mean, "CleanedData\\Traits\\gap filled continuous traits\\20231213\\imputed_traits_mice.csv", row.names=F)
-# write.csv(trait.info.mice.sd, "CleanedData\\Traits\\gap filled continuous traits\\20231213\\imputed_traits_mice_std.csv", row.names=F)
+# write.csv(trait.info.mice.mean, "CleanedData\\Traits\\gap filled continuous traits\\20231006_final\\imputed_traits_mice.csv", row.names=F)
+# write.csv(trait.info.mice.sd, "CleanedData\\Traits\\gap filled continuous traits\\20231006_final\\imputed_traits_mice_std.csv", row.names=F)
 
 #clean-up:
 # rm(list = ls())
