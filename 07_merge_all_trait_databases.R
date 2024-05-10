@@ -179,15 +179,15 @@ talltraits <- allTraits %>%
   pivot_wider(names_from=CleanTraitName, values_from=StdValue, values_fill=NA) %>% 
   ungroup()
 
-# write.csv(allTraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_Dec2023_long.csv', row.names = F)
+# write.csv(allTraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_Apr2024_long.csv', row.names = F)
 
-# write.csv(talltraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_Dec2023.csv', row.names = F)
+# write.csv(talltraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_Apr2024.csv', row.names = F)
 
 # References
 references <- allTraits %>% 
   select(Reference) %>% 
   unique()
-# write.csv(references, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_references_Dec2023.csv', row.names = F)
+# write.csv(references, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_references_Apr2024.csv', row.names = F)
 
 
 ##checking traits
