@@ -87,9 +87,10 @@ growthForm <- read.csv("CleanedData\\Traits\\complete categorical traits\\sCoRRE
   select(species_matched, growth_form)
 
 # Bind all together
-allTraits <- rbind(TRY, AusTraits, CPTD2) %>% 
+allTraits <- rbind(TRY, AusTraits, BIEN, TiP, CPTD2) %>% 
   left_join(growthForm) %>% 
-  select(DatabaseID, DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue, Reference)
+  mutate(ReferenceID=paste(DatabaseID, DatasetID, sep='_')) %>% 
+  select(DatabaseID, DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue, Reference, ReferenceID)
 
 allTraits_wide <- allTraits %>% 
   select(-Reference) %>% 
@@ -102,7 +103,7 @@ miss/total*100
 
 spnum <- length(unique(allTraits_wide$species_matched))
 famnum <- length(unique(allTraits_wide$family))
-# originally were missing 96.6% of data for all species, now with only traits of interest we are missing 88.54% of data
+# we are missing 88.5% of data
 
 label <- allTraits %>%
   group_by(CleanTraitName, DatabaseID) %>%
