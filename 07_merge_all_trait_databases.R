@@ -40,7 +40,7 @@ GExSpecies <- read.csv('OriginalData\\Traits\\GEx_species_family_May2023.csv') %
 names <- rbind(correSpecies, GExSpecies) %>% 
   unique() %>% 
   mutate(drop=ifelse(species_matched=='Dianella longifolia' & family=='Xanthorrhoeaceae', 1, 
-              ifelse(species_matched=='Lancea tibetica' & family=='Phrymaceae', 1, 0))) %>% 
+                     ifelse(species_matched=='Lancea tibetica' & family=='Phrymaceae', 1, 0))) %>% 
   filter(drop==0) %>% 
   select(-drop)
 
@@ -60,20 +60,20 @@ TRY <- read.csv('OriginalData\\Traits\\TRY\\TRY_trait_data_continuous_long_Oct20
   select(DatabaseID, DatasetID, ObservationID, family, species_matched, genus, CleanTraitName, StdValue, Reference) %>% 
   filter(StdValue>0)
 
-# # BIEN - NOTE: photosynthetic rate, stomatal conductance, stem specific density were dropped in the BIEN cleaning file because they were out of line with the TRY trait values
-# BIEN <- read.csv('OriginalData\\Traits\\BIEN\\BIEN_for_scorre_202310263.csv') %>% 
-#   left_join(names) %>%
-#   mutate(Reference=DatasetID) %>% 
-#   select(DatabaseID, DatasetID, ObservationID, family, species_matched, genus, CleanTraitName, StdValue, Reference) %>% 
-#   filter(StdValue>0)
+# BIEN - NOTE: photosynthetic rate, stomatal conductance, stem specific density were dropped in the BIEN cleaning file because they were out of line with the TRY trait values
+BIEN <- read.csv('OriginalData\\Traits\\BIEN\\BIEN_for_scorre_202310263.csv') %>% 
+  left_join(names) %>%
+  mutate(Reference=DatasetID) %>% 
+  select(DatabaseID, DatasetID, ObservationID, family, species_matched, genus, CleanTraitName, StdValue, Reference) %>% 
+  filter(StdValue>0)
 
-# # TiP leaf
-# TiP <- read.csv('OriginalData\\Traits\\TiP_leaf\\TiP_leaf_Oct2023.csv') %>% 
-#   separate(col=species_matched, into=c('genus', 'species'), sep=' ', remove=F) %>% 
-#   left_join(names) %>% 
-#   mutate(Reference='TipLeaf Database') %>% 
-#   select(DatabaseID, DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue, Reference) %>% 
-#   filter(StdValue>0)
+# TiP leaf
+TiP <- read.csv('OriginalData\\Traits\\TiP_leaf\\TiP_leaf_Oct2023.csv') %>% 
+  separate(col=species_matched, into=c('genus', 'species'), sep=' ', remove=F) %>% 
+  left_join(names) %>% 
+  mutate(Reference='TipLeaf Database') %>% 
+  select(DatabaseID, DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue, Reference) %>% 
+  filter(StdValue>0)
 
 # China Plant Trait Database 2
 CPTD2 <- read.csv('OriginalData\\Traits\\ChinaPlant2\\CPTD2_Oct2023.csv') %>% 
@@ -89,8 +89,7 @@ growthForm <- read.csv("CleanedData\\Traits\\complete categorical traits\\sCoRRE
 # Bind all together
 allTraits <- rbind(TRY, AusTraits, CPTD2) %>% 
   left_join(growthForm) %>% 
-  mutate(ReferenceID=paste(DatabaseID, DatasetID, sep='_')) %>% 
-  select(ReferenceID, DatabaseID, DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue, Reference)
+  select(DatabaseID, DatasetID, ObservationID, family, genus, species_matched, CleanTraitName, StdValue, Reference)
 
 allTraits_wide <- allTraits %>% 
   select(-Reference) %>% 
@@ -117,24 +116,24 @@ label <- allTraits %>%
   unique() %>%
   mutate(percent=round((length/253224)*100, 1)) %>% 
   mutate(CleanTraitName2=
-                         # ifelse(CleanTraitName==3108, 'LA (leaf, -petiole)',
-                         ifelse(CleanTraitName==3109, 'Leaf Area (leaflet, -petiole)',
-                         # ifelse(CleanTraitName==3111, 'LA (leaflet, +petiole)',
-                         # ifelse(CleanTraitName==3112, 'LA (leaf, undefined)',
-                         # ifelse(CleanTraitName==3113, 'LA (leaflet, undefined)',
-                         ifelse(CleanTraitName==3114, 'Leaf Area (undefined, undefined)',
-                         ifelse(CleanTraitName=='leaf_area', 'Leaf Area (leaf, +petiole)',
-                         ifelse(CleanTraitName==3115, 'Specific Leaf Area (-petiole)',
-                         ifelse(CleanTraitName==3117, 'Specific Leaf Area (undefined)',
-                         ifelse(CleanTraitName=='SLA', 'Specific Leaf Area (+petiole)', 
-                         ifelse(CleanTraitName=='SRL', 'Specific Root Length (all root)',
-                         ifelse(CleanTraitName==614, 'Specific Root Length (fine root)', 
-                         ifelse(CleanTraitName=='leaf_N', 'Leaf N Content',
-                         ifelse(CleanTraitName=='plant_height_vegetative', 'Plant Vegetative Height',
-                         ifelse(CleanTraitName=='seed_dry_mass', 'Seed Dry Mass',
-                         ifelse(CleanTraitName=='leaf_dry_mass', 'Leaf Dry Mass',
-                         ifelse(CleanTraitName=='LDMC', 'Leaf Dry Matter Content',
-                                CleanTraitName))))))))))))))
+           # ifelse(CleanTraitName==3108, 'LA (leaf, -petiole)',
+           ifelse(CleanTraitName==3109, 'Leaf Area (leaflet, -petiole)',
+           # ifelse(CleanTraitName==3111, 'LA (leaflet, +petiole)',
+           # ifelse(CleanTraitName==3112, 'LA (leaf, undefined)',
+           # ifelse(CleanTraitName==3113, 'LA (leaflet, undefined)',
+           ifelse(CleanTraitName==3114, 'Leaf Area (undefined, undefined)',
+           ifelse(CleanTraitName=='leaf_area', 'Leaf Area (leaf, +petiole)',
+           ifelse(CleanTraitName==3115, 'Specific Leaf Area (-petiole)',
+           ifelse(CleanTraitName==3117, 'Specific Leaf Area (undefined)',
+           ifelse(CleanTraitName=='SLA', 'Specific Leaf Area (+petiole)', 
+           ifelse(CleanTraitName=='SRL', 'Specific Root Length (all root)',
+           ifelse(CleanTraitName==614, 'Specific Root Length (fine root)', 
+           ifelse(CleanTraitName=='leaf_N', 'Leaf N Content',
+           ifelse(CleanTraitName=='plant_height_vegetative', 'Plant Vegetative Height',
+           ifelse(CleanTraitName=='seed_dry_mass', 'Seed Dry Mass',
+           ifelse(CleanTraitName=='leaf_dry_mass', 'Leaf Dry Mass',
+           ifelse(CleanTraitName=='LDMC', 'Leaf Dry Matter Content',
+           CleanTraitName))))))))))))))
 
 label$CleanTraitName2 = factor(label$CleanTraitName2, levels=c('Leaf Area (leaf, +petiole)', 'Leaf Area (leaflet, -petiole)', 'Leaf Area (undefined, undefined)', 'Leaf Dry Mass', 'Leaf Dry Matter Content', 'Specific Leaf Area (+petiole)', 'Specific Leaf Area (-petiole)', 'Specific Leaf Area (undefined)', 'Leaf N Content', 'Plant Vegetative Height', 'Specific Root Length (all root)', 'Specific Root Length (fine root)', 'Seed Dry Mass'))
 
@@ -146,16 +145,16 @@ ggplot(data=label, aes(x=DatabaseID, y=length, label=round(percent,1), fill=Data
   geom_text(vjust = -0.25, size=6) +
   facet_wrap(~CleanTraitName2, ncol=5, labeller=label_wrap_gen(width=25)) +
   scale_y_continuous(labels = label_comma()) +
-  scale_x_discrete(breaks=c("AusTraits", "CPTD2", "TRY", "total"),
-                   limits=c("AusTraits", "CPTD2", "TRY", "total"),
-                   labels=c("Aus", "C2", "TRY", 'all')) +
-  scale_fill_manual(values=c('#4E3686', '#80D87F','darkgrey', '#FED23F'))+
+  scale_x_discrete(breaks=c("AusTraits", "BIEN", "CPTD2", "TIPleaf", "TRY", "total"),
+                   limits=c("AusTraits", "BIEN", "CPTD2", "TIPleaf", "TRY", "total"),
+                   labels=c("Au", "BN", "C2", "TP", "TY", 'all')) +
+  scale_fill_manual(values=c('#4E3686', '#5DA4D9', '#80D87F', '#FED23F','darkgrey', '#EE724C'))+
   theme(strip.text.x = element_text(size = 18),
         axis.title.x=element_text(size=24, vjust=-0.35, margin=margin(t=15)), axis.text.x=element_text(size=22),
         axis.title.y=element_text(size=24, angle=90, vjust=0.5, margin=margin(r=15)), axis.text.y=element_text(size=22),
         legend.position='none') +
   ylab('Number of Observations') + xlab('Database ID')
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 3_input percent complete_20240111.png', width=17, height=19, units='in', dpi=300, bg='white')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 3_input percent complete_20231103.png', width=17, height=19, units='in', dpi=300, bg='white')
 
 # Are there any outlier datasets for each trait?
 ggplot(data=allTraits, aes(x=DatabaseID, y=StdValue)) +
@@ -163,14 +162,14 @@ ggplot(data=allTraits, aes(x=DatabaseID, y=StdValue)) +
   geom_jitter(aes(color=DatabaseID)) +
   geom_boxplot(color='black', alpha=0) +
   facet_wrap(~CleanTraitName, scales='free_y', ncol=4) +
-  scale_x_discrete(breaks=c("AusTraits", "CPTD2", "TRY"),
-                   labels=c("Aus", "C2", "TRY")) +
-  scale_color_manual(values=c('#4E3686', '#80D87F', '#FED23F')) +
+  scale_x_discrete(breaks=c("AusTraits", "BIEN", "CPTD2", "TIPleaf", "TRY"),
+                   labels=c("A", "B", "C", "TIP", "TY")) +
+  scale_color_manual(values=c('#4E3686', '#5DA4D9', '#80D87F', '#FED23F', '#EE724C')) +
   theme_bw() +
   theme(panel.grid.major=element_blank(),
         panel.grid.minor=element_blank(),
         legend.position='top') 
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig x_input traits histograms_20240111.png', width=7.5, height=10, units='in', dpi=300, bg='white')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig x_input traits histograms.png', width=7.5, height=10, units='in', dpi=300, bg='white')
 
 
 # Transpose to wide format for gap filling.
@@ -179,16 +178,15 @@ talltraits <- allTraits %>%
   pivot_wider(names_from=CleanTraitName, values_from=StdValue, values_fill=NA) %>% 
   ungroup()
 
-# write.csv(allTraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_Apr2024_long.csv', row.names = F)
+# write.csv(allTraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_Dec2023_long.csv', row.names = F)
 
-# write.csv(talltraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_Jan2024.csv', row.names = F)
+# write.csv(talltraits, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_Dec2023.csv', row.names = F)
 
 # References
 references <- allTraits %>% 
-  select(ReferenceID, Reference) %>% 
+  select(Reference) %>% 
   unique()
-  
-# write.csv(references, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_references_Apr2024.csv', row.names = F)
+# write.csv(references, 'OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_references_Dec2023.csv', row.names = F)
 
 
 ##checking traits
@@ -204,16 +202,16 @@ multiTraitInd <- allTraits %>%
   group_by(DatabaseID, DatasetID, ObservationID, species_matched) %>% 
   summarise(num_traits=length(CleanTraitName)) %>% 
   ungroup() #%>%
-  # filter(num_traits>1)
-# 184,165 individuals measured (some have more than 1 trait measured on the same individual)
-# 50,705 individuals have more than 1 trait measured on the same individual
+# filter(num_traits>1)
+# 206,113 individuals measured (some have more than 1 trait measured on the same individual)
+# 51,177 individuals have more than 1 trait measured on the same individual
 
 ggplot(data=multiTraitInd, aes(x=num_traits)) +
   geom_histogram(binwidth = 1) +
   xlab('Number of Traits per Individual') + ylab('Number of Individuals') +
-  scale_y_break(c(40000, 130000), ticklabels=c(130000, 150000))
+  scale_y_break(c(40000, 130000), ticklabels=c(140000, 150000))
 
-# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 2_traits per individual histogram_20240111.png', width=8, height=8, units='in', dpi=300, bg='white')
+# ggsave('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\sDiv\\sDiv_sCoRRE_shared\\DataPaper\\2023_sCoRRE_traits\\figures\\Fig 2_traits per individual histogram_20231103.png', width=8, height=8, units='in', dpi=300, bg='white')
 
 # Which families have very little observed data going into the gap filling methods?
 traitMeasured <- allTraits %>% 
