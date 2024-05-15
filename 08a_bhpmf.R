@@ -20,7 +20,7 @@ library(mice)
 setwd('C:\\Users\\kjkomatsu\\Dropbox (Smithsonian)\\working groups\\CoRRE\\CoRRE_database\\Data')
 
 traits <- read.table("OriginalData\\Traits\\raw traits for gap filling\\TRYAusBIEN_continuous_Apr2024.csv", row.names=NULL, sep=",", header=T) %>% 
-  select(-Reference) %>% 
+  select(-Reference, -ReferenceID) %>% 
   pivot_longer(cols=seed_dry_mass:SRL, names_to='trait', values_to='values') %>% 
   arrange(family, genus, species_matched, trait) %>%
   filter(!is.na(values))
@@ -38,13 +38,13 @@ traits13 <- filter(traits, training %in% c(1,3)) %>% select(-training) %>% pivot
 traits23 <- filter(traits, training %in% c(2,3)) %>% select(-training) %>% pivot_wider(names_from=trait, values_from=values) %>% as.data.frame()
 
 sum(is.na(traits12$seed_dry_mass), is.na(traits12$X3117), is.na(traits12$LDMC), is.na(traits12$leaf_area), is.na(traits12$leaf_N), is.na(traits12$SLA), is.na(traits12$leaf_dry_mass), is.na(traits12$plant_height_vegetative), is.na(traits12$SRL), is.na(traits12$X3114), is.na(traits12$X3115), is.na(traits12$X3109), is.na(traits12$X614))
-# 1587707 missing of 1776437 (89.4% missing)
+# 1763587 missing of 1968200 (89.6% missing)
 
 sum(is.na(traits13$seed_dry_mass), is.na(traits13$X3117), is.na(traits13$LDMC), is.na(traits13$leaf_area), is.na(traits13$leaf_N), is.na(traits13$SLA), is.na(traits13$leaf_dry_mass), is.na(traits13$plant_height_vegetative), is.na(traits13$SRL), is.na(traits13$X3114), is.na(traits13$X3115), is.na(traits13$X3109), is.na(traits13$X614))
-# 1587928 missing of 1776658 (89.4% missing)
+# 1763366 missing of 1776658 (89.6% missing)
 
 sum(is.na(traits23$seed_dry_mass), is.na(traits23$X3117), is.na(traits23$LDMC), is.na(traits23$leaf_area), is.na(traits23$leaf_N), is.na(traits23$SLA), is.na(traits23$leaf_dry_mass), is.na(traits23$plant_height_vegetative), is.na(traits23$SRL), is.na(traits23$X3114), is.na(traits23$X3115), is.na(traits23$X3109), is.na(traits23$X614))
-# 1586355 missing of 1775085 (89.4% missing)
+# 1763289 missing of 1775085 (89.6% missing)
 
 
 ##### training with sets 1 and 2; validation of set 3 #####
@@ -114,7 +114,7 @@ fold <- c(rep(10:20, 8), 10, 11)
 #set number of iterations:
 repe <- 90 #should be 90
 
-for(i in 1:repe) { #loop for each trait (column)
+for(i in 27:repe) { #loop for each trait (column)
   set.seed(123)
   GapFilling(as.matrix(trait.info), hierarchy.info,
              num.samples = smpl[i], num.folds.tuning=fold[i], burn=187,
@@ -491,8 +491,8 @@ trait.info.mice <- complete(mice(trait.info.noreplacement, method="cart"))
 
 write.csv(trait.info.mice, "CleanedData\\Traits\\gap filled continuous traits\\20240510_trainingValidation\\imputed_traits_mice_23.csv", row.names=F)
 
-#clean-up:
-rm(list = ls())
+# clean-up:
+# rm(list = ls())
 
 
 
@@ -589,18 +589,12 @@ with(subset(trial, trait=='leaf_area'), hist(log10(original_value)))
 with(subset(trial, trait=='leaf_area'), hist(log10(imputed_value)))
 
 with(subset(trial, trait=='leaf_area' & validate==1), cor.test(original_value, imputed_value,method = "pearson", use = "complete.obs")) 
-# r 0.9612228    
 with(subset(trial, trait=='leaf_area' & validate==2), cor.test(original_value, imputed_value,method = "pearson", use = "complete.obs")) 
-# r 0.952561    
 with(subset(trial, trait=='leaf_area' & validate==3), cor.test(original_value, imputed_value,method = "pearson", use = "complete.obs")) 
-# r 0.9717914    
 
 summary(leaf_area <- lm(log10(imputed_value)~log10(original_value), data=subset(trial, trait=='leaf_area'&!is.na(original_value)&validate==1)))
-# log10(original_value) 0.938390   0.002095  447.92   <2e-16 ***
 summary(leaf_area <- lm(log10(imputed_value)~log10(original_value), data=subset(trial, trait=='leaf_area'&!is.na(original_value)&validate==2)))
-# log10(original_value) 0.939899   0.002192  428.84   <2e-16 ***
 summary(leaf_area <- lm(log10(imputed_value)~log10(original_value), data=subset(trial, trait=='leaf_area'&!is.na(original_value)&validate==3)))
-# log10(original_value) 0.943708   0.002046  461.25   <2e-16 ***
 
 
 #leaf dry mass
@@ -608,18 +602,12 @@ with(subset(trial, trait=='leaf_dry_mass'), hist(log10(original_value)))
 with(subset(trial, trait=='leaf_dry_mass'), hist(log10(imputed_value)))
 
 with(subset(trial, trait=='leaf_dry_mass' & validate==1), cor.test(original_value, imputed_value,method = "pearson", use = "complete.obs"))
-# r 0.9286539     
 with(subset(trial, trait=='leaf_dry_mass' & validate==2), cor.test(original_value, imputed_value,method = "pearson", use = "complete.obs"))
-# r 0.9183957     
 with(subset(trial, trait=='leaf_dry_mass' & validate==3), cor.test(original_value, imputed_value,method = "pearson", use = "complete.obs"))
-# r 0.9385037     
 
 summary(leaf_dry_mass <- lm(log10(imputed_value)~log10(original_value), data=subset(trial, trait=='leaf_dry_mass'&!is.na(original_value)&validate==1)))
-# log10(original_value) 0.952097   0.001587  600.10   <2e-16 ***
 summary(leaf_dry_mass <- lm(log10(imputed_value)~log10(original_value), data=subset(trial, trait=='leaf_dry_mass'&!is.na(original_value)&validate==2)))
-# log10(original_value) 0.953243   0.001529  623.46   <2e-16 ***
 summary(leaf_dry_mass <- lm(log10(imputed_value)~log10(original_value), data=subset(trial, trait=='leaf_dry_mass'&!is.na(original_value)&validate==3)))
-# log10(original_value) 0.952106   0.001538  618.94   <2e-16 ***
 
 
 #LDMC
@@ -627,18 +615,12 @@ with(subset(trial, trait=='LDMC'), hist(log10(original_value)))
 with(subset(trial, trait=='LDMC'), hist(log10(imputed_value)))
 
 with(subset(trial, trait=='LDMC' & validate==1), cor.test(original_value, imputed_value,method = "pearson", use = "complete.obs"))
-# r 0.9587842   
 with(subset(trial, trait=='LDMC' & validate==2), cor.test(original_value, imputed_value,method = "pearson", use = "complete.obs"))
-# r 0.9718856    
 with(subset(trial, trait=='LDMC' & validate==3), cor.test(original_value, imputed_value,method = "pearson", use = "complete.obs"))
-# r 0.9702715    
 
 summary(LDMC <- lm(log10(imputed_value)~log10(original_value), data=subset(trial, trait=='LDMC'&!is.na(original_value)&validate==1)))
-# og10(original_value)  0.9317824  0.0014584  638.89   <2e-16 ***
 summary(LDMC <- lm(log10(imputed_value)~log10(original_value), data=subset(trial, trait=='LDMC'&!is.na(original_value)&validate==2)))
-# log10(original_value)  0.9383542  0.0013525  693.77   <2e-16 ***
 summary(LDMC <- lm(log10(imputed_value)~log10(original_value), data=subset(trial, trait=='LDMC'&!is.na(original_value)&validate==3)))
-# log10(original_value)  0.9339309  0.0014242   655.8   <2e-16 ***
 
 
 #SLA
@@ -646,18 +628,12 @@ with(subset(trial, trait=='SLA'), hist(log10(original_value)))
 with(subset(trial, trait=='SLA'), hist(log10(imputed_value)))
 
 with(subset(trial, trait=='SLA' & validate==1), cor.test(original_value, imputed_value,method = "pearson", use = "complete.obs"))
-# r 0.9561315     
 with(subset(trial, trait=='SLA' & validate==2), cor.test(original_value, imputed_value,method = "pearson", use = "complete.obs"))
-# r 0.9530478      
 with(subset(trial, trait=='SLA' & validate==3), cor.test(original_value, imputed_value,method = "pearson", use = "complete.obs"))
-# r 0.9583306     
 
 summary(SLA <- lm(log10(imputed_value)~log10(original_value), data=subset(trial, trait=='SLA'&!is.na(original_value)&validate==1)))
-# log10(original_value) 0.909172   0.002199  413.43   <2e-16 ***
 summary(SLA <- lm(log10(imputed_value)~log10(original_value), data=subset(trial, trait=='SLA'&!is.na(original_value)&validate==2)))
-# log10(original_value) 0.911848   0.002265  402.50   <2e-16 ***
 summary(SLA <- lm(log10(imputed_value)~log10(original_value), data=subset(trial, trait=='SLA'&!is.na(original_value)&validate==3)))
-# log10(original_value) 0.916130   0.002117  432.81   <2e-16 ***
 
 
 #leaf N
@@ -665,18 +641,12 @@ with(subset(trial, trait=='leaf_N'), hist(log10(original_value)))
 with(subset(trial, trait=='leaf_N'), hist(log10(imputed_value)))
 
 with(subset(trial, trait=='leaf_N' & validate==1), cor.test(original_value, imputed_value,method = "pearson", use = "complete.obs"))
-# r 0.9703424        
 with(subset(trial, trait=='leaf_N' & validate==2), cor.test(original_value, imputed_value,method = "pearson", use = "complete.obs"))
-# r 0.9685136      
 with(subset(trial, trait=='leaf_N' & validate==3), cor.test(original_value, imputed_value,method = "pearson", use = "complete.obs"))
-# r 0.9364026       
 
 summary(leaf_N <- lm(log10(imputed_value)~log10(original_value), data=subset(trial, trait=='leaf_N'&!is.na(original_value)&validate==1)))
-# log10(original_value) 0.948261   0.001971  481.09   <2e-16 ***
 summary(leaf_N <- lm(log10(imputed_value)~log10(original_value), data=subset(trial, trait=='leaf_N'&!is.na(original_value)&validate==2)))
-# log10(original_value) 0.942481   0.002044  461.13   <2e-16 ***
 summary(leaf_N <- lm(log10(imputed_value)~log10(original_value), data=subset(trial, trait=='leaf_N'&!is.na(original_value)&validate==3)))
-# log10(original_value) 0.948495   0.002035  466.06   <2e-16 ***
 
 
 #plant vegetative height
@@ -684,18 +654,12 @@ with(subset(trial, trait=='plant_height_vegetative'), hist(log10(original_value)
 with(subset(trial, trait=='plant_height_vegetative'), hist(log10(imputed_value)))
 
 with(subset(trial, trait=='plant_height_vegetative' & validate==1), cor.test(original_value, imputed_value,method = "pearson", use = "complete.obs"))
-# r 0.9830581   
 with(subset(trial, trait=='plant_height_vegetative' & validate==2), cor.test(original_value, imputed_value,method = "pearson", use = "complete.obs"))
-# r 0.9806463       
 with(subset(trial, trait=='plant_height_vegetative' & validate==3), cor.test(original_value, imputed_value,method = "pearson", use = "complete.obs"))
-# r 0.9576646       
 
 summary(plant_height_vegetative <- lm(log10(imputed_value)~log10(original_value), data=subset(trial, trait=='plant_height_vegetative'&!is.na(original_value)&validate==1)))
-# log10(original_value)  0.9410341  0.0012587  747.65   <2e-16 ***
 summary(plant_height_vegetative <- lm(log10(imputed_value)~log10(original_value), data=subset(trial, trait=='plant_height_vegetative'&!is.na(original_value)&validate==2)))
-# log10(original_value)  0.9379691  0.0012598  744.52   <2e-16 ***
 summary(plant_height_vegetative <- lm(log10(imputed_value)~log10(original_value), data=subset(trial, trait=='plant_height_vegetative'&!is.na(original_value)&validate==3)))
-# log10(original_value)  0.9394736  0.0012648  742.77   <2e-16 ***
 
 
 #SRL
@@ -703,18 +667,12 @@ with(subset(trial, trait=='SRL'), hist(log10(original_value)))
 with(subset(trial, trait=='SRL'), hist(log10(imputed_value)))
 
 with(subset(trial, trait=='SRL' & validate==1), cor.test(original_value, imputed_value,method = "pearson", use = "complete.obs"))
-# r 0.9034755     
 with(subset(trial, trait=='SRL' & validate==2), cor.test(original_value, imputed_value,method = "pearson", use = "complete.obs"))
-# r 0.9056699          
 with(subset(trial, trait=='SRL' & validate==3), cor.test(original_value, imputed_value,method = "pearson", use = "complete.obs"))
-# r 0.9427789          
 
 summary(SRL <- lm(log10(imputed_value)~log10(original_value), data=subset(trial, trait=='SRL'&!is.na(original_value)&validate==1)))
-# log10(original_value) 0.90758    0.00753  120.53   <2e-16 ***
 summary(SRL <- lm(log10(imputed_value)~log10(original_value), data=subset(trial, trait=='SRL'&!is.na(original_value)&validate==2)))
-# log10(original_value) 0.900836   0.007105  126.78   <2e-16 ***
 summary(SRL <- lm(log10(imputed_value)~log10(original_value), data=subset(trial, trait=='SRL'&!is.na(original_value)&validate==3)))
-# log10(original_value) 0.904751   0.007015  128.97   <2e-16 ***
 
 
 #seed dry mass
@@ -722,16 +680,10 @@ with(subset(trial, trait=='seed_dry_mass'), hist(log10(original_value)))
 with(subset(trial, trait=='seed_dry_mass'), hist(log10(imputed_value)))
 
 with(subset(trial, trait=='seed_dry_mass' & validate==1), cor.test(original_value, imputed_value,method = "pearson", use = "complete.obs"))
-# r 0.994225     
 with(subset(trial, trait=='seed_dry_mass' & validate==2), cor.test(original_value, imputed_value,method = "pearson", use = "complete.obs"))
-# r 0.995912        
 with(subset(trial, trait=='seed_dry_mass' & validate==3), cor.test(original_value, imputed_value,method = "pearson", use = "complete.obs"))
-# r 0.9978231        
 
 summary(seed_dry_mass <- lm(log10(imputed_value)~log10(original_value), data=subset(trial, trait=='seed_dry_mass'&!is.na(original_value)&validate==1)))
-# log10(original_value)  0.9856396  0.0005943 1658.603  < 2e-16 ***
 summary(seed_dry_mass <- lm(log10(imputed_value)~log10(original_value), data=subset(trial, trait=='seed_dry_mass'&!is.na(original_value)&validate==2)))
-# log10(original_value)  0.9870789  0.0004944 1996.642  < 2e-16 ***
 summary(seed_dry_mass <- lm(log10(imputed_value)~log10(original_value), data=subset(trial, trait=='seed_dry_mass'&!is.na(original_value)&validate==3)))
-# log10(original_value)  0.9866485  0.0004932 2000.554  < 2e-16 ***
 
