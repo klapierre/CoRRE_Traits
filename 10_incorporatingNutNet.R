@@ -61,5 +61,11 @@ nutnetTraitsCategorical <- read_xlsx('C:\\Users\\kjkomatsu\\OneDrive - UNCG\\man
 continuousTraits <- rbind(correGExTraitsContinuous, nutnetTraitsContinuous)
 # write.csv(continuousTraits, 'C:\\Users\\kjkomatsu\\OneDrive - UNCG\\manuscripts\\1_first author\\2024_corre traits_Nature Scientific Data\\with BIEN and TIPleaf\\trait data for EDI\\v3\\CoRRE_continuousTraitData_Apr2026.csv', row.names=F)
 
+length(unique(continuousTraits$species))
+length(unique(continuousTraits$family))
+
 categoricalTraits <- rbind(correGExTraitsCategorical, nutnetTraitsCategorical)
 # write.csv(categoricalTraits, 'C:\\Users\\kjkomatsu\\OneDrive - UNCG\\manuscripts\\1_first author\\2024_corre traits_Nature Scientific Data\\with BIEN and TIPleaf\\trait data for EDI\\v3\\CoRRE_categoricalTraitData_Apr2026.csv', row.names=F)
+
+length(unique(categoricalTraits$species))
+length(unique(categoricalTraits$family))
