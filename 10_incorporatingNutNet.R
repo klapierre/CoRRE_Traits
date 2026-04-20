@@ -64,8 +64,21 @@ continuousTraits <- rbind(correGExTraitsContinuous, nutnetTraitsContinuous)
 length(unique(continuousTraits$species))
 length(unique(continuousTraits$family))
 
-categoricalTraits <- rbind(correGExTraitsCategorical, nutnetTraitsCategorical)
+categoricalTraits <- rbind(correGExTraitsCategorical, nutnetTraitsCategorical) %>% 
+  filter(!is.na(family)) %>% 
+  mutate(trait_value=ifelse(trait_value=='awl', 'scale', trait_value))
 # write.csv(categoricalTraits, 'C:\\Users\\kjkomatsu\\OneDrive - UNCG\\manuscripts\\1_first author\\2024_corre traits_Nature Scientific Data\\with BIEN and TIPleaf\\trait data for EDI\\v3\\CoRRE_categoricalTraitData_Apr2026.csv', row.names=F)
 
 length(unique(categoricalTraits$species))
 length(unique(categoricalTraits$family))
+
+
+
+
+##### source data for imputation #####
+nutnetSource <- read.csv('C:\\Users\\kjkomatsu\\OneDrive - UNCG\\manuscripts\\1_first author\\codominance\\data\\nutnet\\nutnet_trait database_combo_continuous_20250701_long.csv') %>% 
+  rename(species=species_matched,
+         trait=CleanTraitName,
+         trait_value=StdValue)
+
+correGExSource <- read.csv('https://pasta.lternet.edu/package/data/eml/edi/1533/3/f21fe032152862d12f85d7d4b0eda94a') 
