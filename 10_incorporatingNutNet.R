@@ -77,8 +77,14 @@ length(unique(categoricalTraits$family))
 
 ##### source data for imputation #####
 nutnetSource <- read.csv('C:\\Users\\kjkomatsu\\OneDrive - UNCG\\manuscripts\\1_first author\\codominance\\data\\nutnet\\nutnet_trait database_combo_continuous_20250701_long.csv') %>% 
-  rename(species=species_matched,
+  rename(family=Family,
+         species=species_matched,
          trait=CleanTraitName,
-         trait_value=StdValue)
+         trait_value=StdValue) %>% 
+  mutate(ReferenceID=paste(DatabaseID, DatasetID, sep='_'))
 
 correGExSource <- read.csv('https://pasta.lternet.edu/package/data/eml/edi/1533/3/f21fe032152862d12f85d7d4b0eda94a') 
+
+source <- rbind(nutnetSource, correGExSource)
+# write.csv(categoricalTraits, 'C:\\Users\\kjkomatsu\\OneDrive - UNCG\\manuscripts\\1_first author\\2024_corre traits_Nature Scientific Data\\with BIEN and TIPleaf\\trait data for EDI\\v3\\TRYAusBIEN_continuous_Apr2026_long.csv', row.names=F)
+
