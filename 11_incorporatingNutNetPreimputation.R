@@ -404,7 +404,7 @@ repeats <- TRYtraits %>%
 
 library(BIEN)
 
-sp.vector <- unique(splist$species_matched)
+sp.vector <- unique(speciesList$species_matched)
 
 bienData <- BIEN_trait_species(species=sp.vector) %>% 
   rename(species_matched=scrubbed_species_binomial) %>%  
